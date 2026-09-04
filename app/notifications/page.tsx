@@ -5,6 +5,7 @@ import { markAllNotificationsRead } from "@/app/notification-actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { getNotificationSummaries } from "@/lib/notification-queries";
 import { createClient } from "@/lib/supabase/server";
@@ -35,7 +36,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
-          {unreadCount > 0 && <form action={markAllNotificationsRead}><button className="mark-all-button" type="submit"><CheckCheck size={16} />모두 읽음</button></form>}
+          {unreadCount > 0 && <form action={markAllNotificationsRead}><PendingSubmitButton className="mark-all-button" pendingText="처리 중…"><CheckCheck size={16} />모두 읽음</PendingSubmitButton></form>}
         </header>
         <div className="content-wrap detail-content notifications-content">
           <section className="notifications-hero">
@@ -59,7 +60,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
           </section>
         </div>
       </main>
-      <MobileNav active="notifications" unreadNotificationCount={unreadCount} />
+      <MobileNav />
       <NotificationRealtime userId={userData.user.id} />
     </div>
   );

@@ -3,6 +3,7 @@ import { CalendarDays, Check, Heart, RotateCcw } from "lucide-react";
 import { togglePrayerCompleted, toggleTodayPrayer } from "@/app/prayer-actions";
 import { formatKoreaDate } from "@/lib/dates";
 import type { PrayerSummary } from "@/lib/domain";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 
 type PrayerRecordCardProps = {
   prayer: PrayerSummary;
@@ -37,11 +38,11 @@ export function PrayerRecordCard({ prayer, currentUserId, returnTo, showGroup = 
           <form action={toggleTodayPrayer}>
             <input type="hidden" name="prayerId" value={prayer.id} />
             <input type="hidden" name="returnTo" value={returnTo} />
-            <button className={`daily-prayer-button ${prayer.hasPrayed ? "done" : ""}`} type="submit" title={prayer.hasPrayed ? "다시 누르면 오늘 기록이 취소됩니다." : "한국시간 기준 오늘의 기도 기록을 남깁니다."}>
+            <PendingSubmitButton className={`daily-prayer-button ${prayer.hasPrayed ? "done" : ""}`} pendingText="기록 중…" title={prayer.hasPrayed ? "다시 누르면 오늘 기록이 취소됩니다." : "한국시간 기준 오늘의 기도 기록을 남깁니다."}>
               {prayer.hasPrayed ? <Check size={16} /> : <Heart size={16} />}
               {prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"}
               <span>누적 {prayer.responseCount}회</span>
-            </button>
+            </PendingSubmitButton>
           </form>
         )}
         {mine && (
@@ -49,10 +50,10 @@ export function PrayerRecordCard({ prayer, currentUserId, returnTo, showGroup = 
             <input type="hidden" name="prayerId" value={prayer.id} />
             <input type="hidden" name="returnTo" value={returnTo} />
             <input type="hidden" name="status" value={completed ? "active" : "completed"} />
-            <button className="resolve-button" type="submit">
+            <PendingSubmitButton className="resolve-button" pendingText="변경 중…">
               {completed ? <RotateCcw size={15} /> : <Check size={15} />}
               {completed ? "진행 중으로 되돌리기" : "해결 완료"}
-            </button>
+            </PendingSubmitButton>
           </form>
         )}
       </div>

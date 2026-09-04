@@ -17,6 +17,7 @@ import { signOut, updateNotificationPreferences, updatePassword, updateProfile }
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
 import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
 
@@ -81,7 +82,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <label htmlFor="account-email">로그인 이메일</label>
               <input id="account-email" value={userData.user.email ?? ""} readOnly aria-readonly="true" />
               <p>로그인 이메일은 현재 변경할 수 없습니다.</p>
-              <button className="primary-button" type="submit"><Check size={16} />프로필 저장</button>
+              <PendingSubmitButton className="primary-button" pendingText="저장 중…"><Check size={16} />프로필 저장</PendingSubmitButton>
             </form>
           </section>
 
@@ -93,7 +94,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <label htmlFor="new-password-confirm">비밀번호 확인</label>
               <input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required />
               <p>저장 후에는 메일 링크 없이 이메일과 비밀번호로 로그인할 수 있습니다.</p>
-              <button className="primary-button" type="submit"><Check size={16} />비밀번호 저장</button>
+              <PendingSubmitButton className="primary-button" pendingText="저장 중…"><Check size={16} />비밀번호 저장</PendingSubmitButton>
             </form>
           </section>
 
@@ -125,7 +126,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   <span className="switch" aria-hidden="true" />
                 </label>
               </div>
-              <div className="settings-save-row"><span>기존 알림은 유지되고 새로 발생하는 알림부터 적용됩니다.</span><button className="primary-button" type="submit">알림 설정 저장</button></div>
+              <div className="settings-save-row"><span>기존 알림은 유지되고 새로 발생하는 알림부터 적용됩니다.</span><PendingSubmitButton className="primary-button" pendingText="저장 중…">알림 설정 저장</PendingSubmitButton></div>
             </form>
           </section>
 
@@ -142,11 +143,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel account-panel">
             <div><strong>로그아웃</strong><span>이 기기에서 PrayNote 사용을 종료합니다.</span></div>
-            <form action={signOut}><button className="logout-button" type="submit"><LogOut size={16} />로그아웃</button></form>
+            <form action={signOut}><PendingSubmitButton className="logout-button" pendingText="로그아웃 중…"><LogOut size={16} />로그아웃</PendingSubmitButton></form>
           </section>
         </div>
       </main>
-      <MobileNav active="settings" unreadNotificationCount={unreadCount ?? 0} />
+      <MobileNav active="settings" />
     </div>
   );
 }

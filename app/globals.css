@@ -269,7 +269,7 @@ button { color: inherit; }
   .mobile-nav { position: fixed; inset: auto 0 0; z-index: 30; height: 68px; padding: 5px 17px max(5px, env(safe-area-inset-bottom)); background: rgba(255,255,255,.95); backdrop-filter: blur(16px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; }
   .mobile-nav a { height: 51px; color: #8a94a6; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 9px; font-weight: 650; }
   .mobile-nav a.active { color: var(--blue); }
-  .mobile-nav button { width: 47px; height: 47px; justify-self: center; border: 0; border-radius: 15px; color: #fff; background: var(--blue); display: grid; place-items: center; transform: translateY(-12px); box-shadow: 0 9px 22px rgba(79, 99, 194, .3); }
+.mobile-nav .mobile-create-prayer { width: 47px; height: 47px; padding: 0; justify-self: center; border: 0; border-radius: 15px; color: #fff; background: var(--blue); display: grid; place-items: center; transform: translateY(-12px); box-shadow: 0 9px 22px rgba(79, 99, 194, .3); }
   .toast { bottom: 84px; width: max-content; max-width: calc(100% - 32px); }
 }
 
@@ -606,6 +606,14 @@ button { color: inherit; }
 .settings-form .primary-button { width: fit-content; margin: 5px 0 0 auto; }
 .danger-panel { border-color: #f0dfe2; background: #fffafb; }
 .danger-button { min-height: 39px; padding: 0 13px; border: 1px solid #e8bfc7; border-radius: 9px; color: #a54c5d; background: #fff; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 750; }
+
+button, a.primary-button, a.outline-button, a.mobile-create-prayer { transition: filter .12s ease, transform .12s ease, opacity .12s ease, background-color .12s ease; }
+button:active:not(:disabled), a.primary-button:active, a.outline-button:active, a.mobile-create-prayer:active { filter: saturate(.72) brightness(.86); transform: scale(.97); }
+.mobile-nav .mobile-create-prayer:active { transform: translateY(-12px) scale(.96); }
+button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: saturate(.55); opacity: .68; }
+.button-pending { box-shadow: none !important; }
+.button-spinner { animation: button-spin .75s linear infinite; }
+@keyframes button-spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 760px) {
   .subpage-topbar { padding: 0 17px; }

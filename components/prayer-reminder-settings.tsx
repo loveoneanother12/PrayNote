@@ -1,6 +1,6 @@
 "use client";
 
-import { BellPlus, Clock3, Plus, Trash2 } from "lucide-react";
+import { BellPlus, Clock3, LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -26,7 +26,7 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
   const [times, setTimes] = useState(initialTimes);
   const [adding, setAdding] = useState(false);
   const [newTime, setNewTime] = useState("07:00");
-  const [working, setWorking] = useState(false);
+  const [workingAction, setWorkingAction] = useState<"add" | string | null>(null);
   const [message, setMessage] = useState("");
   const [isPushEnabled, setIsPushEnabled] = useState(pushEnabled);
 
@@ -41,7 +41,8 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
 
   async function addReminder() {
     if (times.length >= 5 || !/^\d{2}:\d{2}$/.test(newTime)) return;
-    setWorking(true);
+    if (workingAction) return;
+    setWorkingAction("add");
     setMessage("");
     const supabase = createClient();
     const { data, error } = await supabase
@@ -58,11 +59,12 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
       setAdding(false);
       setMessage("매일 한국시간 기준으로 알림을 보내드릴게요.");
     }
-    setWorking(false);
+    setWorkingAction(null);
   }
 
   async function removeReminder(id: string) {
-    setWorking(true);
+    if (workingAction) return;
+    setWorkingAction(id);
     setMessage("");
     const supabase = createClient();
     const { error } = await supabase.from("prayer_reminder_times").delete().eq("id", id);
@@ -72,7 +74,7 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
       setTimes((current) => current.filter((item) => item.id !== id));
       setMessage("예약 시간을 삭제했어요.");
     }
-    setWorking(false);
+    setWorkingAction(null);
   }
 
   return (
@@ -80,7 +82,7 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
       <div className="reminder-heading">
         <span className="setting-category-icon reminder"><BellPlus size={17} /></span>
         <div><strong>매일 기도 시간 알림</strong><small>등록한 시각에 “기도할 시간입니다.” 알림을 보내요.</small></div>
-        <button className="reminder-add-button" type="button" onClick={() => setAdding(true)} disabled={times.length >= 5 || adding || working} aria-label="기도 시간 추가">
+        <button className="reminder-add-button" type="button" onClick={() => setAdding(true)} disabled={times.length >= 5 || adding || workingAction !== null} aria-label="기도 시간 추가">
           <Plus size={15} />시간 추가
         </button>
       </div>
@@ -92,14 +94,14 @@ export function PrayerReminderSettings({ userId, initialTimes, pushEnabled }: Pr
         {times.map((item) => (
           <div className="reminder-time-row" key={item.id}>
             <span><Clock3 size={15} />{displayTime(item.timeLocal)}</span>
-            <button type="button" onClick={() => removeReminder(item.id)} disabled={working} aria-label={`${displayTime(item.timeLocal)} 알림 삭제`}><Trash2 size={14} /></button>
+            <button className={workingAction === item.id ? "button-pending" : ""} type="button" onClick={() => removeReminder(item.id)} disabled={workingAction !== null} aria-label={`${displayTime(item.timeLocal)} 알림 삭제`}>{workingAction === item.id ? <LoaderCircle className="button-spinner" size={14} /> : <Trash2 size={14} />}</button>
           </div>
         ))}
         {adding && (
           <div className="reminder-time-form">
             <input type="time" value={newTime} onChange={(event) => setNewTime(event.target.value)} aria-label="새 기도 시간" required />
-            <button type="button" onClick={addReminder} disabled={working}>추가</button>
-            <button className="cancel" type="button" onClick={() => setAdding(false)} disabled={working}>취소</button>
+            <button className={workingAction === "add" ? "button-pending" : ""} type="button" onClick={addReminder} disabled={workingAction !== null}>{workingAction === "add" ? "추가 중…" : "추가"}</button>
+            <button className="cancel" type="button" onClick={() => setAdding(false)} disabled={workingAction !== null}>취소</button>
           </div>
         )}
       </div>

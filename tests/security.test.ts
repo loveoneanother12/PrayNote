@@ -7,6 +7,7 @@ const initialSchema = readFileSync(join(root, "supabase/migrations/202609040001_
 const pushSchema = readFileSync(join(root, "supabase/migrations/202609040006_browser_push.sql"), "utf8");
 const reminderSchema = readFileSync(join(root, "supabase/migrations/202609040007_prayer_reminders.sql"), "utf8");
 const sharedPrayerSchema = readFileSync(join(root, "supabase/migrations/202609040008_personal_and_shared_prayers.sql"), "utf8");
+const hardenedPushSchema = readFileSync(join(root, "supabase/migrations/202609050001_harden_push_delivery.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -75,5 +76,11 @@ describe("security guardrails", () => {
     expect(sharedPrayerSchema).toContain("revoke all on function public.create_prayer_with_groups(text, uuid[], boolean) from public, anon;");
     expect(sharedPrayerSchema).toContain("grant execute on function public.create_prayer_with_groups(text, uuid[], boolean) to authenticated;");
     expect(sharedPrayerSchema).toContain("grant execute on function public.share_prayer_with_groups(uuid, uuid[]) to authenticated;");
+  });
+
+  it("fails visibly when push authentication is missing and tolerates short scheduler delays", () => {
+    expect(hardenedPushSchema).toContain("raise exception 'push_webhook_secret_missing'");
+    expect(hardenedPushSchema).toContain("interval '4 minutes'");
+    expect(hardenedPushSchema).toContain("timeout_milliseconds := 10000");
   });
 });

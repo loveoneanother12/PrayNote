@@ -5,6 +5,7 @@ import { createPrayer } from "@/app/prayer-actions";
 import { CopyInviteButton } from "@/components/copy-invite-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordCard } from "@/components/prayer-record-card";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SharePrayerModal } from "@/components/share-prayer-modal";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
@@ -82,7 +83,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
               <input type="hidden" name="returnTo" value={returnTo} />
               <label className="sr-only" htmlFor="group-prayer-content">기도제목</label>
               <textarea id="group-prayer-content" name="content" maxLength={2000} required placeholder="함께 기도받고 싶은 내용을 적어주세요." />
-              <div><span>등록 날짜는 한국시간 기준으로 자동 저장돼요.</span><button className="primary-button" type="submit"><Plus size={17} />기도제목 등록</button></div>
+              <div><span>등록 날짜는 한국시간 기준으로 자동 저장돼요.</span><PendingSubmitButton className="primary-button" pendingText="등록 중…"><Plus size={17} />기도제목 등록</PendingSubmitButton></div>
             </form>
           </section>
 

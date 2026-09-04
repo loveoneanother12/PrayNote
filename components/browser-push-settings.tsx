@@ -4,7 +4,8 @@ import { BellRing, Check, Download, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type PushState = "checking" | "unsupported" | "needs-install" | "off" | "on" | "denied" | "working";
+type PushState = "checking" | "unsupported" | "needs-install" | "off" | "on" | "denied";
+type PushAction = "enable" | "disable" | "test" | null;
 
 type BrowserPushSettingsProps = {
   initialEnabled: boolean;
@@ -30,6 +31,7 @@ function isStandalone() {
 export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserPushSettingsProps) {
   const [state, setState] = useState<PushState>("checking");
   const [message, setMessage] = useState("");
+  const [workingAction, setWorkingAction] = useState<PushAction>(null);
 
   useEffect(() => {
     async function inspect() {
@@ -46,6 +48,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
         return;
       }
       const registration = await navigator.serviceWorker.register("/sw.js");
+      await registration.update();
       const subscription = await registration.pushManager.getSubscription();
       setState(subscription && initialEnabled ? "on" : "off");
     }
@@ -54,7 +57,8 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
   }, [initialEnabled, vapidPublicKey]);
 
   async function enablePush() {
-    setState("working");
+    if (workingAction) return;
+    setWorkingAction("enable");
     setMessage("");
     try {
       const permission = await Notification.requestPermission();
@@ -64,6 +68,8 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       }
 
       const registration = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
+      await registration.update();
       const existing = await registration.pushManager.getSubscription();
       const subscription = existing ?? await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -97,11 +103,14 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       console.error("Failed to enable browser push", error);
       setState("off");
       setMessage("브라우저 푸시를 켜지 못했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setWorkingAction(null);
     }
   }
 
   async function disablePush() {
-    setState("working");
+    if (workingAction) return;
+    setWorkingAction("disable");
     setMessage("");
     try {
       const registration = await navigator.serviceWorker.getRegistration();
@@ -125,20 +134,23 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       console.error("Failed to disable browser push", error);
       setState("on");
       setMessage("브라우저 푸시 설정을 변경하지 못했어요.");
+    } finally {
+      setWorkingAction(null);
     }
   }
 
   async function sendTest() {
-    setState("working");
+    if (workingAction) return;
+    setWorkingAction("test");
     setMessage("");
     try {
       const response = await fetch("/api/push/test", { method: "POST" });
       if (!response.ok) throw new Error("test_push_failed");
-      setState("on");
       setMessage("테스트 알림을 보냈어요. 잠시 후 기기에서 확인해주세요.");
     } catch {
-      setState("on");
       setMessage("테스트 알림을 보내지 못했어요.");
+    } finally {
+      setWorkingAction(null);
     }
   }
 
@@ -163,13 +175,12 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
         {message && <em role="status">{message}</em>}
       </div>
       <div className="browser-push-actions">
-        {state === "on" && <button type="button" onClick={sendTest}>테스트</button>}
+        {state === "on" && <button className={workingAction === "test" ? "button-pending" : ""} type="button" onClick={sendTest} disabled={workingAction !== null}>{workingAction === "test" ? "발송 중…" : "테스트"}</button>}
         {(state === "on" || state === "off") && (
-          <button className={state === "on" ? "secondary" : "primary"} type="button" onClick={state === "on" ? disablePush : enablePush}>
-            {state === "on" ? "끄기" : "켜기"}{state === "on" && <Check size={13} />}
+          <button className={`${state === "on" ? "secondary" : "primary"} ${workingAction === "enable" || workingAction === "disable" ? "button-pending" : ""}`} type="button" onClick={state === "on" ? disablePush : enablePush} disabled={workingAction !== null}>
+            {workingAction === "enable" ? "켜는 중…" : workingAction === "disable" ? "끄는 중…" : state === "on" ? "끄기" : "켜기"}{state === "on" && !workingAction && <Check size={13} />}
           </button>
         )}
-        {state === "working" && <span>처리 중…</span>}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { deletePrayer, togglePrayerCompleted, toggleTodayPrayer, updatePrayer } from "@/app/prayer-actions";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { MobileNav } from "@/components/mobile-nav";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaDate } from "@/lib/dates";
 import { getPrayerSummaries } from "@/lib/prayer-queries";
@@ -45,8 +46,8 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
             <div className="detail-dates"><span><CalendarDays size={14} />{formatKoreaDate(prayer.createdAt)} 등록</span>{completed && prayer.completedAt && <span className="resolved"><Check size={14} />{formatKoreaDate(prayer.completedAt)} 해결</span>}</div>
             <p className="prayer-full-content">{prayer.content}</p>
             <div className="detail-actions">
-              {!completed && <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><button className={`daily-prayer-button detail-pray ${prayer.hasPrayed ? "done" : ""}`} type="submit">{prayer.hasPrayed ? <Check size={17} /> : <Heart size={17} />}{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"}<span>누적 {prayer.responseCount}회</span></button></form>}
-              {mine && <form action={togglePrayerCompleted}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><input type="hidden" name="status" value={completed ? "active" : "completed"} /><button className="resolve-button detail-resolve" type="submit">{completed ? "진행 중으로 되돌리기" : "해결 완료"}</button></form>}
+              {!completed && <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><PendingSubmitButton className={`daily-prayer-button detail-pray ${prayer.hasPrayed ? "done" : ""}`} pendingText="기록 중…">{prayer.hasPrayed ? <Check size={17} /> : <Heart size={17} />}{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"}<span>누적 {prayer.responseCount}회</span></PendingSubmitButton></form>}
+              {mine && <form action={togglePrayerCompleted}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><input type="hidden" name="status" value={completed ? "active" : "completed"} /><PendingSubmitButton className="resolve-button detail-resolve" pendingText="변경 중…">{completed ? "진행 중으로 되돌리기" : "해결 완료"}</PendingSubmitButton></form>}
             </div>
             {prayer.hasPrayed && !completed && <p className="detail-help">오늘 기도완료 버튼을 다시 누르면 오늘 기록만 취소됩니다. 이전 날짜의 기록은 유지됩니다.</p>}
           </article>
@@ -57,7 +58,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
           {mine && (
             <section className="prayer-edit-panel">
               <div><h2>기도제목 수정</h2><span>등록일과 기존 기도 기록은 그대로 유지됩니다.</span></div>
-              <form action={updatePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><textarea name="content" defaultValue={prayer.content} minLength={1} maxLength={2000} required /><button className="primary-button" type="submit"><Save size={16} />수정 저장</button></form>
+              <form action={updatePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><textarea name="content" defaultValue={prayer.content} minLength={1} maxLength={2000} required /><PendingSubmitButton className="primary-button" pendingText="저장 중…"><Save size={16} />수정 저장</PendingSubmitButton></form>
               <div className="prayer-delete-row"><div><strong>기도제목 삭제</strong><span>삭제하면 공유된 그룹과 내 기도 목록에서 보이지 않게 됩니다.</span></div><form action={deletePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={prayer.groupId ? `/groups/${prayer.groupId}` : "/prayers"} /><ConfirmSubmitButton className="danger-button" message="이 기도제목을 삭제할까요?"><Trash2 size={15} />삭제</ConfirmSubmitButton></form></div>
             </section>
           )}

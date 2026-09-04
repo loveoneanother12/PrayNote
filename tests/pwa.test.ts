@@ -20,4 +20,23 @@ describe("installable PrayNote PWA", () => {
     expect(worker).toContain('self.addEventListener("notificationclick"');
     expect(worker).not.toMatch(/prayer_(content|body)|기도제목 원문/i);
   });
+
+  it("keeps the same five-item mobile navigation on every signed-in page", () => {
+    const mobileNav = readFileSync(join(process.cwd(), "components/mobile-nav.tsx"), "utf8");
+    expect(mobileNav).toContain("홈");
+    expect(mobileNav).toContain("그룹");
+    expect(mobileNav).toContain("내 기도");
+    expect(mobileNav).toContain("설정");
+    expect(mobileNav).not.toContain("<span>알림</span>");
+    expect(mobileNav.indexOf("홈")).toBeLessThan(mobileNav.indexOf("그룹"));
+    expect(mobileNav.indexOf("그룹")).toBeLessThan(mobileNav.indexOf("내 기도"));
+    expect(mobileNav.indexOf("내 기도")).toBeLessThan(mobileNav.indexOf("설정"));
+  });
+
+  it("disables server-action buttons while their work is pending", () => {
+    const pendingButton = readFileSync(join(process.cwd(), "components/pending-submit-button.tsx"), "utf8");
+    expect(pendingButton).toContain("useFormStatus");
+    expect(pendingButton).toContain("disabled={disabled || pending}");
+    expect(pendingButton).toContain('aria-busy={pending}');
+  });
 });

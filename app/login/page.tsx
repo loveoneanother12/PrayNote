@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookHeart, Check, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { requestMagicLink, signInWithPassword, signUpWithPassword } from "./actions";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 
 type LoginPageProps = {
   searchParams: Promise<{ error?: string; sent?: string; next?: string; mode?: string; notice?: string }>;
@@ -87,14 +88,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   <div className="auth-input"><LockKeyhole size={18} /><input id="password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /></div>
                   <label htmlFor="password-confirm">비밀번호 확인</label>
                   <div className="auth-input"><LockKeyhole size={18} /><input id="password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /></div>
-                  <button className="primary-button auth-submit" type="submit">회원가입하고 시작하기</button>
+                  <PendingSubmitButton className="primary-button auth-submit" pendingText="가입 중…">회원가입하고 시작하기</PendingSubmitButton>
                 </form>
               ) : mode === "magic" ? (
                 <form action={requestMagicLink} className="auth-form">
                   <input type="hidden" name="next" value={next} />
                   <label htmlFor="email">기존 로그인 이메일</label>
                   <div className="auth-input"><Mail size={18} /><input id="email" name="email" type="email" autoComplete="email" placeholder="name@example.com" required /></div>
-                  <button className="primary-button auth-submit" type="submit">전환용 로그인 메일 받기</button>
+                  <PendingSubmitButton className="primary-button auth-submit" pendingText="메일 보내는 중…">전환용 로그인 메일 받기</PendingSubmitButton>
                   <Link className="auth-inline-link" href={modeHref("login", params.next)}>비밀번호 로그인으로 돌아가기</Link>
                 </form>
               ) : (
@@ -104,7 +105,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   <div className="auth-input"><Mail size={18} /><input id="email" name="email" type="email" autoComplete="email" placeholder="name@example.com" required /></div>
                   <label htmlFor="password">비밀번호</label>
                   <div className="auth-input"><LockKeyhole size={18} /><input id="password" name="password" type="password" autoComplete="current-password" minLength={8} maxLength={72} placeholder="비밀번호" required /></div>
-                  <button className="primary-button auth-submit" type="submit">로그인</button>
+                  <PendingSubmitButton className="primary-button auth-submit" pendingText="로그인 중…">로그인</PendingSubmitButton>
                   <Link className="auth-inline-link" href={`/login?mode=magic&next=${encodeURIComponent(next)}`}>기존 메일 링크 계정 전환</Link>
                 </form>
               )}

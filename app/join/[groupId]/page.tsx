@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BookHeart, KeyRound, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { requestMembership } from "@/app/group-actions";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createClient } from "@/lib/supabase/server";
 
 type InvitePageProps = {
@@ -39,7 +40,7 @@ export default async function InvitePage({ params, searchParams }: InvitePagePro
             <label htmlFor="invite-code"><KeyRound size={15} />초대코드 확인</label>
             <input id="invite-code" name="inviteCode" placeholder="PRAY-XXXXXXXX" autoCapitalize="characters" maxLength={13} required />
             {query.error && <span className="form-error">{query.error === "invalid-code" ? "초대코드가 일치하지 않아요." : "가입 신청을 보내지 못했어요."}</span>}
-            <button className="primary-button" type="submit">이 그룹에 가입 신청</button>
+            <PendingSubmitButton className="primary-button" pendingText="신청 중…">이 그룹에 가입 신청</PendingSubmitButton>
           </form>
         )}
       </section>

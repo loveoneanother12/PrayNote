@@ -4,6 +4,7 @@ import { Check, Share2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { sharePrayerWithGroups } from "@/app/prayer-actions";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 
 type ShareGroup = { id: string; name: string };
 
@@ -56,7 +57,7 @@ export function SharePrayerModal({
           </div>
           <div className="composer-footer share-footer">
             <span>나중에도 기도제목 상세 화면에서 공유 그룹을 확인할 수 있어요.</span>
-            <div><button type="button" className="cancel-button" onClick={close}>지금은 안 할게요</button><button className="primary-button" type="submit" disabled={selected.length === 0}>선택한 그룹에 공유</button></div>
+            <div><button type="button" className="cancel-button" onClick={close}>지금은 안 할게요</button><PendingSubmitButton className="primary-button" pendingText="공유 중…" disabled={selected.length === 0}>선택한 그룹에 공유</PendingSubmitButton></div>
           </div>
         </form>
       </div>

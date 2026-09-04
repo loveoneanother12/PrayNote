@@ -7,7 +7,7 @@ import { getPrayerSummaries } from "@/lib/prayer-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type DashboardPageProps = {
-  searchParams: Promise<{ created?: string; left?: string; deleted?: string; error?: string }>;
+  searchParams: Promise<{ created?: string; left?: string; deleted?: string; error?: string; compose?: string }>;
 };
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -65,6 +65,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       unreadNotificationCount={unreadCount ?? 0}
       created={params.created ?? (params.left ? "left" : params.deleted ? "deleted" : undefined)}
       error={params.error}
+      initialComposerOpen={params.compose === "1"}
     />
   );
 }

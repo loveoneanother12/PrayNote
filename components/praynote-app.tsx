@@ -23,6 +23,8 @@ import { createGroup } from "@/app/dashboard/actions";
 import { createPrayer, toggleTodayPrayer } from "@/app/prayer-actions";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
+import { MobileNav } from "@/components/mobile-nav";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { formatKoreaDate } from "@/lib/dates";
 import type { GroupSummary, NotificationSummary, PrayerSummary } from "@/lib/domain";
 
@@ -37,14 +39,15 @@ type PrayNoteAppProps = {
   unreadNotificationCount: number;
   created?: string;
   error?: string;
+  initialComposerOpen?: boolean;
 };
 
 const roleLabels = { leader: "LEADER", admin: "ADMIN", member: "MEMBER" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function PrayNoteApp({ displayName, email, groups, prayers, notifications, userId, todayLabel, unreadNotificationCount, created, error }: PrayNoteAppProps) {
+export function PrayNoteApp({ displayName, email, groups, prayers, notifications, userId, todayLabel, unreadNotificationCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
   const [opened, setOpened] = useState(true);
-  const [composerOpen, setComposerOpen] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [personalPrayer, setPersonalPrayer] = useState(false);
@@ -122,7 +125,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
                           <div className="prayer-copy">
                             <div className="prayer-meta"><strong>나</strong><span>·</span><span>{formatKoreaDate(prayer.createdAt)} 등록</span></div>
                             <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{prayer.content}</Link>
-                            <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value="/dashboard" /><button className={`pray-button ${prayer.hasPrayed ? "selected" : ""}`} type="submit" aria-pressed={prayer.hasPrayed}><Heart size={16} fill={prayer.hasPrayed ? "currentColor" : "none"} />{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"} <span>{prayer.responseCount}회</span></button></form>
+                            <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value="/dashboard" /><PendingSubmitButton className={`pray-button ${prayer.hasPrayed ? "selected" : ""}`} pendingText="기록 중…" aria-pressed={prayer.hasPrayed}><Heart size={16} fill={prayer.hasPrayed ? "currentColor" : "none"} />{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"} <span>{prayer.responseCount}회</span></PendingSubmitButton></form>
                           </div>
                           <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label="개인 기도제목 자세히 보기"><ChevronRight size={19} /></Link>
                         </article>
@@ -144,7 +147,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
                             <div className="prayer-copy">
                               <div className="prayer-meta"><strong>{prayer.authorName}</strong><span>·</span><span>{formatKoreaDate(prayer.createdAt)} 등록</span></div>
                               <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{prayer.content}</Link>
-                              <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value="/dashboard" /><button className={`pray-button ${prayer.hasPrayed ? "selected" : ""}`} type="submit" aria-pressed={prayer.hasPrayed} title={prayer.hasPrayed ? "다시 누르면 오늘 기록이 취소됩니다." : undefined}><Heart size={16} fill={prayer.hasPrayed ? "currentColor" : "none"} />{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"} <span>{prayer.responseCount}회</span></button></form>
+                              <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value="/dashboard" /><PendingSubmitButton className={`pray-button ${prayer.hasPrayed ? "selected" : ""}`} pendingText="기록 중…" aria-pressed={prayer.hasPrayed} title={prayer.hasPrayed ? "다시 누르면 오늘 기록이 취소됩니다." : undefined}><Heart size={16} fill={prayer.hasPrayed ? "currentColor" : "none"} />{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"} <span>{prayer.responseCount}회</span></PendingSubmitButton></form>
                             </div>
                             <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label={`${prayer.authorName}님의 기도제목 자세히 보기`}><ChevronRight size={19} /></Link>
                           </article>
@@ -198,13 +201,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
         </div>
       </main>
 
-      <nav className="mobile-nav" aria-label="모바일 메뉴">
-        <a className="active" href="#top"><Home size={20} /><span>홈</span></a>
-        <a href="#groups"><Users size={20} /><span>그룹</span></a>
-        <button onClick={() => setComposerOpen(true)} aria-label="기도제목 나누기"><Plus size={25} /></button>
-        <Link href="/prayers"><BookHeart size={20} /><span>내 기도</span></Link>
-        <Link href="/notifications"><Bell size={20} /><span>알림</span>{unreadNotificationCount > 0 && <em className="mobile-notification-dot" />}</Link>
-      </nav>
+      <MobileNav active="home" onCreatePrayer={() => setComposerOpen(true)} />
 
       <NotificationRealtime userId={userId} />
 
@@ -238,7 +235,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
               </label>
               <label htmlFor="prayer-content">함께 기도받고 싶은 내용을 적어주세요</label>
               <textarea id="prayer-content" name="content" autoFocus maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="솔직한 마음을 편안하게 나눠주세요." required />
-              <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={() => setComposerOpen(false)}>취소</button><button className="primary-button" disabled={!draft.trim() || (!personalPrayer && selectedGroupIds.length === 0)}>기도제목 등록</button></div></div>
+              <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={() => setComposerOpen(false)}>취소</button><PendingSubmitButton className="primary-button" pendingText="등록 중…" disabled={!draft.trim() || (!personalPrayer && selectedGroupIds.length === 0)}>기도제목 등록</PendingSubmitButton></div></div>
             </form>
           </div>
         </div>
@@ -253,7 +250,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
               <input id="group-name" name="name" minLength={2} maxLength={50} autoFocus required placeholder="예: 청년부 셀모임" />
               <label htmlFor="group-description">그룹 소개 <span className="optional-label">선택</span></label>
               <textarea id="group-description" name="description" maxLength={500} placeholder="그룹을 간단히 소개해주세요." />
-              <div className="composer-footer"><span>개설자는 자동으로 리더가 됩니다.</span><div><button type="button" className="cancel-button" onClick={() => setGroupModalOpen(false)}>취소</button><button className="primary-button" type="submit">그룹 만들기</button></div></div>
+              <div className="composer-footer"><span>개설자는 자동으로 리더가 됩니다.</span><div><button type="button" className="cancel-button" onClick={() => setGroupModalOpen(false)}>취소</button><PendingSubmitButton className="primary-button" pendingText="만드는 중…">그룹 만들기</PendingSubmitButton></div></div>
             </form>
           </div>
         </div>

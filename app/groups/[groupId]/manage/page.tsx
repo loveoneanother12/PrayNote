@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { changeAdminRole, deleteGroup, leaveGroup, reviewMembership, updateGroup } from "@/app/group-actions";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { MobileNav } from "@/components/mobile-nav";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaDate } from "@/lib/dates";
 import type { GroupRole, MembershipStatus } from "@/lib/domain";
@@ -75,8 +76,8 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
                     <div className="avatar avatar-2">{nameFor(membership.user_id).slice(0, 2)}</div>
                     <div><strong>{nameFor(membership.user_id)}</strong><span>{formatKoreaDate(membership.requested_at)} 신청</span></div>
                     <div className="membership-actions">
-                      <form action={reviewMembership}><input type="hidden" name="membershipId" value={membership.id} /><input type="hidden" name="groupId" value={groupId} /><button name="decision" value="reject" className="reject-button"><X size={15} />거절</button></form>
-                      <form action={reviewMembership}><input type="hidden" name="membershipId" value={membership.id} /><input type="hidden" name="groupId" value={groupId} /><button name="decision" value="approve" className="approve-button"><Check size={15} />승인</button></form>
+                      <form action={reviewMembership}><input type="hidden" name="membershipId" value={membership.id} /><input type="hidden" name="groupId" value={groupId} /><PendingSubmitButton name="decision" value="reject" className="reject-button" pendingText="처리 중…"><X size={15} />거절</PendingSubmitButton></form>
+                      <form action={reviewMembership}><input type="hidden" name="membershipId" value={membership.id} /><input type="hidden" name="groupId" value={groupId} /><PendingSubmitButton name="decision" value="approve" className="approve-button" pendingText="처리 중…"><Check size={15} />승인</PendingSubmitButton></form>
                     </div>
                   </div>
                 ))}
@@ -94,7 +95,7 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
                   <div><strong>{membership.user_id === userData.user.id ? `${nameFor(membership.user_id)} (나)` : nameFor(membership.user_id)}</strong><span>{membership.role === "leader" ? "Leader" : membership.role === "admin" ? "Admin · 가입 승인 가능" : "Member"}</span></div>
                   <span className={`member-role-badge ${membership.role}`}>{membership.role === "leader" ? <Crown size={13} /> : membership.role === "admin" ? <ShieldCheck size={13} /> : null}{membership.role.toUpperCase()}</span>
                   {isLeader && membership.user_id !== userData.user.id && membership.role !== "leader" && (
-                    <form action={changeAdminRole}><input type="hidden" name="groupId" value={groupId} /><input type="hidden" name="userId" value={membership.user_id} /><input type="hidden" name="makeAdmin" value={membership.role === "admin" ? "false" : "true"} /><button className="role-action-button">{membership.role === "admin" ? "Admin 해제" : "Admin 지정"}</button></form>
+                    <form action={changeAdminRole}><input type="hidden" name="groupId" value={groupId} /><input type="hidden" name="userId" value={membership.user_id} /><input type="hidden" name="makeAdmin" value={membership.role === "admin" ? "false" : "true"} /><PendingSubmitButton className="role-action-button" pendingText="변경 중…">{membership.role === "admin" ? "Admin 해제" : "Admin 지정"}</PendingSubmitButton></form>
                   )}
                 </div>
               ))}
@@ -104,7 +105,7 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
           {isLeader && (
             <section className="manage-panel">
               <div className="manage-panel-heading"><div><h2>그룹 정보</h2><span>그룹 이름과 소개를 수정할 수 있습니다.</span></div></div>
-              <form action={updateGroup} className="settings-form"><input type="hidden" name="groupId" value={groupId} /><label htmlFor="manage-name">그룹 이름</label><input id="manage-name" name="name" defaultValue={group.name} minLength={2} maxLength={50} required /><label htmlFor="manage-description">그룹 소개</label><textarea id="manage-description" name="description" defaultValue={group.description ?? ""} maxLength={500} /><button className="primary-button" type="submit">변경사항 저장</button></form>
+              <form action={updateGroup} className="settings-form"><input type="hidden" name="groupId" value={groupId} /><label htmlFor="manage-name">그룹 이름</label><input id="manage-name" name="name" defaultValue={group.name} minLength={2} maxLength={50} required /><label htmlFor="manage-description">그룹 소개</label><textarea id="manage-description" name="description" defaultValue={group.description ?? ""} maxLength={500} /><PendingSubmitButton className="primary-button" pendingText="저장 중…">변경사항 저장</PendingSubmitButton></form>
             </section>
           )}
 

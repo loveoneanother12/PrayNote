@@ -46,7 +46,7 @@ async function sendToSubscription(
       keys: { p256dh: subscription.p256dh, auth: subscription.auth },
     },
     JSON.stringify(payload),
-    { TTL: 60 * 60, urgency: "normal" },
+    { TTL: 60 * 60, urgency: "high" },
   );
 }
 
