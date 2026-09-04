@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 const root = process.cwd();
 const initialSchema = readFileSync(join(root, "supabase/migrations/202609040001_initial_schema.sql"), "utf8");
 const pushSchema = readFileSync(join(root, "supabase/migrations/202609040006_browser_push.sql"), "utf8");
+const reminderSchema = readFileSync(join(root, "supabase/migrations/202609040007_prayer_reminders.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -43,5 +44,21 @@ describe("security guardrails", () => {
     const pushRoute = readFileSync(join(root, "app/api/push/route.ts"), "utf8");
     expect(pushRoute).toContain("timingSafeEqual");
     expect(pushRoute).toContain("x-praynote-push-secret");
+  });
+
+  it("protects reminder times and enforces the five-time limit", () => {
+    expect(reminderSchema).toContain("alter table public.prayer_reminder_times enable row level security;");
+    expect(reminderSchema).toContain("user_id = auth.uid()");
+    expect(reminderSchema).toContain(">= 5");
+    expect(reminderSchema).toContain("pg_advisory_xact_lock");
+  });
+
+  it("dispatches daily reminders through an authenticated cron webhook", () => {
+    const reminderRoute = readFileSync(join(root, "app/api/push/reminder/route.ts"), "utf8");
+    expect(reminderSchema).toContain("praynote-daily-prayer-reminders");
+    expect(reminderSchema).toContain("Asia/Seoul");
+    expect(reminderSchema).toContain("on conflict do nothing");
+    expect(reminderRoute).toContain("timingSafeEqual");
+    expect(reminderRoute).toContain("x-praynote-push-secret");
   });
 });

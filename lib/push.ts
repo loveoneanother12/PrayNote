@@ -141,3 +141,34 @@ export async function sendTestPush(userId: string) {
   }
   return { delivered };
 }
+
+export async function sendPrayerReminderPush(userId: string, reminderId: string, deliveryDate: string) {
+  configureWebPush();
+  const admin = createAdminClient();
+  const [{ data: preferences }, { data: subscriptions }] = await Promise.all([
+    admin.from("notification_preferences").select("push_enabled").eq("user_id", userId).single(),
+    admin.from("push_subscriptions").select("id, endpoint, p256dh, auth").eq("user_id", userId),
+  ]);
+  if (!preferences?.push_enabled || !subscriptions?.length) return { delivered: 0, skipped: true };
+
+  let delivered = 0;
+  for (const subscription of subscriptions as PushSubscriptionRow[]) {
+    try {
+      await sendToSubscription(subscription, {
+        title: "기도할 시간입니다.",
+        body: "PrayNote에서 오늘의 기도를 이어가세요.",
+        url: "/dashboard",
+        notificationId: `prayer-reminder-${reminderId}-${deliveryDate}`,
+      });
+      delivered += 1;
+    } catch (sendError) {
+      const statusCode = typeof sendError === "object" && sendError && "statusCode" in sendError
+        ? Number(sendError.statusCode)
+        : null;
+      if (statusCode === 404 || statusCode === 410) {
+        await admin.from("push_subscriptions").delete().eq("id", subscription.id);
+      }
+    }
+  }
+  return { delivered, skipped: false };
+}

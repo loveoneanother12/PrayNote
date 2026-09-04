@@ -91,6 +91,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       if (preferenceError) throw preferenceError;
 
       setState("on");
+      window.dispatchEvent(new CustomEvent("praynote:push-status", { detail: { enabled: true } }));
       setMessage("이 기기의 브라우저 푸시를 켰어요.");
     } catch (error) {
       console.error("Failed to enable browser push", error);
@@ -118,6 +119,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
         await supabase.from("notification_preferences").update({ push_enabled: false }).eq("user_id", userData.user.id);
       }
       setState("off");
+      window.dispatchEvent(new CustomEvent("praynote:push-status", { detail: { enabled: false } }));
       setMessage("이 기기의 브라우저 푸시를 껐어요.");
     } catch (error) {
       console.error("Failed to disable browser push", error);

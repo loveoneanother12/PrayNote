@@ -16,6 +16,7 @@ import { redirect } from "next/navigation";
 import { signOut, updateNotificationPreferences, updatePassword, updateProfile } from "@/app/settings/actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
+import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,7 +29,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const [{ data: userData }, query] = await Promise.all([supabase.auth.getUser(), searchParams]);
   if (!userData.user) redirect("/login?next=/settings");
 
-  const [{ data: profile }, { data: preferences }, { count: unreadCount }] = await Promise.all([
+  const [{ data: profile }, { data: preferences }, { count: unreadCount }, { data: reminderTimes }] = await Promise.all([
     supabase.from("profiles").select("display_name").eq("id", userData.user.id).single(),
     supabase
       .from("notification_preferences")
@@ -36,6 +37,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       .eq("user_id", userData.user.id)
       .single(),
     supabase.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", userData.user.id).is("read_at", null),
+    supabase.from("prayer_reminder_times").select("id, time_local").eq("user_id", userData.user.id).order("time_local"),
   ]);
 
   const displayName = profile?.display_name ?? userData.user.email?.split("@")[0] ?? "기도하는 이";
@@ -130,6 +132,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           <section className="settings-panel upcoming-panel">
             <div className="settings-panel-heading"><span><Smartphone size={18} /></span><div><h2>외부 알림</h2><p>PrayNote를 열지 않았을 때도 소식을 받는 기능입니다.</p></div></div>
             <BrowserPushSettings initialEnabled={preferences?.push_enabled ?? false} vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
+            <PrayerReminderSettings
+              userId={userData.user.id}
+              initialTimes={(reminderTimes ?? []).map((item) => ({ id: item.id, timeLocal: item.time_local }))}
+              pushEnabled={preferences?.push_enabled ?? false}
+            />
             <div className="upcoming-setting"><span className="setting-category-icon email"><Mail size={17} /></span><div><strong>이메일 알림</strong><small>중요 소식을 이메일로 요약해 받는 기능입니다.</small></div><em>준비 중</em></div>
           </section>
 

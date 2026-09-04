@@ -391,6 +391,7 @@ button { color: inherit; }
 .setting-category-icon.membership { color: #4b876f; background: #e8f4ee; }
 .setting-category-icon.push { color: #8062a6; background: #f1eafa; }
 .setting-category-icon.push.enabled { color: #fff; background: #6075d4; }
+.setting-category-icon.reminder { color: #4d7d6a; background: #e7f4ee; }
 .setting-category-icon.email { color: #9a742f; background: #fff5dc; }
 .settings-save-row { padding-top: 18px; border-top: 1px solid #edf0f4; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .settings-save-row > span { color: #939cac; font-size: 9px; line-height: 1.5; }
@@ -408,6 +409,28 @@ button { color: inherit; }
 .browser-push-actions button:disabled { cursor: wait; opacity: .6; }
 .browser-push-actions > span { color: #8d97a8; font-size: 9px; }
 .browser-push-setting + .upcoming-setting { border-top: 1px solid #eff1f4; }
+.prayer-reminder-setting { padding: 17px 2px 15px; border-top: 1px solid #eff1f4; }
+.reminder-heading { display: flex; align-items: center; gap: 12px; }
+.reminder-heading > div:nth-child(2) { min-width: 0; flex: 1; display: grid; gap: 5px; }
+.reminder-heading strong { color: #405069; font-size: 12px; }
+.reminder-heading small { color: #8d97a8; font-size: 10px; line-height: 1.5; }
+.reminder-add-button { min-height: 33px; padding: 0 11px; border: 1px solid #cfe3da; border-radius: 9px; color: #487763; background: #f3faf7; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 9px; font-weight: 750; }
+.reminder-add-button:disabled { cursor: not-allowed; opacity: .48; }
+.reminder-warning { margin: 12px 0 0 47px; padding: 9px 11px; border-radius: 9px; color: #936733; background: #fff7e6; font-size: 9px; line-height: 1.5; }
+.reminder-times { margin: 14px 0 0 47px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.reminder-empty { grid-column: 1 / -1; min-height: 41px; padding: 0 11px; border: 1px dashed #dfe3e9; border-radius: 9px; color: #929bab; display: flex; align-items: center; gap: 7px; font-size: 9px; }
+.reminder-time-row { min-height: 41px; padding: 0 7px 0 11px; border: 1px solid #e1e6e3; border-radius: 9px; background: #fbfdfc; display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+.reminder-time-row > span { color: #4f665c; display: inline-flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 750; }
+.reminder-time-row button { width: 28px; height: 28px; border: 0; border-radius: 7px; color: #a06c76; background: transparent; display: grid; place-items: center; cursor: pointer; }
+.reminder-time-row button:hover { background: #fff0f3; }
+.reminder-time-row button:disabled { cursor: wait; opacity: .5; }
+.reminder-time-form { grid-column: 1 / -1; min-height: 45px; padding: 6px; border: 1px solid #dfe5e1; border-radius: 10px; background: #f8fbfa; display: flex; align-items: center; gap: 7px; }
+.reminder-time-form input { min-width: 125px; height: 33px; padding: 0 9px; border: 1px solid #d8dfdc; border-radius: 8px; color: #42564d; background: #fff; outline: none; font: inherit; font-size: 10px; }
+.reminder-time-form input:focus { border-color: #6e9a87; box-shadow: 0 0 0 3px #eaf5f0; }
+.reminder-time-form button { min-height: 33px; padding: 0 11px; border: 0; border-radius: 8px; color: #fff; background: #5b8c77; cursor: pointer; font-size: 9px; font-weight: 750; }
+.reminder-time-form button.cancel { color: #747f91; background: #eef0f3; }
+.reminder-footnote { margin: 10px 0 0 47px; color: #9aa2af; display: flex; justify-content: space-between; font-size: 8px; }
+.reminder-message { margin: 9px 0 0 47px; color: #507965; font-size: 9px; }
 .upcoming-setting + .upcoming-setting { border-top: 1px solid #eff1f4; }
 .upcoming-setting > div { min-width: 0; flex: 1; display: grid; gap: 5px; }
 .upcoming-setting strong { color: #405069; font-size: 12px; }
@@ -589,6 +612,13 @@ button { color: inherit; }
   .settings-save-row .primary-button { width: 100%; }
   .browser-push-setting { align-items: flex-start; flex-wrap: wrap; }
   .browser-push-actions { width: 100%; padding-left: 47px; }
+  .reminder-heading { align-items: flex-start; flex-wrap: wrap; }
+  .reminder-add-button { margin-left: 47px; }
+  .reminder-warning, .reminder-times, .reminder-footnote, .reminder-message { margin-left: 0; }
+  .reminder-times { grid-template-columns: 1fr; }
+  .reminder-time-form { flex-wrap: wrap; }
+  .reminder-time-form input { width: 100%; }
+  .reminder-time-form button { flex: 1; }
   .mobile-subpage-nav { grid-template-columns: repeat(5, 1fr); }
   .mobile-subpage-nav a { position: relative; }
   .state-card { padding: 35px 22px; }
