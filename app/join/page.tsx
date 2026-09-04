@@ -3,6 +3,7 @@ import { BookHeart, KeyRound, Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { requestMembership } from "@/app/group-actions";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { getAuthIdentity } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 type JoinPageProps = {
@@ -12,8 +13,8 @@ type JoinPageProps = {
 export default async function JoinPage({ searchParams }: JoinPageProps) {
   const query = await searchParams;
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect(`/login?next=${encodeURIComponent("/join")}`);
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect(`/login?next=${encodeURIComponent("/join")}`);
 
   return (
     <main className="join-page">

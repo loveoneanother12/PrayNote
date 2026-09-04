@@ -7,7 +7,8 @@ import { MobileNav } from "@/components/mobile-nav";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaDate } from "@/lib/dates";
-import type { GroupRole, MembershipStatus } from "@/lib/domain";
+import { getAuthIdentity } from "@/lib/auth";
+import { getGroupManageOverview } from "@/lib/group-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type ManageGroupPageProps = {
@@ -15,53 +16,29 @@ type ManageGroupPageProps = {
   searchParams: Promise<{ reviewed?: string; role?: string; updated?: string; error?: string }>;
 };
 
-type MembershipRow = {
-  id: string;
-  user_id: string;
-  role: GroupRole;
-  status: MembershipStatus;
-  requested_at: string;
-};
-
 export default async function ManageGroupPage({ params, searchParams }: ManageGroupPageProps) {
   const [{ groupId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/login");
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: myMembership }, { data: group }] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", userData.user.id).single(),
-    supabase.from("group_memberships").select("role").eq("group_id", groupId).eq("user_id", userData.user.id).eq("status", "active").maybeSingle(),
-    supabase.from("groups").select("id, name, description").eq("id", groupId).is("deleted_at", null).maybeSingle(),
-  ]);
+  const overview = await getGroupManageOverview(supabase, groupId);
+  if (!overview) notFound();
 
-  if (!myMembership || !group) notFound();
-
-  const canModerate = myMembership.role === "leader" || myMembership.role === "admin";
-  const isLeader = myMembership.role === "leader";
-  const { data: membershipData } = await supabase
-    .from("group_memberships")
-    .select("id, user_id, role, status, requested_at")
-    .eq("group_id", groupId)
-    .in("status", canModerate ? ["active", "pending"] : ["active"])
-    .order("created_at", { ascending: true });
-
-  const memberships = (membershipData ?? []) as MembershipRow[];
-  const userIds = [...new Set(memberships.map((membership) => membership.user_id))];
-  const { data: profiles } = userIds.length
-    ? await supabase.from("profiles").select("id, display_name").in("id", userIds)
-    : { data: [] };
-  const nameFor = (userId: string) => profiles?.find((item) => item.id === userId)?.display_name ?? "가입 신청자";
+  const { group, role, memberships } = overview;
+  const canModerate = role === "leader" || role === "admin";
+  const isLeader = role === "leader";
+  const nameFor = (userId: string) => memberships.find((item) => item.user_id === userId)?.display_name ?? "가입 신청자";
   const pending = memberships.filter((membership) => membership.status === "pending");
   const active = memberships.filter((membership) => membership.status === "active");
-  const displayName = profile?.display_name ?? userData.user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = overview.displayName ?? user.email?.split("@")[0] ?? "기도하는 이";
   const notice = query.reviewed === "approved" ? "가입 신청을 승인했어요." : query.reviewed === "rejected" ? "가입 신청을 거절했어요." : query.role === "admin" ? "Admin 권한을 부여했어요." : query.role === "member" ? "Admin 권한을 해제했어요." : query.updated ? "그룹 정보를 수정했어요." : "";
 
   return (
     <div className="app-shell">
       <SubpageNav displayName={displayName} active="groups" />
       <main className="main-content subpage-main">
-        <header className="topbar subpage-topbar"><Link className="back-link" href={`/groups/${groupId}`}><ArrowLeft size={18} />{group.name}</Link><span className="management-role">내 역할 · {myMembership.role.toUpperCase()}</span></header>
+        <header className="topbar subpage-topbar"><Link className="back-link" href={`/groups/${groupId}`}><ArrowLeft size={18} />{group.name}</Link><span className="management-role">내 역할 · {role.toUpperCase()}</span></header>
         <div className="content-wrap detail-content manage-content">
           <section className="manage-heading"><div><p>그룹 운영</p><h1>{group.name} 관리</h1><span>멤버와 가입 신청, 그룹 정보를 관리합니다.</span></div><div className="manage-member-count"><Users size={20} /><strong>{active.length}</strong><span>활동 멤버</span></div></section>
 
@@ -92,9 +69,9 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
               {active.map((membership) => (
                 <div className="membership-row" key={membership.id}>
                   <div className="avatar avatar-1">{nameFor(membership.user_id).slice(0, 2)}</div>
-                  <div><strong>{membership.user_id === userData.user.id ? `${nameFor(membership.user_id)} (나)` : nameFor(membership.user_id)}</strong><span>{membership.role === "leader" ? "Leader" : membership.role === "admin" ? "Admin · 가입 승인 가능" : "Member"}</span></div>
+                  <div><strong>{membership.user_id === user.id ? `${nameFor(membership.user_id)} (나)` : nameFor(membership.user_id)}</strong><span>{membership.role === "leader" ? "Leader" : membership.role === "admin" ? "Admin · 가입 승인 가능" : "Member"}</span></div>
                   <span className={`member-role-badge ${membership.role}`}>{membership.role === "leader" ? <Crown size={13} /> : membership.role === "admin" ? <ShieldCheck size={13} /> : null}{membership.role.toUpperCase()}</span>
-                  {isLeader && membership.user_id !== userData.user.id && membership.role !== "leader" && (
+                  {isLeader && membership.user_id !== user.id && membership.role !== "leader" && (
                     <form action={changeAdminRole}><input type="hidden" name="groupId" value={groupId} /><input type="hidden" name="userId" value={membership.user_id} /><input type="hidden" name="makeAdmin" value={membership.role === "admin" ? "false" : "true"} /><PendingSubmitButton className="role-action-button" pendingText="변경 중…">{membership.role === "admin" ? "Admin 해제" : "Admin 지정"}</PendingSubmitButton></form>
                   )}
                 </div>

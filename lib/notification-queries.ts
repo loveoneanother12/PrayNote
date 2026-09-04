@@ -12,6 +12,11 @@ export type NotificationRow = {
   created_at: string;
 };
 
+type NotificationSummaryRow = NotificationRow & {
+  actor_name: string | null;
+  group_name: string | null;
+};
+
 function roleFrom(data: unknown) {
   if (!data || typeof data !== "object" || !("role" in data)) return null;
   const role = (data as { role?: unknown }).role;
@@ -52,41 +57,24 @@ export function notificationHref(row: NotificationRow) {
 
 export async function getNotificationSummaries(
   supabase: SupabaseClient,
-  recipientId: string,
+  _recipientId: string,
   limit = 50,
 ): Promise<NotificationSummary[]> {
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("id, actor_id, group_id, prayer_id, type, data, read_at, created_at")
-    .eq("recipient_id", recipientId)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const { data, error } = await supabase.rpc("get_notification_summaries_fast", { result_limit: limit });
 
   if (error) {
     console.error("Failed to fetch notifications", { code: error.code, message: error.message });
     return [];
   }
 
-  const rows = (data ?? []) as NotificationRow[];
-  const actorIds = [...new Set(rows.flatMap((row) => (row.actor_id ? [row.actor_id] : [])))];
-  const groupIds = [...new Set(rows.flatMap((row) => (row.group_id ? [row.group_id] : [])))];
-  const [{ data: profiles }, { data: groups }] = await Promise.all([
-    actorIds.length
-      ? supabase.from("profiles").select("id, display_name").in("id", actorIds)
-      : Promise.resolve({ data: [] }),
-    groupIds.length
-      ? supabase.from("groups").select("id, name").in("id", groupIds)
-      : Promise.resolve({ data: [] }),
-  ]);
+  const rows = (data ?? []) as NotificationSummaryRow[];
 
   return rows.map((row) => {
-    const actorName = profiles?.find((profile) => profile.id === row.actor_id)?.display_name ?? null;
-    const groupName = groups?.find((group) => group.id === row.group_id)?.name ?? null;
     return {
       id: row.id,
       type: row.type,
-      message: notificationMessage(row, actorName, groupName),
-      groupName,
+      message: notificationMessage(row, row.actor_name, row.group_name),
+      groupName: row.group_name,
       href: notificationHref(row),
       createdAt: row.created_at,
       readAt: row.read_at,

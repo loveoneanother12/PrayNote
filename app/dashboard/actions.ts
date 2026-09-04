@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthIdentity } from "@/lib/auth";
 
 const groupSchema = z.object({
   name: z.string().trim().min(2).max(50),
@@ -21,9 +22,9 @@ export async function createGroup(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
+  const user = await getAuthIdentity(supabase);
 
-  if (!userData.user) {
+  if (!user) {
     redirect("/login");
   }
 

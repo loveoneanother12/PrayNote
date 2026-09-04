@@ -8,6 +8,7 @@ const pushSchema = readFileSync(join(root, "supabase/migrations/202609040006_bro
 const reminderSchema = readFileSync(join(root, "supabase/migrations/202609040007_prayer_reminders.sql"), "utf8");
 const sharedPrayerSchema = readFileSync(join(root, "supabase/migrations/202609040008_personal_and_shared_prayers.sql"), "utf8");
 const hardenedPushSchema = readFileSync(join(root, "supabase/migrations/202609050001_harden_push_delivery.sql"), "utf8");
+const performanceSchema = readFileSync(join(root, "supabase/migrations/202609050002_performance_read_models.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -82,5 +83,13 @@ describe("security guardrails", () => {
     expect(hardenedPushSchema).toContain("raise exception 'push_webhook_secret_missing'");
     expect(hardenedPushSchema).toContain("interval '4 minutes'");
     expect(hardenedPushSchema).toContain("timeout_milliseconds := 10000");
+  });
+
+  it("keeps accelerated read models scoped to the signed-in user", () => {
+    expect(performanceSchema).toContain("public.can_access_prayer(prayer.id, auth.uid())");
+    expect(performanceSchema).toContain("notification.recipient_id = auth.uid()");
+    expect(performanceSchema).toContain("membership.user_id = auth.uid()");
+    expect(performanceSchema).toMatch(/revoke all on function public\.get_prayer_summaries_fast[\s\S]+from public, anon;/);
+    expect(performanceSchema).toContain("grant execute on function public.get_dashboard_overview() to authenticated;");
   });
 });

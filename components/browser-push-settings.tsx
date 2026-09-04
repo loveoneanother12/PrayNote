@@ -79,10 +79,11 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       if (!serialized.keys?.p256dh || !serialized.keys.auth) throw new Error("subscription_keys_missing");
 
       const supabase = createClient();
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("session_missing");
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id;
+      if (!userId) throw new Error("session_missing");
       const { error: subscriptionError } = await supabase.from("push_subscriptions").upsert({
-        user_id: userData.user.id,
+        user_id: userId,
         endpoint: subscription.endpoint,
         p256dh: serialized.keys.p256dh,
         auth: serialized.keys.auth,
@@ -93,7 +94,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
 
       const { error: preferenceError } = await supabase.from("notification_preferences")
         .update({ push_enabled: true })
-        .eq("user_id", userData.user.id);
+        .eq("user_id", userId);
       if (preferenceError) throw preferenceError;
 
       setState("on");
@@ -116,8 +117,9 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       const registration = await navigator.serviceWorker.getRegistration();
       const subscription = await registration?.pushManager.getSubscription();
       const supabase = createClient();
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("session_missing");
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id;
+      if (!userId) throw new Error("session_missing");
 
       if (subscription) {
         await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
@@ -125,7 +127,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       }
       const { count } = await supabase.from("push_subscriptions").select("id", { count: "exact", head: true });
       if (!count) {
-        await supabase.from("notification_preferences").update({ push_enabled: false }).eq("user_id", userData.user.id);
+        await supabase.from("notification_preferences").update({ push_enabled: false }).eq("user_id", userId);
       }
       setState("off");
       window.dispatchEvent(new CustomEvent("praynote:push-status", { detail: { enabled: false } }));

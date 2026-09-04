@@ -5,14 +5,15 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeInternalPath } from "@/lib/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthIdentity } from "@/lib/auth";
 
 const uuidSchema = z.string().uuid();
 
 async function requireUser() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login");
-  return { supabase, user: data.user };
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login");
+  return { supabase, user };
 }
 
 export async function markNotificationRead(formData: FormData) {

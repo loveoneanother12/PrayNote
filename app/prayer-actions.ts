@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeInternalPath } from "@/lib/navigation";
+import { getAuthIdentity } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 const uuidSchema = z.string().uuid();
@@ -11,9 +12,9 @@ const contentSchema = z.string().trim().min(1).max(2000);
 
 async function requireUser() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login");
-  return { supabase, user: data.user };
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login");
+  return { supabase, user };
 }
 
 export async function createPrayer(formData: FormData) {

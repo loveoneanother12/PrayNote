@@ -20,6 +20,7 @@ import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthIdentity } from "@/lib/auth";
 
 type SettingsPageProps = {
   searchParams: Promise<{ saved?: string; error?: string }>;
@@ -27,21 +28,21 @@ type SettingsPageProps = {
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const supabase = await createClient();
-  const [{ data: userData }, query] = await Promise.all([supabase.auth.getUser(), searchParams]);
-  if (!userData.user) redirect("/login?next=/settings");
+  const [user, query] = await Promise.all([getAuthIdentity(supabase), searchParams]);
+  if (!user) redirect("/login?next=/settings");
 
   const [{ data: profile }, { data: preferences }, { count: unreadCount }, { data: reminderTimes }] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", userData.user.id).single(),
+    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
     supabase
       .from("notification_preferences")
       .select("in_app_enabled, new_prayer_enabled, prayer_response_enabled, membership_enabled, push_enabled, email_enabled")
-      .eq("user_id", userData.user.id)
+      .eq("user_id", user.id)
       .single(),
-    supabase.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", userData.user.id).is("read_at", null),
-    supabase.from("prayer_reminder_times").select("id, time_local").eq("user_id", userData.user.id).order("time_local"),
+    supabase.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", user.id).is("read_at", null),
+    supabase.from("prayer_reminder_times").select("id, time_local").eq("user_id", user.id).order("time_local"),
   ]);
 
-  const displayName = profile?.display_name ?? userData.user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
   const notice = query.saved === "profile"
     ? "프로필을 저장했어요."
     : query.saved === "notifications"
@@ -80,7 +81,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <label htmlFor="display-name">표시 이름</label>
               <input id="display-name" name="displayName" defaultValue={displayName} minLength={2} maxLength={30} required />
               <label htmlFor="account-email">로그인 이메일</label>
-              <input id="account-email" value={userData.user.email ?? ""} readOnly aria-readonly="true" />
+              <input id="account-email" value={user.email ?? ""} readOnly aria-readonly="true" />
               <p>로그인 이메일은 현재 변경할 수 없습니다.</p>
               <PendingSubmitButton className="primary-button" pendingText="저장 중…"><Check size={16} />프로필 저장</PendingSubmitButton>
             </form>
@@ -134,7 +135,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <div className="settings-panel-heading"><span><Smartphone size={18} /></span><div><h2>외부 알림</h2><p>PrayNote를 열지 않았을 때도 소식을 받는 기능입니다.</p></div></div>
             <BrowserPushSettings initialEnabled={preferences?.push_enabled ?? false} vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
             <PrayerReminderSettings
-              userId={userData.user.id}
+              userId={user.id}
               initialTimes={(reminderTimes ?? []).map((item) => ({ id: item.id, timeLocal: item.time_local }))}
               pushEnabled={preferences?.push_enabled ?? false}
             />

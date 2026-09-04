@@ -3,6 +3,7 @@ import { BookHeart, KeyRound, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { requestMembership } from "@/app/group-actions";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { getAuthIdentity } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 type InvitePageProps = {
@@ -13,13 +14,15 @@ type InvitePageProps = {
 export default async function InvitePage({ params, searchParams }: InvitePageProps) {
   const [{ groupId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const { data: preview, error: previewError } = await supabase.rpc("get_join_group_preview", { target_group_id: groupId });
+  const [{ data: preview, error: previewError }, user] = await Promise.all([
+    supabase.rpc("get_join_group_preview", { target_group_id: groupId }),
+    getAuthIdentity(supabase),
+  ]);
   if (previewError || !preview?.[0]) notFound();
 
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect(`/login?next=${encodeURIComponent(`/join/${groupId}`)}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/join/${groupId}`)}`);
 
-  const { data: membership } = await supabase.from("group_memberships").select("status").eq("group_id", groupId).eq("user_id", userData.user.id).maybeSingle();
+  const { data: membership } = await supabase.from("group_memberships").select("status").eq("group_id", groupId).eq("user_id", user.id).maybeSingle();
   if (membership?.status === "active") redirect(`/groups/${groupId}`);
 
   const group = preview[0];

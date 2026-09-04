@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaDate } from "@/lib/dates";
+import { getAuthIdentity } from "@/lib/auth";
 import { getPrayerSummaries } from "@/lib/prayer-queries";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,19 +21,19 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
   if (!/^[0-9a-f-]{36}$/i.test(prayerId)) notFound();
 
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/login");
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login");
 
   const [{ data: profile }, prayers] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", userData.user.id).single(),
-    getPrayerSummaries(supabase, userData.user.id, { prayerIds: [prayerId] }),
+    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
+    getPrayerSummaries(supabase, user.id, { prayerIds: [prayerId] }),
   ]);
   const prayer = prayers[0];
   if (!prayer) notFound();
 
-  const mine = prayer.authorId === userData.user.id;
+  const mine = prayer.authorId === user.id;
   const completed = prayer.status === "completed";
-  const displayName = profile?.display_name ?? userData.user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
   const detailPath = `/prayers/${prayer.id}`;
 
   return (

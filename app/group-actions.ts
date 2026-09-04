@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthIdentity } from "@/lib/auth";
 
 const uuidSchema = z.string().uuid();
 const inviteCodeSchema = z.string().trim().toUpperCase().regex(/^PRAY-[A-F0-9]{8}$/);
@@ -14,8 +15,8 @@ const groupSchema = z.object({
 
 async function requireUser() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login");
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login");
   return supabase;
 }
 

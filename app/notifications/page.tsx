@@ -7,6 +7,7 @@ import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
+import { getAuthIdentity } from "@/lib/auth";
 import { getNotificationSummaries } from "@/lib/notification-queries";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,19 +17,19 @@ type NotificationsPageProps = {
 
 export default async function NotificationsPage({ searchParams }: NotificationsPageProps) {
   const supabase = await createClient();
-  const [{ data: userData }, query] = await Promise.all([supabase.auth.getUser(), searchParams]);
-  if (!userData.user) redirect("/login?next=/notifications");
+  const [user, query] = await Promise.all([getAuthIdentity(supabase), searchParams]);
+  if (!user) redirect("/login?next=/notifications");
 
   const [{ data: profile }, notifications] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", userData.user.id).single(),
-    getNotificationSummaries(supabase, userData.user.id, 100),
+    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
+    getNotificationSummaries(supabase, user.id, 100),
   ]);
   const unreadCount = notifications.filter((notification) => !notification.readAt).length;
   const view = query.view === "unread" ? "unread" : "all";
   const visibleNotifications = view === "unread"
     ? notifications.filter((notification) => !notification.readAt)
     : notifications;
-  const displayName = profile?.display_name ?? userData.user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
 
   return (
     <div className="app-shell">
@@ -61,7 +62,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
         </div>
       </main>
       <MobileNav />
-      <NotificationRealtime userId={userData.user.id} />
+      <NotificationRealtime userId={user.id} />
     </div>
   );
 }

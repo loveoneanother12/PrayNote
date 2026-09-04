@@ -4,15 +4,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthIdentity } from "@/lib/auth";
 
 const displayNameSchema = z.string().trim().min(2).max(30);
 const passwordSchema = z.string().min(8).max(72);
 
 async function requireUser() {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login?next=/settings");
-  return { supabase, user: data.user };
+  const user = await getAuthIdentity(supabase);
+  if (!user) redirect("/login?next=/settings");
+  return { supabase, user };
 }
 
 export async function updateProfile(formData: FormData) {
