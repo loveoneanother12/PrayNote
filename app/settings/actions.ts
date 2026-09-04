@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
 const displayNameSchema = z.string().trim().min(2).max(30);
+const passwordSchema = z.string().min(8).max(72);
 
 async function requireUser() {
   const supabase = await createClient();
@@ -55,6 +56,24 @@ export async function updateNotificationPreferences(formData: FormData) {
   revalidatePath("/notifications");
   revalidatePath("/settings");
   redirect("/settings?saved=notifications");
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = passwordSchema.safeParse(formData.get("password"));
+  const passwordConfirm = formData.get("passwordConfirm");
+
+  if (!password.success) redirect("/settings?error=weak-password");
+  if (password.data !== passwordConfirm) redirect("/settings?error=password-mismatch");
+
+  const { supabase } = await requireUser();
+  const { error } = await supabase.auth.updateUser({ password: password.data });
+
+  if (error) {
+    console.error("Failed to update password", { code: error.code, status: error.status });
+    redirect("/settings?error=password-failed");
+  }
+
+  redirect("/settings?saved=password");
 }
 
 export async function signOut() {

@@ -365,6 +365,12 @@ button { color: inherit; }
 .profile-settings-form input[readonly] { color: #8993a5; background: #f5f6f9; }
 .profile-settings-form p { grid-column: 2 / -1; margin: -4px 0 3px; color: #98a1b0; font-size: 9px; }
 .profile-settings-form .primary-button { grid-column: 3; grid-row: 1; min-height: 39px; font-size: 11px; }
+.password-settings-form { padding-top: 19px; display: grid; grid-template-columns: 130px 1fr auto; align-items: center; gap: 11px 15px; }
+.password-settings-form label { color: #566278; font-size: 11px; font-weight: 750; }
+.password-settings-form input { height: 43px; padding: 0 13px; border: 1px solid #dfe3eb; border-radius: 10px; outline: none; color: var(--ink); }
+.password-settings-form input:focus { border-color: #8291dd; box-shadow: 0 0 0 3px #eef0ff; }
+.password-settings-form p { grid-column: 2 / -1; margin: -4px 0 3px; color: #98a1b0; font-size: 9px; }
+.password-settings-form .primary-button { grid-column: 3; grid-row: 1 / span 2; min-height: 39px; font-size: 11px; }
 .notification-settings-form { padding-top: 4px; }
 .setting-toggle { min-height: 72px; position: relative; padding: 14px 2px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .setting-toggle + .setting-toggle { border-top: 1px solid #eff1f4; }
@@ -563,9 +569,9 @@ button { color: inherit; }
   .notifications-hero > div > span { display: none; }
   .notification-row { padding: 13px; }
   .settings-hero { padding: 22px; }
-  .profile-settings-form { grid-template-columns: 1fr; align-items: stretch; }
-  .profile-settings-form p, .profile-settings-form .primary-button { grid-column: 1; grid-row: auto; }
-  .profile-settings-form .primary-button { width: 100%; margin-top: 4px; }
+  .profile-settings-form, .password-settings-form { grid-template-columns: 1fr; align-items: stretch; }
+  .profile-settings-form p, .profile-settings-form .primary-button, .password-settings-form p, .password-settings-form .primary-button { grid-column: 1; grid-row: auto; }
+  .profile-settings-form .primary-button, .password-settings-form .primary-button { width: 100%; margin-top: 4px; }
   .setting-toggle-group { padding-left: 0; }
   .settings-save-row { align-items: stretch; flex-direction: column; }
   .settings-save-row .primary-button { width: 100%; }
@@ -590,7 +596,11 @@ button { color: inherit; }
 .auth-form-heading > span { color: var(--blue); font-size: 12px; font-weight: 750; }
 .auth-form-heading h2 { margin: 12px 0 8px; font-size: 30px; letter-spacing: -.04em; }
 .auth-form-heading p { margin: 0 0 30px; color: var(--muted); font-size: 13px; }
+.auth-mode-switch { margin: 0 0 20px; padding: 4px; border-radius: 12px; background: #eef0f6; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.auth-mode-switch a { padding: 9px; border-radius: 9px; color: #7b8495; text-align: center; text-decoration: none; font-size: 12px; font-weight: 750; }
+.auth-mode-switch a.active { color: #4057bd; background: #fff; box-shadow: 0 3px 10px rgba(48,60,100,.08); }
 .auth-error { padding: 12px 14px; border-radius: 10px; color: #a8495a; background: #fff0f3; font-size: 12px; }
+.auth-notice { padding: 12px 14px; border-radius: 10px; color: #4960bd; background: #eef1ff; font-size: 12px; }
 .auth-form { display: grid; gap: 10px; }
 .auth-form label { color: #4e5a70; font-size: 12px; font-weight: 700; }
 .auth-input { height: 50px; padding: 0 14px; border: 1px solid #dfe3eb; border-radius: 11px; background: #fff; display: flex; align-items: center; gap: 10px; color: #929cad; }
@@ -598,6 +608,7 @@ button { color: inherit; }
 .auth-input input { width: 100%; border: 0; outline: 0; color: var(--ink); background: transparent; }
 .auth-input input::placeholder { color: #acb3bf; }
 .auth-submit { width: 100%; min-height: 49px; margin-top: 7px; }
+.auth-inline-link { margin-top: 5px; color: #7180bf; text-align: center; text-decoration: none; font-size: 11px; font-weight: 650; }
 .auth-terms { margin: 19px auto 0; max-width: 350px; color: #99a1af; text-align: center; font-size: 10px; line-height: 1.6; }
 .auth-demo-link, .auth-link { display: block; margin-top: 23px; color: var(--blue); text-align: center; text-decoration: none; font-size: 12px; font-weight: 700; }
 .mail-sent { text-align: center; }
