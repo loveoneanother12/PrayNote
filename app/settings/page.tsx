@@ -15,6 +15,7 @@ import {
 import { redirect } from "next/navigation";
 import { signOut, updateNotificationPreferences, updatePassword, updateProfile } from "@/app/settings/actions";
 import { MobileNav } from "@/components/mobile-nav";
+import { BrowserPushSettings } from "@/components/browser-push-settings";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
 
@@ -128,7 +129,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel upcoming-panel">
             <div className="settings-panel-heading"><span><Smartphone size={18} /></span><div><h2>외부 알림</h2><p>PrayNote를 열지 않았을 때도 소식을 받는 기능입니다.</p></div></div>
-            <div className="upcoming-setting"><span className="setting-category-icon push"><Smartphone size={17} /></span><div><strong>브라우저 푸시</strong><small>기기 알림 권한과 발송 서버 연결 후 제공됩니다.</small></div><em>준비 중</em></div>
+            <BrowserPushSettings initialEnabled={preferences?.push_enabled ?? false} vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
             <div className="upcoming-setting"><span className="setting-category-icon email"><Mail size={17} /></span><div><strong>이메일 알림</strong><small>중요 소식을 이메일로 요약해 받는 기능입니다.</small></div><em>준비 중</em></div>
           </section>
 

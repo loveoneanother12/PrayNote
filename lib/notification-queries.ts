@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NotificationSummary, NotificationType } from "@/lib/domain";
 
-type NotificationRow = {
+export type NotificationRow = {
   id: string;
   actor_id: string | null;
   group_id: string | null;

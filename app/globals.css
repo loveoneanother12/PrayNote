@@ -390,12 +390,24 @@ button { color: inherit; }
 .setting-category-icon.response { color: #b95c7a; background: #fff0f4; }
 .setting-category-icon.membership { color: #4b876f; background: #e8f4ee; }
 .setting-category-icon.push { color: #8062a6; background: #f1eafa; }
+.setting-category-icon.push.enabled { color: #fff; background: #6075d4; }
 .setting-category-icon.email { color: #9a742f; background: #fff5dc; }
 .settings-save-row { padding-top: 18px; border-top: 1px solid #edf0f4; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .settings-save-row > span { color: #939cac; font-size: 9px; line-height: 1.5; }
 .settings-save-row .primary-button { min-height: 39px; font-size: 11px; }
 .upcoming-panel { background: linear-gradient(120deg, #fff, #fbfbfe); }
 .upcoming-setting { min-height: 67px; padding: 13px 2px; display: flex; align-items: center; gap: 12px; }
+.browser-push-setting { min-height: 86px; padding: 15px 2px; display: flex; align-items: center; gap: 12px; }
+.browser-push-copy { min-width: 0; flex: 1; display: grid; gap: 5px; }
+.browser-push-copy strong { color: #405069; font-size: 12px; }
+.browser-push-copy small { color: #8d97a8; font-size: 10px; line-height: 1.5; }
+.browser-push-copy em { color: #5f72c9; font-style: normal; font-size: 9px; line-height: 1.5; }
+.browser-push-actions { display: flex; align-items: center; gap: 7px; }
+.browser-push-actions button { min-height: 33px; padding: 0 11px; border: 1px solid #dfe3eb; border-radius: 9px; color: #667188; background: #fff; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 9px; font-weight: 750; }
+.browser-push-actions button.primary { border-color: #6075d4; color: #fff; background: #6075d4; }
+.browser-push-actions button:disabled { cursor: wait; opacity: .6; }
+.browser-push-actions > span { color: #8d97a8; font-size: 9px; }
+.browser-push-setting + .upcoming-setting { border-top: 1px solid #eff1f4; }
 .upcoming-setting + .upcoming-setting { border-top: 1px solid #eff1f4; }
 .upcoming-setting > div { min-width: 0; flex: 1; display: grid; gap: 5px; }
 .upcoming-setting strong { color: #405069; font-size: 12px; }
@@ -575,6 +587,8 @@ button { color: inherit; }
   .setting-toggle-group { padding-left: 0; }
   .settings-save-row { align-items: stretch; flex-direction: column; }
   .settings-save-row .primary-button { width: 100%; }
+  .browser-push-setting { align-items: flex-start; flex-wrap: wrap; }
+  .browser-push-actions { width: 100%; padding-left: 47px; }
   .mobile-subpage-nav { grid-template-columns: repeat(5, 1fr); }
   .mobile-subpage-nav a { position: relative; }
   .state-card { padding: 35px 22px; }
