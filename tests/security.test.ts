@@ -6,6 +6,7 @@ const root = process.cwd();
 const initialSchema = readFileSync(join(root, "supabase/migrations/202609040001_initial_schema.sql"), "utf8");
 const pushSchema = readFileSync(join(root, "supabase/migrations/202609040006_browser_push.sql"), "utf8");
 const reminderSchema = readFileSync(join(root, "supabase/migrations/202609040007_prayer_reminders.sql"), "utf8");
+const sharedPrayerSchema = readFileSync(join(root, "supabase/migrations/202609040008_personal_and_shared_prayers.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -60,5 +61,19 @@ describe("security guardrails", () => {
     expect(reminderSchema).toContain("on conflict do nothing");
     expect(reminderRoute).toContain("timingSafeEqual");
     expect(reminderRoute).toContain("x-praynote-push-secret");
+  });
+
+  it("keeps personal prayers private and validates every shared group", () => {
+    expect(sharedPrayerSchema).toContain("create table public.prayer_group_shares");
+    expect(sharedPrayerSchema).toContain("alter table public.prayer_group_shares enable row level security;");
+    expect(sharedPrayerSchema).toContain("prayer.author_id = target_user_id");
+    expect(sharedPrayerSchema).toContain("public.is_active_group_member(candidate.group_id)");
+    expect(sharedPrayerSchema).toContain("normalized_group_ids := array[]::uuid[]");
+  });
+
+  it("exposes shared-prayer mutations only through authenticated RPCs", () => {
+    expect(sharedPrayerSchema).toContain("revoke all on function public.create_prayer_with_groups(text, uuid[], boolean) from public, anon;");
+    expect(sharedPrayerSchema).toContain("grant execute on function public.create_prayer_with_groups(text, uuid[], boolean) to authenticated;");
+    expect(sharedPrayerSchema).toContain("grant execute on function public.share_prayer_with_groups(uuid, uuid[]) to authenticated;");
   });
 });

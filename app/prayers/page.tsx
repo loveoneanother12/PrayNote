@@ -54,7 +54,7 @@ export default async function MyPrayersPage({ searchParams }: MyPrayersPageProps
             <div className="record-section-heading"><div><span className="status-dot active" /><h2>진행 중인 기도제목</h2></div><strong>{activePrayers.length}</strong></div>
             <div className="record-grid">
               {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={userData.user.id} returnTo="/prayers" showGroup />)}
-              {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 내 기도가 없어요</strong><span>그룹에서 기도제목을 등록해보세요.</span></div>}
+              {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 내 기도가 없어요</strong><span>메인 화면에서 개인기도나 그룹 기도제목을 등록해보세요.</span></div>}
             </div>
           </section>}
 

@@ -17,19 +17,23 @@ async function requireUser() {
 }
 
 export async function createPrayer(formData: FormData) {
-  const groupId = uuidSchema.safeParse(formData.get("groupId"));
+  const groupIds = formData.getAll("groupIds")
+    .map((value) => uuidSchema.safeParse(value))
+    .filter((result) => result.success)
+    .map((result) => result.data);
+  const personal = formData.get("personal") === "on";
   const content = contentSchema.safeParse(formData.get("content"));
   const returnTo = safeInternalPath(formData.get("returnTo"));
 
-  if (!groupId.success || !content.success) {
+  if (!content.success || (!personal && groupIds.length === 0) || groupIds.length > 20) {
     redirect(`${returnTo}?error=invalid-prayer`);
   }
 
-  const { supabase, user } = await requireUser();
-  const { error } = await supabase.from("prayer_requests").insert({
-    group_id: groupId.data,
-    author_id: user.id,
-    content: content.data,
+  const { supabase } = await requireUser();
+  const { data: prayerId, error } = await supabase.rpc("create_prayer_with_groups", {
+    prayer_content: content.data,
+    target_group_ids: personal ? [] : [...new Set(groupIds)],
+    is_personal: personal,
   });
 
   if (error) {
@@ -38,9 +42,39 @@ export async function createPrayer(formData: FormData) {
   }
 
   revalidatePath("/dashboard");
-  revalidatePath(`/groups/${groupId.data}`);
+  for (const groupId of groupIds) revalidatePath(`/groups/${groupId}`);
   revalidatePath("/prayers");
-  redirect(`${returnTo}?created=prayer`);
+  const separator = returnTo.includes("?") ? "&" : "?";
+  const sharePrompt = !personal && returnTo.startsWith("/groups/") && prayerId
+    ? `&prayerId=${encodeURIComponent(prayerId)}&share=1`
+    : "";
+  redirect(`${returnTo}${separator}created=prayer${sharePrompt}`);
+}
+
+export async function sharePrayerWithGroups(formData: FormData) {
+  const prayerId = uuidSchema.safeParse(formData.get("prayerId"));
+  const groupIds = formData.getAll("groupIds")
+    .map((value) => uuidSchema.safeParse(value))
+    .filter((result) => result.success)
+    .map((result) => result.data);
+  const returnTo = safeInternalPath(formData.get("returnTo"), "/dashboard");
+
+  if (!prayerId.success || groupIds.length > 20) redirect(`${returnTo}?error=share-prayer-failed`);
+
+  const { supabase } = await requireUser();
+  const { error } = await supabase.rpc("share_prayer_with_groups", {
+    target_prayer_id: prayerId.data,
+    target_group_ids: [...new Set(groupIds)],
+  });
+  if (error) {
+    console.error("Failed to share prayer", { code: error.code, message: error.message });
+    redirect(`${returnTo}?error=share-prayer-failed`);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/prayers");
+  for (const groupId of groupIds) revalidatePath(`/groups/${groupId}`);
+  redirect(`${returnTo}?shared=prayer`);
 }
 
 export async function togglePrayerCompleted(formData: FormData) {

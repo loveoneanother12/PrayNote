@@ -45,8 +45,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     }));
   }
 
-  const [prayers, notifications] = await Promise.all([
-    getPrayerSummaries(supabase, userData.user.id, { groupIds, status: "active" }),
+  const [groupPrayers, personalPrayers, notifications] = await Promise.all([
+    getPrayerSummaries(supabase, userData.user.id, { groupIds, status: "active", expandGroups: true }),
+    getPrayerSummaries(supabase, userData.user.id, { authorId: userData.user.id, status: "active", personalOnly: true }),
     getNotificationSummaries(supabase, userData.user.id, 4),
   ]);
 
@@ -57,7 +58,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       displayName={profile?.display_name ?? fallbackName}
       email={userData.user.email ?? ""}
       groups={groups}
-      prayers={prayers}
+      prayers={[...personalPrayers, ...groupPrayers]}
       notifications={notifications}
       userId={userData.user.id}
       todayLabel={formatKoreaToday()}

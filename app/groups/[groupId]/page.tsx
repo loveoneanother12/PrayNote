@@ -5,6 +5,7 @@ import { createPrayer } from "@/app/prayer-actions";
 import { CopyInviteButton } from "@/components/copy-invite-button";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordCard } from "@/components/prayer-record-card";
+import { SharePrayerModal } from "@/components/share-prayer-modal";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
 import { getPrayerSummaries } from "@/lib/prayer-queries";
@@ -12,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type GroupPageProps = {
   params: Promise<{ groupId: string }>;
-  searchParams: Promise<{ created?: string; updated?: string; deleted?: string; error?: string; view?: string }>;
+  searchParams: Promise<{ created?: string; updated?: string; deleted?: string; shared?: string; error?: string; view?: string; share?: string; prayerId?: string }>;
 };
 
 export default async function GroupPage({ params, searchParams }: GroupPageProps) {
@@ -30,10 +31,15 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
 
   if (!membership || !group) notFound();
 
-  const [{ count: memberCount }, prayers] = await Promise.all([
+  const [{ count: memberCount }, prayers, { data: myMemberships }] = await Promise.all([
     supabase.from("group_memberships").select("id", { count: "exact", head: true }).eq("group_id", groupId).eq("status", "active"),
     getPrayerSummaries(supabase, userData.user.id, { groupIds: [groupId] }),
+    supabase.from("group_memberships").select("group_id").eq("user_id", userData.user.id).eq("status", "active"),
   ]);
+  const myGroupIds = (myMemberships ?? []).map((item) => item.group_id);
+  const { data: myGroups } = myGroupIds.length
+    ? await supabase.from("groups").select("id, name").in("id", myGroupIds).is("deleted_at", null)
+    : { data: [] as { id: string; name: string }[] };
 
   const activePrayers = prayers.filter((prayer) => prayer.status === "active");
   const resolvedPrayers = prayers.filter((prayer) => prayer.status === "completed");
@@ -72,7 +78,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
           <section className="inline-composer">
             <div className="inline-composer-icon"><BookHeart size={22} /></div>
             <form action={createPrayer}>
-              <input type="hidden" name="groupId" value={groupId} />
+              <input type="hidden" name="groupIds" value={groupId} />
               <input type="hidden" name="returnTo" value={returnTo} />
               <label className="sr-only" htmlFor="group-prayer-content">기도제목</label>
               <textarea id="group-prayer-content" name="content" maxLength={2000} required placeholder="함께 기도받고 싶은 내용을 적어주세요." />
@@ -80,9 +86,9 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             </form>
           </section>
 
-          {(queryParams.created || queryParams.updated || queryParams.deleted || queryParams.error) && (
+          {(queryParams.created || queryParams.updated || queryParams.deleted || queryParams.shared || queryParams.error) && (
             <div className={`page-notice ${queryParams.error ? "error" : ""}`}>
-              {queryParams.created ? "기도제목이 등록됐어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : queryParams.updated === "active" ? "진행 중 기도로 되돌렸어요." : "요청을 처리하지 못했어요."}
+              {queryParams.shared ? "선택한 그룹에도 기도제목을 공유했어요." : queryParams.created ? "기도제목이 등록됐어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : queryParams.updated === "active" ? "진행 중 기도로 되돌렸어요." : "요청을 처리하지 못했어요."}
             </div>
           )}
 
@@ -111,6 +117,9 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
         </div>
       </main>
       <MobileNav active="groups" />
+      {queryParams.share === "1" && queryParams.prayerId && /^[0-9a-f-]{36}$/i.test(queryParams.prayerId) && (
+        <SharePrayerModal prayerId={queryParams.prayerId} currentGroup={{ id: group.id, name: group.name }} groups={myGroups ?? []} returnTo={returnTo} />
+      )}
     </div>
   );
 }

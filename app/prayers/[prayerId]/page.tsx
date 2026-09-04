@@ -38,7 +38,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
     <div className="app-shell">
       <SubpageNav displayName={displayName} active={mine ? "prayers" : "groups"} />
       <main className="main-content subpage-main">
-        <header className="topbar subpage-topbar"><Link className="back-link" href={`/groups/${prayer.groupId}`}><ArrowLeft size={18} />{prayer.groupName}</Link><span className={`detail-status ${completed ? "resolved" : "active"}`}>{completed ? <Check size={14} /> : <BookHeart size={14} />}{completed ? "해결된 기도" : "함께 기도 중"}</span></header>
+        <header className="topbar subpage-topbar"><Link className="back-link" href={prayer.groupId ? `/groups/${prayer.groupId}` : "/prayers"}><ArrowLeft size={18} />{prayer.groupName}</Link><span className={`detail-status ${completed ? "resolved" : "active"}`}>{completed ? <Check size={14} /> : <BookHeart size={14} />}{completed ? "해결된 기도" : prayer.isPersonal ? "개인기도" : "함께 기도 중"}</span></header>
         <div className="content-wrap prayer-detail-content">
           <article className="prayer-detail-card">
             <div className="prayer-detail-author"><div className="avatar avatar-1">{prayer.authorName.slice(0, 2)}</div><div><strong>{mine ? "나" : prayer.authorName}</strong><span>{prayer.groupName}</span></div></div>
@@ -58,7 +58,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
             <section className="prayer-edit-panel">
               <div><h2>기도제목 수정</h2><span>등록일과 기존 기도 기록은 그대로 유지됩니다.</span></div>
               <form action={updatePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><textarea name="content" defaultValue={prayer.content} minLength={1} maxLength={2000} required /><button className="primary-button" type="submit"><Save size={16} />수정 저장</button></form>
-              <div className="prayer-delete-row"><div><strong>기도제목 삭제</strong><span>삭제하면 그룹과 내 기도 목록에서 보이지 않게 됩니다.</span></div><form action={deletePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={`/groups/${prayer.groupId}`} /><ConfirmSubmitButton className="danger-button" message="이 기도제목을 삭제할까요?"><Trash2 size={15} />삭제</ConfirmSubmitButton></form></div>
+              <div className="prayer-delete-row"><div><strong>기도제목 삭제</strong><span>삭제하면 공유된 그룹과 내 기도 목록에서 보이지 않게 됩니다.</span></div><form action={deletePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={prayer.groupId ? `/groups/${prayer.groupId}` : "/prayers"} /><ConfirmSubmitButton className="danger-button" message="이 기도제목을 삭제할까요?"><Trash2 size={15} />삭제</ConfirmSubmitButton></form></div>
             </section>
           )}
         </div>

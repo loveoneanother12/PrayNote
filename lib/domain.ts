@@ -21,8 +21,11 @@ export type GroupSummary = {
 
 export type PrayerSummary = {
   id: string;
-  groupId: string;
+  groupId: string | null;
   groupName: string;
+  groupIds: string[];
+  groupNames: string[];
+  isPersonal: boolean;
   authorId: string;
   authorName: string;
   content: string;

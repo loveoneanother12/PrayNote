@@ -171,7 +171,7 @@ button { color: inherit; }
 
 .mobile-nav { display: none; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; padding: 20px; background: rgba(28, 35, 52, .45); backdrop-filter: blur(4px); display: grid; place-items: center; animation: fade-in .15s ease-out; }
-.composer-modal { width: min(570px, 100%); padding: 25px; border-radius: 18px; background: #fff; box-shadow: 0 30px 80px rgba(27, 35, 56, .24); }
+.composer-modal { width: min(570px, 100%); max-height: min(90vh, 760px); padding: 25px; border-radius: 18px; background: #fff; box-shadow: 0 30px 80px rgba(27, 35, 56, .24); overflow-y: auto; }
 .composer-heading, .composer-heading > div { display: flex; align-items: center; }
 .composer-heading { justify-content: space-between; }
 .composer-heading > div { gap: 12px; }
@@ -183,6 +183,28 @@ button { color: inherit; }
 .composer-modal textarea { width: 100%; min-height: 168px; resize: vertical; padding: 15px; border: 1px solid #dfe3eb; border-radius: 12px; outline: none; color: var(--ink); line-height: 1.6; }
 .composer-modal input { width: 100%; height: 47px; padding: 0 14px; border: 1px solid #dfe3eb; border-radius: 12px; outline: none; color: var(--ink); }
 .composer-modal select { width: 100%; height: 47px; margin-bottom: 18px; padding: 0 14px; border: 1px solid #dfe3eb; border-radius: 12px; outline: none; color: var(--ink); background: #fff; }
+.composer-group-options { max-height: 164px; margin-bottom: 12px; padding: 7px; border: 1px solid #dfe3eb; border-radius: 12px; background: #fafbfc; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; overflow-y: auto; }
+.composer-group-options.disabled { opacity: .5; }
+.composer-group-option { min-height: 39px; margin: 0 !important; padding: 0 10px; border: 1px solid #e3e6ec; border-radius: 9px; color: #59657a !important; background: #fff; display: flex !important; align-items: center; gap: 7px; cursor: pointer; font-size: 10px !important; }
+.composer-group-option input { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; }
+.composer-group-option span { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.composer-group-option > svg { color: transparent; }
+.composer-group-option:has(input:checked) { border-color: #8291dc; color: #4e62bf !important; background: #eef1ff; }
+.composer-group-option:has(input:checked) > svg { color: #586dcc; }
+.composer-group-option:has(input:focus-visible) { outline: 3px solid #dfe4ff; outline-offset: 1px; }
+.composer-no-groups { grid-column: 1 / -1; padding: 10px; color: #8e98a8; font-size: 10px; text-align: center; }
+.personal-prayer-toggle { min-height: 62px; margin: 0 0 18px !important; padding: 10px 12px; border-radius: 11px; background: #f4f5f8; display: flex !important; align-items: center; gap: 10px; cursor: pointer; }
+.personal-prayer-toggle > span:first-child { min-width: 0; flex: 1; display: flex; align-items: center; gap: 9px; }
+.personal-prayer-toggle > span:first-child > svg { color: #65728a; }
+.personal-prayer-toggle strong, .personal-prayer-toggle small { display: block; }
+.personal-prayer-toggle strong { color: #4a576e; font-size: 11px; }
+.personal-prayer-toggle small { margin-top: 4px; color: #919aa9; font-size: 9px; font-weight: 500; line-height: 1.4; }
+.personal-prayer-toggle > input { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; }
+.personal-prayer-toggle > input:checked + .switch { background: #6075d4; }
+.personal-prayer-toggle > input:checked + .switch::after { transform: translateX(18px); }
+.personal-prayer-toggle:has(input:focus-visible) { outline: 3px solid #dfe4ff; }
+.personal-prayer-section .section-heading h2 { color: #52617a; display: flex; align-items: center; gap: 7px; }
+.personal-prayer-section .section-heading h2 svg { color: #6a78a0; }
 .composer-modal input:focus { border-color: #8291dd; box-shadow: 0 0 0 3px #eef0ff; }
 .composer-modal input::placeholder { color: #a6aebb; }
 .composer-modal textarea:focus { border-color: #8291dd; box-shadow: 0 0 0 3px #eef0ff; }
@@ -193,6 +215,23 @@ button { color: inherit; }
 .composer-footer { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; }
 .composer-footer > span { color: #9aa3b2; font-size: 10px; }
 .composer-footer > div { display: flex; gap: 8px; }
+.share-prayer-modal { width: min(610px, 100%); }
+.share-group-list { max-height: 310px; display: grid; gap: 8px; overflow-y: auto; }
+.share-group-option { min-height: 59px; margin: 0 !important; padding: 10px 12px; border: 1px solid #e2e5eb; border-radius: 11px; background: #fff; display: flex !important; align-items: center; gap: 10px; cursor: pointer; }
+.share-group-option > input { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; }
+.share-group-option > span { min-width: 0; flex: 1; display: flex; align-items: center; gap: 10px; }
+.share-group-option > span > svg { color: #78849a; }
+.share-group-option strong, .share-group-option small { display: block; }
+.share-group-option strong { color: #46536a; font-size: 11px; }
+.share-group-option small { margin-top: 4px; color: #959dab; font-size: 9px; font-weight: 500; }
+.share-group-option > svg { color: transparent; }
+.share-group-option.selected { border-color: #8291dc; background: #eef1ff; }
+.share-group-option.selected > svg { color: #566bc9; }
+.share-group-option:has(input:focus-visible) { outline: 3px solid #dfe4ff; outline-offset: 1px; }
+.share-group-option.disabled { border-style: dashed; cursor: default; opacity: .72; }
+.share-no-groups { margin: 0; padding: 22px; border: 1px dashed #dfe3e9; border-radius: 11px; color: #919aa9; text-align: center; font-size: 10px; }
+.share-footer { align-items: flex-end; gap: 15px; }
+.share-footer > span { max-width: 230px; line-height: 1.45; }
 .toast { position: fixed; z-index: 70; left: 50%; bottom: 28px; transform: translateX(-50%); padding: 12px 17px; border-radius: 11px; color: white; background: #2f3b51; box-shadow: 0 14px 35px rgba(24, 31, 47, .25); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; animation: toast-in .22s ease-out; }
 .error-toast { background: #a8495a; }
 .realtime-toast { background: #5368c7; }
@@ -241,6 +280,11 @@ button { color: inherit; }
   .overview-title small { max-width: 180px; }
   .section-heading { align-items: center; }
   .composer-modal { padding: 20px; }
+  .composer-group-options { grid-template-columns: 1fr; }
+  .share-footer { align-items: stretch; flex-direction: column; }
+  .share-footer > span { max-width: none; }
+  .share-footer > div { display: grid; grid-template-columns: 1fr; }
+  .share-footer button { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

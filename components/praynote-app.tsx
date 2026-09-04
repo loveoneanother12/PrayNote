@@ -11,6 +11,7 @@ import {
   CircleAlert,
   Heart,
   Home,
+  LockKeyhole,
   MoreHorizontal,
   Plus,
   Search,
@@ -46,9 +47,12 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
   const [composerOpen, setComposerOpen] = useState(false);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  const [personalPrayer, setPersonalPrayer] = useState(false);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const toast = created === "group" ? "새 그룹을 만들었어요" : created === "prayer" ? "기도제목을 나눴어요" : created === "left" ? "그룹에서 탈퇴했어요" : created === "deleted" ? "그룹을 삭제했어요" : "";
   const initials = displayName.trim().slice(0, 2).toUpperCase();
-  const activeCount = prayers.length;
+  const activeCount = new Set(prayers.map((prayer) => prayer.id)).size;
+  const personalPrayers = prayers.filter((prayer) => prayer.isPersonal);
 
   return (
     <div className="app-shell">
@@ -89,7 +93,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
               <h1>평안한 하루예요, {displayName}님.</h1>
               <p>서로의 마음을 기억하고, 작은 기도로 오늘을 이어가요.</p>
             </div>
-            <button className="primary-button" disabled={groups.length === 0} onClick={() => setComposerOpen(true)}><Plus size={19} />기도제목 나누기</button>
+            <button className="primary-button" onClick={() => setComposerOpen(true)}><Plus size={19} />기도제목 나누기</button>
           </section>
 
           <section className="prayer-overview" id="prayers">
@@ -100,7 +104,7 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
               onClick={() => setOpened((value) => !value)}
             >
               <span className="overview-icon"><BookHeart size={22} /></span>
-              <span className="overview-title"><strong>기도제목 열어보기</strong><small>{groups.length}개 그룹에서 {activeCount}개의 기도제목이 기다리고 있어요</small></span>
+              <span className="overview-title"><strong>기도제목 열어보기</strong><small>개인기도와 {groups.length}개 그룹의 기도제목 {activeCount}개가 있어요</small></span>
               {activeCount > 0 && <span className="unread-chip">새 기도 {activeCount}</span>}
               <ChevronDown className={opened ? "chevron-open" : ""} size={21} />
             </button>
@@ -108,6 +112,24 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
             {opened && (
               <div className="overview-body">
                 {groups.length === 0 && <div className="section-heading compact"><div><h2>아직 그룹이 없어요</h2><span>그룹을 만들거나 초대받아 참여해보세요.</span></div></div>}
+                {personalPrayers.length > 0 && (
+                  <section className="dashboard-group-prayers personal-prayer-section">
+                    <div className="section-heading compact"><div><h2><LockKeyhole size={16} />개인기도</h2><span>나만 볼 수 있는 기도제목 {personalPrayers.length}개</span></div><Link className="text-button" href="/prayers">모두 보기 <ChevronRight size={16} /></Link></div>
+                    <div className="prayer-list">
+                      {personalPrayers.slice(0, 3).map((prayer, index) => (
+                        <article className="prayer-card" key={prayer.id}>
+                          <div className={`avatar avatar-${index % 3}`}>{prayer.authorName.slice(0, 2)}</div>
+                          <div className="prayer-copy">
+                            <div className="prayer-meta"><strong>나</strong><span>·</span><span>{formatKoreaDate(prayer.createdAt)} 등록</span></div>
+                            <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{prayer.content}</Link>
+                            <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value="/dashboard" /><button className={`pray-button ${prayer.hasPrayed ? "selected" : ""}`} type="submit" aria-pressed={prayer.hasPrayed}><Heart size={16} fill={prayer.hasPrayed ? "currentColor" : "none"} />{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"} <span>{prayer.responseCount}회</span></button></form>
+                          </div>
+                          <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label="개인 기도제목 자세히 보기"><ChevronRight size={19} /></Link>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                )}
                 {groups.map((group) => {
                   const allGroupPrayers = prayers.filter((prayer) => prayer.groupId === group.id);
                   const groupPrayers = allGroupPrayers.slice(0, 3);
@@ -192,13 +214,31 @@ export function PrayNoteApp({ displayName, email, groups, prayers, notifications
             <div className="composer-heading"><div><span className="overview-icon"><BookHeart size={21} /></span><div><h2 id="composer-title">기도제목 나누기</h2><p>등록 날짜는 한국시간 기준으로 자동 저장됩니다.</p></div></div><button onClick={() => setComposerOpen(false)} aria-label="닫기">×</button></div>
             <form action={createPrayer}>
               <input type="hidden" name="returnTo" value="/dashboard" />
-              <label htmlFor="prayer-group">나눌 그룹</label>
-              <select id="prayer-group" name="groupId" required defaultValue={groups[0]?.id}>
-                {groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}
-              </select>
+              <label>그룹을 선택해주세요 <span className="optional-label">다중선택 가능</span></label>
+              <div className={`composer-group-options ${personalPrayer ? "disabled" : ""}`} aria-disabled={personalPrayer}>
+                {groups.length === 0 && <span className="composer-no-groups">가입된 그룹이 없어도 개인기도로 저장할 수 있어요.</span>}
+                {groups.map((group) => (
+                  <label className="composer-group-option" key={group.id}>
+                    <input
+                      type="checkbox"
+                      name="groupIds"
+                      value={group.id}
+                      checked={selectedGroupIds.includes(group.id)}
+                      disabled={personalPrayer}
+                      onChange={(event) => setSelectedGroupIds((current) => event.target.checked ? [...current, group.id] : current.filter((id) => id !== group.id))}
+                    />
+                    <span>{group.name}</span><Check size={14} />
+                  </label>
+                ))}
+              </div>
+              <label className="personal-prayer-toggle">
+                <span><LockKeyhole size={17} /><span><strong>혼자 보는 개인 기도제목인가요?</strong><small>켜면 어떤 그룹에도 공유되지 않고 나만 볼 수 있어요.</small></span></span>
+                <input type="checkbox" name="personal" checked={personalPrayer} onChange={(event) => setPersonalPrayer(event.target.checked)} />
+                <span className="switch" aria-hidden="true" />
+              </label>
               <label htmlFor="prayer-content">함께 기도받고 싶은 내용을 적어주세요</label>
               <textarea id="prayer-content" name="content" autoFocus maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="솔직한 마음을 편안하게 나눠주세요." required />
-              <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={() => setComposerOpen(false)}>취소</button><button className="primary-button" disabled={!draft.trim()}>기도제목 등록</button></div></div>
+              <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={() => setComposerOpen(false)}>취소</button><button className="primary-button" disabled={!draft.trim() || (!personalPrayer && selectedGroupIds.length === 0)}>기도제목 등록</button></div></div>
             </form>
           </div>
         </div>
