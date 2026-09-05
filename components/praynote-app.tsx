@@ -24,6 +24,7 @@ import { InstantPrayerButton } from "@/components/instant-prayer-actions";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
+import { InstallGuideModal } from "@/components/install-guide-modal";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
@@ -39,6 +40,7 @@ type PrayNoteAppProps = {
   notifications: NotificationSummary[];
   userId: string;
   todayLabel: string;
+  greeting: string;
   unreadNotificationCount: number;
   groupCount: number;
   prayerCount: number;
@@ -50,7 +52,7 @@ type PrayNoteAppProps = {
 const roleLabels = { leader: "LEADER", admin: "ADMIN", member: "MEMBER" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function PrayNoteApp({ displayName, profileColor, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
+export function PrayNoteApp({ displayName, profileColor, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, greeting, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
   const router = useRouter();
   const [opened, setOpened] = useState(true);
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
@@ -170,6 +172,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
         <header className="topbar">
           <a className="mobile-brand" href="#top"><span className="brand-mark"><BookHeart size={19} /></span>PrayNote</a>
           <form className="search-box" action="/search" method="get"><Search size={18} /><input name="q" aria-label="기도제목 검색" placeholder="기도제목 검색" /><kbd>⌘ K</kbd></form>
+          <InstallGuideModal />
           <Link className="icon-button notification-button" href="/notifications" aria-label={`읽지 않은 알림 ${unreadNotificationCount}개`}><Bell size={20} />{unreadNotificationCount > 0 && <span />}</Link>
           <ProfileDot color={profileColor} label={displayName} className="top-avatar" />
         </header>
@@ -178,7 +181,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
           <section className="welcome-row">
             <div>
               <p className="eyebrow"><Sparkles size={15} />{todayLabel} · 오늘도 함께하는 기도</p>
-              <h1>평안한 하루예요, {displayName}님.</h1>
+              <h1>{greeting}, {displayName}님.</h1>
               <p>서로의 마음을 기억하고, 작은 기도로 오늘을 이어가요.</p>
             </div>
             <button className="primary-button" onClick={() => setComposerOpen(true)}><Plus size={19} />기도제목 나누기</button>
@@ -271,18 +274,13 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
             </div>
           </section>
 
-          <section className="bottom-grid">
+          <section className="bottom-grid single-panel">
             <div className="activity-panel" id="notifications">
               <div className="section-heading compact"><div><h2>최근 소식</h2></div><Link className="text-button" href="/notifications">모두 보기 <ChevronRight size={16} /></Link></div>
               <div className="dashboard-notifications">
                 {notifications.slice(0, 3).map((notification) => <NotificationListItem key={notification.id} notification={notification} compact />)}
                 {notifications.length === 0 && <div className="empty-activity"><Bell size={20} /><span>새로운 소식이 생기면 알려드릴게요.</span></div>}
               </div>
-            </div>
-            <div className="verse-card">
-              <span>오늘의 말씀</span>
-              <blockquote>“소망 중에 즐거워하며<br />환난 중에 참으며<br />기도에 항상 힘쓰며”</blockquote>
-              <cite>로마서 12:12</cite>
             </div>
           </section>
         </div>

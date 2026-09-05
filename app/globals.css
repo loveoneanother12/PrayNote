@@ -64,6 +64,8 @@ button { color: inherit; }
 .icon-button, .more-button { border: 0; background: transparent; cursor: pointer; }
 .icon-button { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
 .icon-button:hover { background: #f2f3f8; }
+.install-guide-button { min-height: 36px; padding: 0 11px; border: 1px solid #e1e5ed; border-radius: 10px; color: #62708a; background: #fff; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 750; }
+.install-guide-button:hover { color: #4d62bf; border-color: #d3d9f1; background: #f7f8ff; }
 .notification-button { position: relative; color: var(--ink); text-decoration: none; }
 .notification-button span { position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: #ef6d76; border: 2px solid white; }
 .top-avatar { width: 38px; height: 38px; }
@@ -141,6 +143,7 @@ button { color: inherit; }
 .join-card small { font-size: 11px; }
 
 .bottom-grid { margin-top: 43px; display: grid; grid-template-columns: 1.4fr .8fr; gap: 16px; }
+.bottom-grid.single-panel { display: block; }
 .dashboard-group-prayers, .groups-section, .bottom-grid, .prayer-record-section, .settings-panel { content-visibility: auto; contain-intrinsic-size: auto 320px; }
 .activity-panel, .verse-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 21px; }
 .activity-item { padding: 13px 0; display: flex; align-items: center; gap: 12px; border-top: 1px solid #eef0f4; }
@@ -180,6 +183,31 @@ button { color: inherit; }
 .verse-card > span { font-size: 10px; font-weight: 750; letter-spacing: .06em; opacity: .72; }
 .verse-card blockquote { margin: 19px 0 16px; font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.62; letter-spacing: -.02em; }
 .verse-card cite { font-style: normal; font-size: 11px; opacity: .72; }
+.modal-open { overflow: hidden; }
+.guide-backdrop { position: fixed; inset: 0; z-index: 80; padding: 20px; background: rgba(28, 35, 52, .5); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; animation: fade-in .15s ease-out; }
+.install-guide-sheet { width: min(900px, 100%); max-height: min(88vh, 760px); padding: 12px 28px 25px; border-radius: 24px 24px 0 0; background: #fff; box-shadow: 0 -20px 70px rgba(27, 35, 56, .22); overflow-y: auto; animation: guide-up .22s ease-out; }
+.guide-handle { width: 45px; height: 4px; margin: 0 auto 14px; border-radius: 10px; background: #d9dde5; }
+.guide-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.guide-heading > div { display: flex; align-items: center; gap: 12px; }
+.guide-heading > div > span { width: 43px; height: 43px; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #7285df, #5267c8); display: grid; place-items: center; }
+.guide-heading p { margin: 0 0 3px; color: var(--blue); font-size: 9px; font-weight: 800; }
+.guide-heading h2 { margin: 0; font-size: 20px; letter-spacing: -.03em; }
+.guide-heading > button { width: 36px; height: 36px; border: 0; border-radius: 10px; color: #758095; background: #f2f4f7; display: grid; place-items: center; cursor: pointer; }
+.guide-intro { margin: 14px 0 19px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.guide-platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.guide-platform { padding: 18px; border: 1px solid #e4e7ed; border-radius: 15px; background: #fafbfc; }
+.guide-platform-title { display: flex; align-items: center; gap: 9px; }
+.guide-platform-title > span { min-width: 36px; height: 25px; padding: 0 7px; border-radius: 7px; color: #fff; background: #5d72d2; display: grid; place-items: center; font-size: 8px; font-weight: 850; letter-spacing: .04em; }
+.guide-platform:nth-child(2) .guide-platform-title > span { background: #4c8a72; }
+.guide-platform h3 { margin: 0; font-size: 14px; }
+.guide-platform ol { margin: 16px 0 0; padding: 0; display: grid; gap: 10px; list-style: none; }
+.guide-platform li { min-height: 43px; display: flex; align-items: flex-start; gap: 9px; color: #647087; font-size: 10px; line-height: 1.55; }
+.guide-platform li em { width: 23px; height: 23px; flex: 0 0 auto; border-radius: 50%; color: #5368c7; background: #e9edff; display: grid; place-items: center; font-style: normal; font-size: 9px; font-weight: 850; }
+.guide-platform li > div { padding-top: 3px; }
+.guide-platform li svg { margin-right: 4px; vertical-align: -3px; color: #6578ca; }
+.guide-platform li strong { color: #3f4c63; }
+.guide-footer { margin-top: 15px; padding: 11px 13px; border-radius: 10px; color: #8b95a5; background: #f3f4f7; display: flex; align-items: center; gap: 8px; font-size: 9px; }
+@keyframes guide-up { from { opacity: 0; transform: translateY(35px); } to { opacity: 1; transform: translateY(0); } }
 
 .mobile-nav { display: none; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; padding: 20px; background: rgba(28, 35, 52, .45); backdrop-filter: blur(4px); display: grid; place-items: center; animation: fade-in .15s ease-out; }
@@ -272,6 +300,8 @@ button { color: inherit; }
   .mobile-brand .brand-mark { width: 34px; height: 34px; border-radius: 11px; }
   .search-box { display: none; }
   .top-avatar { display: none; }
+  .install-guide-button { width: 36px; min-height: 36px; padding: 0; justify-content: center; }
+  .install-guide-button span { display: none; }
   .content-wrap { width: calc(100% - 32px); padding: 32px 0 30px; }
   .welcome-row { align-items: flex-start; margin-bottom: 25px; }
   .welcome-row h1 { font-size: 27px; }
@@ -287,6 +317,9 @@ button { color: inherit; }
   .group-card { min-height: 156px; padding: 16px; }
   .group-card-top { top: 16px; right: 15px; }
   .bottom-grid { grid-template-columns: 1fr; }
+  .guide-backdrop { padding: 0; }
+  .install-guide-sheet { max-height: 91vh; padding: 11px 17px max(21px, env(safe-area-inset-bottom)); }
+  .guide-platform-grid { grid-template-columns: 1fr; }
   .mobile-nav { position: fixed; inset: auto 0 0; z-index: 30; height: 68px; padding: 5px 17px max(5px, env(safe-area-inset-bottom)); background: rgba(255,255,255,.95); backdrop-filter: blur(16px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; }
   .mobile-nav a { height: 51px; color: #8a94a6; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 9px; font-weight: 650; }
   .mobile-nav a.active { color: var(--blue); }

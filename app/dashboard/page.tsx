@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { PrayNoteApp } from "@/components/praynote-app";
-import { formatKoreaToday } from "@/lib/dates";
+import { formatKoreaToday, getKoreaGreeting } from "@/lib/dates";
 import { getDashboardBundle } from "@/lib/dashboard-queries";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,6 +28,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       notifications={bundle.notifications}
       userId={bundle.userId}
       todayLabel={formatKoreaToday()}
+      greeting={getKoreaGreeting()}
       unreadNotificationCount={bundle.unreadCount}
       groupCount={bundle.groupCount}
       prayerCount={bundle.prayerCount}
