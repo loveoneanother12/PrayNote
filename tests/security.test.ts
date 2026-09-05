@@ -10,6 +10,7 @@ const sharedPrayerSchema = readFileSync(join(root, "supabase/migrations/20260904
 const hardenedPushSchema = readFileSync(join(root, "supabase/migrations/202609050001_harden_push_delivery.sql"), "utf8");
 const performanceSchema = readFileSync(join(root, "supabase/migrations/202609050002_performance_read_models.sql"), "utf8");
 const bundleSchema = readFileSync(join(root, "supabase/migrations/202609050003_ultra_performance.sql"), "utf8");
+const multiApproverJoinSchema = readFileSync(join(root, "supabase/migrations/202609050004_fix_multi_approver_join.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -100,5 +101,12 @@ describe("security guardrails", () => {
     expect(bundleSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to authenticated;");
     expect(bundleSchema).toContain("where notification.recipient_id = auth.uid()");
     expect(bundleSchema).toContain("where reminder.user_id = auth.uid()");
+  });
+
+  it("gives every membership approver a unique notification event key", () => {
+    expect(multiApproverJoinSchema).toContain("membership.user_id::text");
+    expect(multiApproverJoinSchema).toContain("request_event_id::text");
+    expect(multiApproverJoinSchema).toContain("membership.role in ('admin', 'leader')");
+    expect(multiApproverJoinSchema).toContain("grant execute on function public.request_group_membership(uuid, text) to authenticated;");
   });
 });
