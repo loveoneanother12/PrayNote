@@ -25,6 +25,8 @@ export type DashboardOverview = {
 export type DashboardBundle = DashboardOverview & {
   userId: string;
   email: string;
+  groupCount: number;
+  prayerCount: number;
   groupPrayers: PrayerSummary[];
   personalPrayers: PrayerSummary[];
   notifications: NotificationSummary[];
@@ -57,11 +59,14 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
     user_id: string;
     email?: string | null;
     overview: DashboardOverviewRow;
+    counts?: { group_count?: number | string | null; prayer_count?: number | string | null };
     group_prayers?: PrayerSummaryRow[];
     personal_prayers?: PrayerSummaryRow[];
     notifications?: NotificationSummaryRow[];
   };
   const overview = bundle.overview ?? {};
+  const groupPrayers = (bundle.group_prayers ?? []).map(mapPrayerSummaryRow);
+  const personalPrayers = (bundle.personal_prayers ?? []).map(mapPrayerSummaryRow);
   return {
     userId: bundle.user_id,
     email: bundle.email ?? "",
@@ -75,8 +80,10 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
       memberCount: Number(group.member_count),
       unreadCount: Number(group.unread_count),
     })),
-    groupPrayers: (bundle.group_prayers ?? []).map(mapPrayerSummaryRow),
-    personalPrayers: (bundle.personal_prayers ?? []).map(mapPrayerSummaryRow),
+    groupCount: Number(bundle.counts?.group_count ?? overview.groups?.length ?? 0),
+    prayerCount: Number(bundle.counts?.prayer_count ?? new Set([...groupPrayers, ...personalPrayers].map((prayer) => prayer.id)).size),
+    groupPrayers,
+    personalPrayers,
     notifications: (bundle.notifications ?? []).map(mapNotificationSummaryRow),
   };
 }

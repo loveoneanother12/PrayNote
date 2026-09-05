@@ -37,6 +37,8 @@ type PrayNoteAppProps = {
   userId: string;
   todayLabel: string;
   unreadNotificationCount: number;
+  groupCount: number;
+  prayerCount: number;
   created?: string;
   error?: string;
   initialComposerOpen?: boolean;
@@ -45,7 +47,7 @@ type PrayNoteAppProps = {
 const roleLabels = { leader: "LEADER", admin: "ADMIN", member: "MEMBER" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, unreadNotificationCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
+export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
   const router = useRouter();
   const [opened, setOpened] = useState(true);
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
@@ -63,8 +65,11 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
   const visibleError = localError || error;
   const groups = [...initialGroups, ...optimisticGroups.filter((optimistic) => !initialGroups.some((group) => group.id === optimistic.id))];
   const prayers = [...optimisticPrayers.filter((optimistic) => !initialPrayers.some((prayer) => prayer.id === optimistic.id && prayer.groupId === optimistic.groupId)), ...initialPrayers];
+  const newGroupCount = new Set(optimisticGroups.filter((group) => !initialGroups.some((initial) => initial.id === group.id)).map((group) => group.id)).size;
+  const newPrayerCount = new Set(optimisticPrayers.filter((prayer) => !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
+  const displayedGroupCount = groupCount + newGroupCount;
+  const displayedPrayerCount = prayerCount + newPrayerCount;
   const initials = displayName.trim().slice(0, 2).toUpperCase();
-  const activeCount = new Set(prayers.map((prayer) => prayer.id)).size;
   const personalPrayers = prayers.filter((prayer) => prayer.isPersonal);
 
   async function submitPrayer(event: FormEvent<HTMLFormElement>) {
@@ -184,8 +189,8 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
               onClick={() => setOpened((value) => !value)}
             >
               <span className="overview-icon"><BookHeart size={22} /></span>
-              <span className="overview-title"><strong>기도제목 열어보기</strong><small>개인기도와 {groups.length}개 그룹의 기도제목 {activeCount}개가 있어요</small></span>
-              {activeCount > 0 && <span className="unread-chip">새 기도 {activeCount}</span>}
+              <span className="overview-title"><strong>기도제목 열어보기</strong><small>개인기도 + 가입 그룹 {displayedGroupCount}개 · 기도제목 총 {displayedPrayerCount}개 (중복 제외)</small></span>
+              {displayedPrayerCount > 0 && <span className="unread-chip">기도 {displayedPrayerCount}</span>}
               <ChevronDown className={opened ? "chevron-open" : ""} size={21} />
             </button>
 

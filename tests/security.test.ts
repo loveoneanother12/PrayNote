@@ -11,6 +11,7 @@ const hardenedPushSchema = readFileSync(join(root, "supabase/migrations/20260905
 const performanceSchema = readFileSync(join(root, "supabase/migrations/202609050002_performance_read_models.sql"), "utf8");
 const bundleSchema = readFileSync(join(root, "supabase/migrations/202609050003_ultra_performance.sql"), "utf8");
 const multiApproverJoinSchema = readFileSync(join(root, "supabase/migrations/202609050004_fix_multi_approver_join.sql"), "utf8");
+const dashboardCountSchema = readFileSync(join(root, "supabase/migrations/202609050005_dashboard_scope_counts.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -108,5 +109,13 @@ describe("security guardrails", () => {
     expect(multiApproverJoinSchema).toContain("request_event_id::text");
     expect(multiApproverJoinSchema).toContain("membership.role in ('admin', 'leader')");
     expect(multiApproverJoinSchema).toContain("grant execute on function public.request_group_membership(uuid, text) to authenticated;");
+  });
+
+  it("counts only private prayers and prayers from active memberships", () => {
+    expect(dashboardCountSchema).toContain("prayer.author_id = auth.uid()");
+    expect(dashboardCountSchema).toContain("membership.user_id = auth.uid()");
+    expect(dashboardCountSchema).toContain("membership.status = 'active'");
+    expect(dashboardCountSchema).toContain("app_group.deleted_at is null");
+    expect(dashboardCountSchema).toContain("count(distinct prayer.id) as prayer_count");
   });
 });

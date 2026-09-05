@@ -30,6 +30,17 @@ describe("performance read paths", () => {
     expect(dashboard).not.toContain("supabase.from(");
   });
 
+  it("uses explicit scoped dashboard totals instead of expanded list row counts", () => {
+    const dashboardQueries = read("lib/dashboard-queries.ts");
+    const dashboardUi = read("components/praynote-app.tsx");
+    const countSchema = read("supabase/migrations/202609050005_dashboard_scope_counts.sql");
+    expect(dashboardQueries).toContain("bundle.counts?.group_count");
+    expect(dashboardQueries).toContain("bundle.counts?.prayer_count");
+    expect(dashboardUi).toContain("중복 제외");
+    expect(countSchema).toContain("count(distinct prayer.id) as prayer_count");
+    expect(countSchema).toContain("membership.status = 'active'");
+  });
+
   it("places server functions beside the Seoul database and uses Turbopack locally", () => {
     const vercel = JSON.parse(read("vercel.json")) as { regions?: string[] };
     const packageJson = JSON.parse(read("package.json")) as { scripts?: Record<string, string> };
