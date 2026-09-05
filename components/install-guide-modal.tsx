@@ -2,6 +2,7 @@
 
 import { BellRing, Download, HelpCircle, MoreHorizontal, Share2, ShieldAlert, Smartphone, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 const iosSteps = [
   <>최신 버전의 <strong>Safari</strong>로 접속해주세요.</>,
@@ -32,7 +33,7 @@ export function InstallGuideModal() {
   return (
     <>
       <button className="install-guide-button" type="button" onClick={() => setOpen(true)}><HelpCircle size={17} /><span>사용 가이드</span></button>
-      {open && <div className="guide-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+      {open && createPortal(<div className="guide-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
         <section className="install-guide-sheet" role="dialog" aria-modal="true" aria-labelledby="install-guide-title" onMouseDown={(event) => event.stopPropagation()}>
           <div className="guide-handle" aria-hidden="true" />
           <header className="guide-heading">
@@ -46,7 +47,7 @@ export function InstallGuideModal() {
           </div>
           <footer className="guide-footer"><MoreHorizontal size={17} /><span>기기와 브라우저 버전에 따라 메뉴 이름이 조금 다를 수 있어요.</span></footer>
         </section>
-      </div>}
+      </div>, document.body)}
     </>
   );
 }

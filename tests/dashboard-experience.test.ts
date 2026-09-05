@@ -24,6 +24,8 @@ describe("installation guide and daily verse", () => {
     expect(guide).toContain("Android");
     expect(guide).toContain("홈 화면에 추가");
     expect(guide).toContain("세부정보 더보기");
+    expect(guide).toContain("createPortal");
+    expect(guide).toContain("document.body");
   });
 
   it("does not publish a static verse-of-the-day card", () => {

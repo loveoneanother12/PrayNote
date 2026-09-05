@@ -110,8 +110,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </form>
               )}
 
-              <p className="auth-terms">계속하면 PrayNote의 이용약관과 개인정보 처리방침에 동의하게 됩니다.</p>
-              <Link className="auth-demo-link" href="/">로그인 전 데모 화면 보기</Link>
+              <p className="auth-terms">
+                계속하면 PrayNote의 이용약관과 <Link href="/privacy">개인정보 처리방침</Link>에 동의하게 됩니다.
+              </p>
             </>
           )}
         </div>
