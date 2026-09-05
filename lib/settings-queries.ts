@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ProfileColor } from "@/lib/domain";
+import { normalizeProfileColor } from "./profile-colors";
 
 export type SettingsBundle = {
   userId: string;
   email: string;
   displayName: string | null;
+  profileColor: ProfileColor;
   unreadCount: number;
   preferences: {
     in_app_enabled?: boolean;
@@ -24,6 +27,7 @@ export async function getSettingsBundle(supabase: SupabaseClient): Promise<Setti
     user_id: string;
     email?: string | null;
     display_name?: string | null;
+    profile_color?: string | null;
     unread_count?: number | string;
     preferences?: SettingsBundle["preferences"];
     reminder_times?: SettingsBundle["reminderTimes"];
@@ -32,6 +36,7 @@ export async function getSettingsBundle(supabase: SupabaseClient): Promise<Setti
     userId: row.user_id,
     email: row.email ?? "",
     displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.profile_color),
     unreadCount: Number(row.unread_count ?? 0),
     preferences: row.preferences ?? {},
     reminderTimes: row.reminder_times ?? [],

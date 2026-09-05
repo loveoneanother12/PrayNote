@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NotificationSummary, NotificationType } from "@/lib/domain";
+import { normalizeProfileColor } from "./profile-colors";
 
 export type NotificationRow = {
   id: string;
@@ -37,12 +38,14 @@ export async function getNotificationsPageBundle(supabase: SupabaseClient, limit
     user_id: string;
     email?: string | null;
     display_name?: string | null;
+    profile_color?: string | null;
     notifications?: NotificationSummaryRow[];
   };
   return {
     userId: row.user_id,
     email: row.email ?? "",
     displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.profile_color),
     notifications: (row.notifications ?? []).map(mapNotificationSummaryRow),
   };
 }

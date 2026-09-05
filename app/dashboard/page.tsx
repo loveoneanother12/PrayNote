@@ -21,6 +21,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   return (
     <PrayNoteApp
       displayName={bundle.displayName ?? fallbackName}
+      profileColor={bundle.profileColor}
       email={bundle.email}
       groups={bundle.groups}
       prayers={[...bundle.personalPrayers, ...bundle.groupPrayers]}

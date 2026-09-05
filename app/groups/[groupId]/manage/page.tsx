@@ -6,6 +6,7 @@ import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { InstantAdminRoleButton, InstantGroupSettingsForm, InstantMembershipReview } from "@/components/instant-group-actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { SubpageNav } from "@/components/subpage-nav";
+import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
 import { getGroupManageBundle } from "@/lib/group-queries";
 import { createClient } from "@/lib/supabase/server";
@@ -34,7 +35,7 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
 
   return (
     <div className="app-shell">
-      <SubpageNav displayName={displayName} active="groups" />
+      <SubpageNav displayName={displayName} profileColor={overview.profileColor} active="groups" />
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar"><Link className="back-link" href={`/groups/${groupId}`}><ArrowLeft size={18} />{group.name}</Link><span className="management-role">내 역할 · {role.toUpperCase()}</span></header>
         <div className="content-wrap detail-content manage-content">
@@ -48,7 +49,7 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
               <div className="membership-list">
                 {pending.map((membership) => (
                   <div className="membership-row" key={membership.id}>
-                    <div className="avatar avatar-2">{nameFor(membership.user_id).slice(0, 2)}</div>
+                    <ProfileDot color={membership.profile_color} label={nameFor(membership.user_id)} />
                     <div><strong>{nameFor(membership.user_id)}</strong><span>{formatKoreaDate(membership.requested_at)} 신청</span></div>
                     <InstantMembershipReview membershipId={membership.id} />
                   </div>
@@ -63,7 +64,7 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
             <div className="membership-list">
               {active.map((membership) => (
                 <div className="membership-row" key={membership.id}>
-                  <div className="avatar avatar-1">{nameFor(membership.user_id).slice(0, 2)}</div>
+                  <ProfileDot color={membership.profile_color} label={nameFor(membership.user_id)} />
                   <div><strong>{membership.user_id === bundle.userId ? `${nameFor(membership.user_id)} (나)` : nameFor(membership.user_id)}</strong><span>{membership.role === "leader" ? "Leader" : membership.role === "admin" ? "Admin · 가입 승인 가능" : "Member"}</span></div>
                   <span className={`member-role-badge ${membership.role}`}>{membership.role === "leader" ? <Crown size={13} /> : membership.role === "admin" ? <ShieldCheck size={13} /> : null}{membership.role.toUpperCase()}</span>
                   {isLeader && membership.user_id !== bundle.userId && membership.role !== "leader" && (

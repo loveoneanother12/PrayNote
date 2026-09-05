@@ -54,7 +54,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
   return (
     <div className="app-shell">
-      <SubpageNav displayName={displayName} active="settings" unreadNotificationCount={bundle.unreadCount} />
+      <SubpageNav displayName={displayName} profileColor={bundle.profileColor} active="settings" unreadNotificationCount={bundle.unreadCount} />
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
@@ -69,8 +69,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           {(notice || query.error) && <div className={`page-notice ${query.error ? "error" : ""}`}>{notice || errorMessage}</div>}
 
           <section className="settings-panel">
-            <div className="settings-panel-heading"><span><UserRound size={18} /></span><div><h2>프로필</h2><p>그룹 멤버들에게 표시되는 이름입니다.</p></div></div>
-            <InstantProfileForm userId={bundle.userId} displayName={displayName} email={bundle.email} />
+            <div className="settings-panel-heading"><span><UserRound size={18} /></span><div><h2>프로필</h2><p>그룹 멤버들에게 표시되는 이름과 색입니다.</p></div></div>
+            <InstantProfileForm userId={bundle.userId} displayName={displayName} email={bundle.email} initialColor={bundle.profileColor} />
           </section>
 
           <section className="settings-panel">

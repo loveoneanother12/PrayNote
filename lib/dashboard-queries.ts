@@ -1,10 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { GroupRole, GroupSummary, NotificationSummary, PrayerSummary } from "@/lib/domain";
+import type { GroupRole, GroupSummary, NotificationSummary, PrayerSummary, ProfileColor } from "@/lib/domain";
 import { mapNotificationSummaryRow, type NotificationSummaryRow } from "@/lib/notification-queries";
 import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
+import { normalizeProfileColor } from "./profile-colors";
 
 type DashboardOverviewRow = {
   display_name?: string | null;
+  profile_color?: string | null;
   unread_count?: number | string | null;
   groups?: Array<{
     id: string;
@@ -18,6 +20,7 @@ type DashboardOverviewRow = {
 
 export type DashboardOverview = {
   displayName: string | null;
+  profileColor: ProfileColor;
   groups: GroupSummary[];
   unreadCount: number;
 };
@@ -39,6 +42,7 @@ export async function getDashboardOverview(supabase: SupabaseClient): Promise<Da
   const row = (data ?? {}) as DashboardOverviewRow;
   return {
     displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.profile_color),
     unreadCount: Number(row.unread_count ?? 0),
     groups: (row.groups ?? []).map((group) => ({
       id: group.id,
@@ -71,6 +75,7 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
     userId: bundle.user_id,
     email: bundle.email ?? "",
     displayName: overview.display_name ?? null,
+    profileColor: normalizeProfileColor(overview.profile_color),
     unreadCount: Number(overview.unread_count ?? 0),
     groups: (overview.groups ?? []).map((group) => ({
       id: group.id,

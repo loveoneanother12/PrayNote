@@ -1,6 +1,7 @@
 export type GroupRole = "member" | "admin" | "leader";
 export type MembershipStatus = "pending" | "active" | "rejected";
 export type PrayerStatus = "active" | "completed";
+export type ProfileColor = "indigo" | "sky" | "teal" | "green" | "amber" | "rose" | "violet" | "slate";
 export type NotificationType =
   | "new_prayer"
   | "prayer_response"
@@ -28,6 +29,7 @@ export type PrayerSummary = {
   isPersonal: boolean;
   authorId: string;
   authorName: string;
+  authorColor: ProfileColor;
   content: string;
   status: PrayerStatus;
   responseCount: number;

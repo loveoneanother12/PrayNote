@@ -42,6 +42,17 @@ button { color: inherit; }
 .avatar-0 { color: #49695c; background: #e1f0e9; }
 .avatar-1 { color: #425a9e; background: #e6ebff; }
 .avatar-2 { color: #92566a; background: #fbe5ec; }
+.profile-dot { flex: 0 0 auto; width: 41px; height: 41px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(71, 82, 108, .12), 0 5px 13px rgba(39, 50, 78, .12); display: inline-block; }
+.profile-dot.small { width: 24px; height: 24px; border-width: 2px; }
+.profile-dot.large { width: 49px; height: 49px; }
+.profile-color-indigo { background: linear-gradient(145deg, #7c8ee5, #5368cc); }
+.profile-color-sky { background: linear-gradient(145deg, #69c8ef, #3497cc); }
+.profile-color-teal { background: linear-gradient(145deg, #55c5b5, #2b9386); }
+.profile-color-green { background: linear-gradient(145deg, #7bcf86, #459e59); }
+.profile-color-amber { background: linear-gradient(145deg, #f4c95f, #d99b26); }
+.profile-color-rose { background: linear-gradient(145deg, #ef91aa, #c95476); }
+.profile-color-violet { background: linear-gradient(145deg, #ac8be3, #7653bd); }
+.profile-color-slate { background: linear-gradient(145deg, #98a5b8, #68758b); }
 
 .main-content { min-height: 100vh; margin-left: 246px; }
 .topbar { height: 73px; padding: 0 42px; position: sticky; top: 0; z-index: 15; background: rgba(255,255,255,.88); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(226,229,236,.85); display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
@@ -233,6 +244,14 @@ button { color: inherit; }
 .share-no-groups { margin: 0; padding: 22px; border: 1px dashed #dfe3e9; border-radius: 11px; color: #919aa9; text-align: center; font-size: 10px; }
 .share-footer { align-items: flex-end; gap: 15px; }
 .share-footer > span { max-width: 230px; line-height: 1.45; }
+.prayer-owner-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.prayer-owner-button { min-height: 29px; padding: 0 9px; border: 1px solid #dfe3eb; border-radius: 8px; color: #62708a; background: #fff; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; font-size: 9px; font-weight: 750; }
+.prayer-owner-button:hover { color: #4e63c1; border-color: #cfd6f4; background: #f5f7ff; }
+.prayer-owner-button.share { color: #587665; border-color: #d9e8e0; background: #f8fcfa; }
+.prayer-owner-actions.compact .prayer-owner-button { min-height: 27px; padding: 0 7px; font-size: 8px; }
+.prayer-card > .prayer-owner-actions { position: absolute; top: 13px; right: 39px; }
+.prayer-card:has(> .prayer-owner-actions) .prayer-meta { padding-right: 240px; }
+.prayer-edit-modal { width: min(620px, 100%); }
 .toast { position: fixed; z-index: 70; left: 50%; bottom: 28px; transform: translateX(-50%); padding: 12px 17px; border-radius: 11px; color: white; background: #2f3b51; box-shadow: 0 14px 35px rgba(24, 31, 47, .25); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; animation: toast-in .22s ease-out; }
 .error-toast { background: #a8495a; }
 .realtime-toast { background: #5368c7; }
@@ -333,7 +352,7 @@ button { color: inherit; }
 .status-dot.resolved { background: #5a9b81; box-shadow: 0 0 0 4px #e5f2ec; }
 .section-description { margin: 9px 0 0; color: var(--muted); font-size: 11px; }
 .record-grid { margin-top: 15px; display: grid; gap: 12px; }
-.record-card { padding: 21px 22px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: 0 8px 25px rgba(39,50,78,.04); }
+.record-card { position: relative; padding: 21px 22px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: 0 8px 25px rgba(39,50,78,.04); }
 .record-card.resolved { border-color: #dfeae5; background: linear-gradient(120deg, #fff, #fbfefc); }
 .record-card-head { display: flex; align-items: center; gap: 11px; }
 .record-card-head > div:nth-child(2) { min-width: 0; flex: 1; }
@@ -341,6 +360,7 @@ button { color: inherit; }
 .record-card-head strong { color: #3d4a60; font-size: 12px; }
 .record-card-head span { margin-top: 4px; color: #929cac; display: flex; align-items: center; gap: 5px; font-size: 10px; }
 .record-card-head em { padding: 5px 8px; border-radius: 8px; color: var(--sage); background: #e7f3ed; display: inline-flex; align-items: center; gap: 4px; font-style: normal; font-size: 10px; font-weight: 750; }
+.record-card-head .prayer-owner-actions { margin-left: auto; }
 .record-card > p { margin: 16px 0; color: #3f4b61; line-height: 1.75; font-size: 14px; white-space: pre-wrap; }
 .record-content-link { margin: 16px 0; color: inherit; display: block; text-decoration: none; }
 .record-content-link p { margin: 0; color: #3f4b61; display: -webkit-box; overflow: hidden; -webkit-line-clamp: 4; -webkit-box-orient: vertical; line-height: 1.75; font-size: 14px; white-space: pre-wrap; }
@@ -411,6 +431,16 @@ button { color: inherit; }
 .profile-settings-form input[readonly] { color: #8993a5; background: #f5f6f9; }
 .profile-settings-form p { grid-column: 2 / -1; margin: -4px 0 3px; color: #98a1b0; font-size: 9px; }
 .profile-settings-form .primary-button { grid-column: 3; grid-row: 1; min-height: 39px; font-size: 11px; }
+.profile-color-fieldset { grid-column: 1 / -1; margin: 5px 0; padding: 15px; border: 1px solid #e4e7ed; border-radius: 12px; }
+.profile-color-fieldset legend { padding: 0 6px; color: #566278; font-size: 11px; font-weight: 750; }
+.profile-color-fieldset > p { margin: 0 0 13px; color: #929bab; font-size: 9px; }
+.profile-color-picker { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.profile-color-option { min-width: 0; margin: 0; padding: 10px 4px 8px; border: 1px solid #e5e8ee; border-radius: 11px; background: #fafbfc; display: grid; justify-items: center; gap: 7px; cursor: pointer; }
+.profile-color-option:hover { border-color: #cfd6f2; background: #f7f8ff; }
+.profile-color-option.selected { border-color: #7b8bd8; background: #eef1ff; box-shadow: 0 0 0 2px #e5e9ff; }
+.profile-color-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.profile-color-option span:last-child { color: #758096; font-size: 8px; font-weight: 700; }
+.profile-color-option:has(input:focus-visible) { outline: 3px solid #dfe4ff; outline-offset: 2px; }
 .password-settings-form { padding-top: 19px; display: grid; grid-template-columns: 130px 1fr auto; align-items: center; gap: 11px 15px; }
 .password-settings-form label { color: #566278; font-size: 11px; font-weight: 750; }
 .password-settings-form input { height: 43px; padding: 0 13px; border: 1px solid #dfe3eb; border-radius: 10px; outline: none; color: var(--ink); }
@@ -511,7 +541,9 @@ button { color: inherit; }
 .detail-status { padding: 7px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 750; }
 .detail-status.active { color: #5267c6; background: #edf0ff; }
 .detail-status.resolved { color: #4c806b; background: #e8f4ee; }
-.prayer-detail-card { padding: 34px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.prayer-detail-card { position: relative; padding: 34px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.prayer-detail-card > .prayer-owner-actions { position: absolute; top: 31px; right: 31px; }
+.prayer-detail-card:has(> .prayer-owner-actions) .prayer-detail-author { padding-right: 225px; }
 .prayer-detail-author { display: flex; align-items: center; gap: 11px; }
 .prayer-detail-author strong, .prayer-detail-author span { display: block; }
 .prayer-detail-author strong { font-size: 13px; }
@@ -631,6 +663,9 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .inline-composer form > div { align-items: flex-end; }
   .inline-composer form > div > span { max-width: 170px; line-height: 1.5; }
   .record-card { padding: 18px; }
+  .record-card-head { flex-wrap: wrap; }
+  .record-card-head .prayer-owner-actions { width: 100%; order: 3; margin-top: 7px; }
+  .record-card-head em { margin-left: auto; }
   .record-actions { align-items: stretch; flex-direction: column; }
   .record-actions form, .record-actions button { width: 100%; }
   .resolve-form { margin-left: 0; }
@@ -641,6 +676,8 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .prayer-filter-tabs a { flex: 1; justify-content: center; }
   .prayer-detail-content, .search-content { padding-top: 24px; }
   .prayer-detail-card { padding: 24px 19px; }
+  .prayer-detail-card > .prayer-owner-actions { position: static; margin-top: 15px; }
+  .prayer-detail-card:has(> .prayer-owner-actions) .prayer-detail-author { padding-right: 0; }
   .prayer-full-content { min-height: 110px; font-size: 15px; }
   .detail-actions { align-items: stretch; flex-direction: column; }
   .detail-actions form, .detail-actions button { width: 100%; }
@@ -665,6 +702,12 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .profile-settings-form, .password-settings-form { grid-template-columns: 1fr; align-items: stretch; }
   .profile-settings-form p, .profile-settings-form .primary-button, .password-settings-form p, .password-settings-form .primary-button { grid-column: 1; grid-row: auto; }
   .profile-settings-form .primary-button, .password-settings-form .primary-button { width: 100%; margin-top: 4px; }
+  .profile-color-fieldset { grid-column: 1; }
+  .profile-color-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .prayer-card > .prayer-owner-actions { position: static; grid-column: 2; margin: 7px 0 0; justify-content: flex-start; }
+  .prayer-card:has(> .prayer-owner-actions) { flex-wrap: wrap; }
+  .prayer-card:has(> .prayer-owner-actions) .prayer-copy { width: calc(100% - 52px); flex: none; }
+  .prayer-card:has(> .prayer-owner-actions) .prayer-meta { padding-right: 0; }
   .setting-toggle-group { padding-left: 0; }
   .settings-save-row { align-items: stretch; flex-direction: column; }
   .settings-save-row .primary-button { width: 100%; }

@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { Bell, BookHeart, Home, Settings, Users } from "lucide-react";
+import { ProfileDot } from "@/components/profile-dot";
+import type { ProfileColor } from "@/lib/domain";
 
 type SubpageNavProps = {
   displayName: string;
+  profileColor?: ProfileColor;
   active: "groups" | "prayers" | "notifications" | "settings";
   unreadNotificationCount?: number;
 };
 
-export function SubpageNav({ displayName, active, unreadNotificationCount = 0 }: SubpageNavProps) {
+export function SubpageNav({ displayName, profileColor = "indigo", active, unreadNotificationCount = 0 }: SubpageNavProps) {
   return (
     <aside className="sidebar" aria-label="주요 메뉴">
       <Link className="brand" href="/dashboard" aria-label="PrayNote 홈">
@@ -23,7 +26,7 @@ export function SubpageNav({ displayName, active, unreadNotificationCount = 0 }:
       <div className="side-spacer" />
       <Link className={`nav-item ${active === "settings" ? "active" : ""}`} href="/settings"><Settings size={19} />설정</Link>
       <div className="profile-mini simple-profile">
-        <div className="avatar avatar-me">{displayName.slice(0, 2).toUpperCase()}</div>
+        <ProfileDot color={profileColor} label={displayName} />
         <div><strong>{displayName}</strong><span>함께 기도해요</span></div>
       </div>
     </aside>

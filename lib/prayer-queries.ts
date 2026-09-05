@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { PrayerStatus, PrayerSummary } from "@/lib/domain";
+import { normalizeProfileColor } from "./profile-colors";
 
 type PrayerFilters = {
   groupIds?: string[];
@@ -22,6 +23,7 @@ export type PrayerSummaryRow = {
   is_personal: boolean;
   author_id: string;
   author_name: string;
+  author_color?: string | null;
   content: string;
   status: PrayerStatus;
   response_count: number;
@@ -40,6 +42,7 @@ export function mapPrayerSummaryRow(row: PrayerSummaryRow): PrayerSummary {
     isPersonal: row.is_personal,
     authorId: row.author_id,
     authorName: row.author_name,
+    authorColor: normalizeProfileColor(row.author_color),
     content: row.content,
     status: row.status,
     responseCount: Number(row.response_count),
@@ -53,6 +56,8 @@ type PrayerPageBundleRow = {
   user_id: string;
   email?: string | null;
   display_name?: string | null;
+  profile_color?: string | null;
+  my_groups?: Array<{ id: string; name: string }>;
   prayers?: PrayerSummaryRow[];
 };
 
@@ -61,7 +66,7 @@ export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
   if (error) throw error;
   if (!data) return null;
   const row = data as PrayerPageBundleRow;
-  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
+  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, profileColor: normalizeProfileColor(row.profile_color), myGroups: row.my_groups ?? [], prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
 }
 
 export async function getPrayerDetailPageBundle(supabase: SupabaseClient, prayerId: string) {
@@ -69,7 +74,7 @@ export async function getPrayerDetailPageBundle(supabase: SupabaseClient, prayer
   if (error) throw error;
   if (!data) return null;
   const row = data as Omit<PrayerPageBundleRow, "prayers"> & { prayer?: PrayerSummaryRow | null };
-  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, prayer: row.prayer ? mapPrayerSummaryRow(row.prayer) : null };
+  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, profileColor: normalizeProfileColor(row.profile_color), myGroups: row.my_groups ?? [], prayer: row.prayer ? mapPrayerSummaryRow(row.prayer) : null };
 }
 
 export async function getSearchPrayerPageBundle(supabase: SupabaseClient, search: string) {
@@ -77,7 +82,7 @@ export async function getSearchPrayerPageBundle(supabase: SupabaseClient, search
   if (error) throw error;
   if (!data) return null;
   const row = data as PrayerPageBundleRow;
-  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
+  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, profileColor: normalizeProfileColor(row.profile_color), myGroups: row.my_groups ?? [], prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
 }
 
 export async function getPrayerSummaries(

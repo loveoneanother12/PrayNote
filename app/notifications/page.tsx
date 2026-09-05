@@ -27,7 +27,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
 
   return (
     <div className="app-shell">
-      <SubpageNav displayName={displayName} active="notifications" unreadNotificationCount={unreadCount} />
+      <SubpageNav displayName={displayName} profileColor={bundle.profileColor} active="notifications" unreadNotificationCount={unreadCount} />
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>

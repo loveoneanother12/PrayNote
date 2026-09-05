@@ -33,7 +33,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
 
   return (
     <div className="app-shell">
-      <SubpageNav displayName={displayName} active="groups" />
+      <SubpageNav displayName={displayName} profileColor={overview.profileColor} active="groups" />
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
@@ -76,7 +76,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
           {(view === "active" || view === "all") && <section className="prayer-record-section">
             <div className="record-section-heading"><div><span className="status-dot active" /><h2>함께 기도 중</h2></div><strong>{activePrayers.length}</strong></div>
             <div className="record-grid">
-              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} />)}
+              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} groups={myGroups} />)}
               {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 기도제목이 없어요</strong><span>위 입력창에서 첫 기도제목을 나눠보세요.</span></div>}
             </div>
           </section>}
@@ -85,7 +85,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             <div className="record-section-heading"><div><span className="status-dot resolved" /><h2>해결된 기도제목들</h2></div><strong>{resolvedPrayers.length}</strong></div>
             <p className="section-description">완료한 기도제목이 해결 날짜와 함께 차곡차곡 보관됩니다.</p>
             <div className="record-grid">
-              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} />)}
+              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} groups={myGroups} />)}
               {resolvedPrayers.length === 0 && <div className="empty-records compact"><CalendarCheck size={24} /><strong>아직 해결 기록이 없어요</strong></div>}
             </div>
           </section>}

@@ -1,9 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { GroupRole, MembershipStatus } from "@/lib/domain";
 import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
+import { normalizeProfileColor } from "./profile-colors";
 
 type GroupPageOverviewRow = {
   display_name?: string | null;
+  display_profile_color?: string | null;
   role: GroupRole;
   group: {
     id: string;
@@ -18,6 +20,7 @@ type GroupPageOverviewRow = {
 function mapGroupPageOverview(row: GroupPageOverviewRow) {
   return {
     displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.display_profile_color),
     role: row.role,
     group: row.group,
     memberCount: Number(row.member_count),
@@ -49,12 +52,14 @@ export async function getGroupPageBundle(supabase: SupabaseClient, groupId: stri
 
 type GroupManageOverviewRow = {
   display_name?: string | null;
+  display_profile_color?: string | null;
   role: GroupRole;
   group: { id: string; name: string; description: string | null };
   memberships?: Array<{
     id: string;
     user_id: string;
     display_name: string;
+    profile_color?: string | null;
     role: GroupRole;
     status: MembershipStatus;
     requested_at: string;
@@ -69,9 +74,10 @@ export async function getGroupManageOverview(supabase: SupabaseClient, groupId: 
   const row = data as GroupManageOverviewRow;
   return {
     displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.display_profile_color),
     role: row.role,
     group: row.group,
-    memberships: row.memberships ?? [],
+    memberships: (row.memberships ?? []).map((membership) => ({ ...membership, profile_color: normalizeProfileColor(membership.profile_color) })),
   };
 }
 
@@ -85,9 +91,10 @@ export async function getGroupManageBundle(supabase: SupabaseClient, groupId: st
     email: row.email ?? "",
     overview: row.overview ? {
       displayName: row.overview.display_name ?? null,
+      profileColor: normalizeProfileColor(row.overview.display_profile_color),
       role: row.overview.role,
       group: row.overview.group,
-      memberships: row.overview.memberships ?? [],
+      memberships: (row.overview.memberships ?? []).map((membership) => ({ ...membership, profile_color: normalizeProfileColor(membership.profile_color) })),
     } : null,
   };
 }

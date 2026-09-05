@@ -24,12 +24,15 @@ import { InstantPrayerButton } from "@/components/instant-prayer-actions";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
+import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
+import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
-import type { GroupSummary, NotificationSummary, PrayerSummary } from "@/lib/domain";
+import type { GroupSummary, NotificationSummary, PrayerSummary, ProfileColor } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
 
 type PrayNoteAppProps = {
   displayName: string;
+  profileColor: ProfileColor;
   email: string;
   groups: GroupSummary[];
   prayers: PrayerSummary[];
@@ -47,7 +50,7 @@ type PrayNoteAppProps = {
 const roleLabels = { leader: "LEADER", admin: "ADMIN", member: "MEMBER" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
+export function PrayNoteApp({ displayName, profileColor, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
   const router = useRouter();
   const [opened, setOpened] = useState(true);
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
@@ -57,6 +60,7 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const [optimisticGroups, setOptimisticGroups] = useState<GroupSummary[]>([]);
   const [optimisticPrayers, setOptimisticPrayers] = useState<PrayerSummary[]>([]);
+  const [contentOverrides, setContentOverrides] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState<"prayer" | "group" | null>(null);
   const [localToast, setLocalToast] = useState("");
   const [localError, setLocalError] = useState("");
@@ -69,7 +73,6 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
   const newPrayerCount = new Set(optimisticPrayers.filter((prayer) => !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
   const displayedGroupCount = groupCount + newGroupCount;
   const displayedPrayerCount = prayerCount + newPrayerCount;
-  const initials = displayName.trim().slice(0, 2).toUpperCase();
   const personalPrayers = prayers.filter((prayer) => prayer.isPersonal);
 
   async function submitPrayer(event: FormEvent<HTMLFormElement>) {
@@ -99,8 +102,8 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
     const sharedGroupIds = selectedGroups.map((group) => group.id);
     const sharedGroupNames = selectedGroups.map((group) => group.name);
     const optimisticRows: PrayerSummary[] = personalPrayer
-      ? [{ id: prayerId, groupId: null, groupName: "개인기도", groupIds: [], groupNames: [], isPersonal: true, authorId: userId, authorName: displayName, content, status: "active", responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }]
-      : selectedGroups.map((group) => ({ id: prayerId, groupId: group.id, groupName: group.name, groupIds: sharedGroupIds, groupNames: sharedGroupNames, isPersonal: false, authorId: userId, authorName: displayName, content, status: "active" as const, responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }));
+      ? [{ id: prayerId, groupId: null, groupName: "개인기도", groupIds: [], groupNames: [], isPersonal: true, authorId: userId, authorName: displayName, authorColor: profileColor, content, status: "active", responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }]
+      : selectedGroups.map((group) => ({ id: prayerId, groupId: group.id, groupName: group.name, groupIds: sharedGroupIds, groupNames: sharedGroupNames, isPersonal: false, authorId: userId, authorName: displayName, authorColor: profileColor, content, status: "active" as const, responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }));
     setOptimisticPrayers((current) => [...optimisticRows, ...current]);
     setDraft("");
     setSelectedGroupIds([]);
@@ -157,7 +160,7 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
         <div className="side-spacer" />
         <Link className="nav-item" href="/settings"><Settings size={19} />설정</Link>
         <div className="profile-mini">
-          <div className="avatar avatar-me">{initials}</div>
+          <ProfileDot color={profileColor} label={displayName} />
           <div><strong>{displayName}</strong><span>{email}</span></div>
           <MoreHorizontal size={18} />
         </div>
@@ -168,7 +171,7 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
           <a className="mobile-brand" href="#top"><span className="brand-mark"><BookHeart size={19} /></span>PrayNote</a>
           <form className="search-box" action="/search" method="get"><Search size={18} /><input name="q" aria-label="기도제목 검색" placeholder="기도제목 검색" /><kbd>⌘ K</kbd></form>
           <Link className="icon-button notification-button" href="/notifications" aria-label={`읽지 않은 알림 ${unreadNotificationCount}개`}><Bell size={20} />{unreadNotificationCount > 0 && <span />}</Link>
-          <div className="avatar avatar-me top-avatar">{initials}</div>
+          <ProfileDot color={profileColor} label={displayName} className="top-avatar" />
         </header>
 
         <div className="content-wrap">
@@ -201,14 +204,15 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
                   <section className="dashboard-group-prayers personal-prayer-section">
                     <div className="section-heading compact"><div><h2><LockKeyhole size={16} />개인기도</h2><span>나만 볼 수 있는 기도제목 {personalPrayers.length}개</span></div><Link className="text-button" href="/prayers">모두 보기 <ChevronRight size={16} /></Link></div>
                     <div className="prayer-list">
-                      {personalPrayers.slice(0, 3).map((prayer, index) => (
+                      {personalPrayers.slice(0, 3).map((prayer) => (
                         <article className="prayer-card" key={prayer.id}>
-                          <div className={`avatar avatar-${index % 3}`}>{prayer.authorName.slice(0, 2)}</div>
+                          <ProfileDot color={prayer.authorColor} label={prayer.authorName} />
                           <div className="prayer-copy">
                             <div className="prayer-meta"><strong>나</strong><span>·</span><span>{formatKoreaDate(prayer.createdAt)} 등록</span></div>
-                            <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{prayer.content}</Link>
+                            <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{contentOverrides[prayer.id] ?? prayer.content}</Link>
                             <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="pray-button" />
                           </div>
+                          <PrayerOwnerActions prayerId={prayer.id} initialContent={contentOverrides[prayer.id] ?? prayer.content} initialSharedGroups={[]} groups={groups} onContentChange={(content) => setContentOverrides((current) => ({ ...current, [prayer.id]: content }))} compact />
                           <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label="개인 기도제목 자세히 보기"><ChevronRight size={19} /></Link>
                         </article>
                       ))}
@@ -223,14 +227,15 @@ export function PrayNoteApp({ displayName, email, groups: initialGroups, prayers
                       <div className="section-heading compact"><div><h2>{group.name}</h2><span>진행 중인 기도제목 {allGroupPrayers.length}개</span></div><Link className="text-button" href={`/groups/${group.id}`}>모두 보기 <ChevronRight size={16} /></Link></div>
                       <div className="prayer-list">
                         {groupPrayers.length === 0 && <div className="empty-prayers compact"><BookHeart size={22} /><strong>아직 진행 중인 기도제목이 없어요</strong></div>}
-                        {groupPrayers.map((prayer, index) => (
+                        {groupPrayers.map((prayer) => (
                           <article className="prayer-card" key={prayer.id}>
-                            <div className={`avatar avatar-${index % 3}`}>{prayer.authorName.slice(0, 2)}</div>
+                            <ProfileDot color={prayer.authorColor} label={prayer.authorName} />
                             <div className="prayer-copy">
                               <div className="prayer-meta"><strong>{prayer.authorName}</strong><span>·</span><span>{formatKoreaDate(prayer.createdAt)} 등록</span></div>
-                              <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{prayer.content}</Link>
+                              <Link className="dashboard-prayer-link" href={`/prayers/${prayer.id}`}>{contentOverrides[prayer.id] ?? prayer.content}</Link>
                               <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="pray-button" />
                             </div>
+                            {prayer.authorId === userId && <PrayerOwnerActions prayerId={prayer.id} initialContent={contentOverrides[prayer.id] ?? prayer.content} initialSharedGroups={prayer.groupIds.map((id, index) => ({ id, name: prayer.groupNames[index] ?? "공유 그룹" }))} groups={groups} onContentChange={(content) => setContentOverrides((current) => ({ ...current, [prayer.id]: content }))} compact />}
                             <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label={`${prayer.authorName}님의 기도제목 자세히 보기`}><ChevronRight size={19} /></Link>
                           </article>
                         ))}

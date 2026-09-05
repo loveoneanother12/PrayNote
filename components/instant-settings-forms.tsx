@@ -4,15 +4,19 @@ import { Check, LoaderCircle, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, type ReactNode, startTransition, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ProfileDot } from "@/components/profile-dot";
+import type { ProfileColor } from "@/lib/domain";
+import { PROFILE_COLORS } from "@/lib/profile-colors";
 
 function SaveButton({ pending, children }: { pending: boolean; children: ReactNode }) {
   return <button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending}>{pending ? <><LoaderCircle className="button-spinner" size={15} />저장 중…</> : children}</button>;
 }
 
-export function InstantProfileForm({ userId, displayName, email }: { userId: string; displayName: string; email: string }) {
+export function InstantProfileForm({ userId, displayName, email, initialColor }: { userId: string; displayName: string; email: string; initialColor: ProfileColor }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
+  const [color, setColor] = useState<ProfileColor>(initialColor);
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending) return;
@@ -21,11 +25,29 @@ export function InstantProfileForm({ userId, displayName, email }: { userId: str
     if (name.length < 2 || name.length > 30) return setMessage("이름은 2~30자로 입력해주세요.");
     setPending(true); setMessage("");
     const supabase = createClient();
-    const { data, error } = await supabase.from("profiles").update({ display_name: name }).eq("id", userId).select("id").maybeSingle();
+    const { data, error } = await supabase.from("profiles").update({ display_name: name, profile_color: color }).eq("id", userId).select("id").maybeSingle();
     setPending(false); setMessage(error || !data ? "저장하지 못했어요." : "저장했어요.");
     if (!error && data) startTransition(() => router.refresh());
   }
-  return <form onSubmit={save} className="profile-settings-form"><label htmlFor="display-name">표시 이름</label><input id="display-name" name="displayName" defaultValue={displayName} minLength={2} maxLength={30} required /><label htmlFor="account-email">로그인 이메일</label><input id="account-email" value={email} readOnly aria-readonly="true" /><p>{message || "로그인 이메일은 현재 변경할 수 없습니다."}</p><SaveButton pending={pending}><Check size={16} />프로필 저장</SaveButton></form>;
+  return <form onSubmit={save} className="profile-settings-form">
+    <label htmlFor="display-name">표시 이름</label>
+    <input id="display-name" name="displayName" defaultValue={displayName} minLength={2} maxLength={30} required />
+    <fieldset className="profile-color-fieldset">
+      <legend>나를 나타내는 색</legend>
+      <p>기도제목과 멤버 목록에서 프로필 사진 대신 이 색으로 표시됩니다.</p>
+      <div className="profile-color-picker">
+        {PROFILE_COLORS.map((option) => <label className={`profile-color-option ${color === option.value ? "selected" : ""}`} key={option.value}>
+          <input type="radio" name="profileColor" value={option.value} checked={color === option.value} onChange={() => setColor(option.value)} />
+          <ProfileDot color={option.value} label={option.label} size="large" />
+          <span>{option.label}</span>
+        </label>)}
+      </div>
+    </fieldset>
+    <label htmlFor="account-email">로그인 이메일</label>
+    <input id="account-email" value={email} readOnly aria-readonly="true" />
+    <p>{message || "로그인 이메일은 현재 변경할 수 없습니다."}</p>
+    <SaveButton pending={pending}><Check size={16} />프로필 저장</SaveButton>
+  </form>;
 }
 
 export function InstantPasswordForm() {

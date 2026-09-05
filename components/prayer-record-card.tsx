@@ -4,6 +4,8 @@ import Link from "next/link";
 import { CalendarDays, Check } from "lucide-react";
 import { useState } from "react";
 import { InstantPrayerButton, InstantPrayerStatusButton } from "@/components/instant-prayer-actions";
+import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
+import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
 import type { PrayerStatus, PrayerSummary } from "@/lib/domain";
 
@@ -12,26 +14,29 @@ type PrayerRecordCardProps = {
   currentUserId: string;
   returnTo: string;
   showGroup?: boolean;
+  groups?: Array<{ id: string; name: string }>;
 };
 
-export function PrayerRecordCard({ prayer, currentUserId, showGroup = false }: PrayerRecordCardProps) {
+export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, groups = [] }: PrayerRecordCardProps) {
   const mine = prayer.authorId === currentUserId;
   const [status, setStatus] = useState<PrayerStatus>(prayer.status);
   const [completedAt, setCompletedAt] = useState(prayer.completedAt);
+  const [content, setContent] = useState(prayer.content);
   const completed = status === "completed";
 
   return (
     <article className={`record-card ${completed ? "resolved" : ""}`}>
       <div className="record-card-head">
-        <div className="avatar avatar-1">{prayer.authorName.slice(0, 2)}</div>
+        <ProfileDot color={prayer.authorColor} label={prayer.authorName} />
         <div>
           <strong>{mine ? "나" : prayer.authorName}</strong>
           <span><CalendarDays size={13} />{formatKoreaDate(prayer.createdAt)} 등록{showGroup ? ` · ${prayer.groupName}` : ""}</span>
         </div>
+        {mine && <PrayerOwnerActions prayerId={prayer.id} initialContent={content} initialSharedGroups={prayer.groupIds.map((id, index) => ({ id, name: prayer.groupNames[index] ?? "공유 그룹" }))} groups={groups} onContentChange={setContent} compact />}
         {completed && <em><Check size={14} />해결됨</em>}
       </div>
       <Link className="record-content-link" href={`/prayers/${prayer.id}`}>
-        <p>{prayer.content}</p>
+        <p>{content}</p>
         <span>자세히 보기</span>
       </Link>
       {completed && completedAt && (
