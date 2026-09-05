@@ -12,6 +12,8 @@ const performanceSchema = readFileSync(join(root, "supabase/migrations/202609050
 const bundleSchema = readFileSync(join(root, "supabase/migrations/202609050003_ultra_performance.sql"), "utf8");
 const multiApproverJoinSchema = readFileSync(join(root, "supabase/migrations/202609050004_fix_multi_approver_join.sql"), "utf8");
 const dashboardCountSchema = readFileSync(join(root, "supabase/migrations/202609050005_dashboard_scope_counts.sql"), "utf8");
+const profileColorSchema = readFileSync(join(root, "supabase/migrations/202609060001_profile_colors_and_prayer_tools.sql"), "utf8");
+const safeAnonymousBundleSchema = readFileSync(join(root, "supabase/migrations/202609060002_safe_anonymous_bundle_entry.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -96,12 +98,15 @@ describe("security guardrails", () => {
     expect(performanceSchema).toContain("grant execute on function public.get_dashboard_overview() to authenticated;");
   });
 
-  it("exposes screen bundles only to authenticated users", () => {
+  it("guards screen bundle data with the authenticated user id", () => {
     expect(bundleSchema).toContain("case when auth.uid() is null then null");
     expect(bundleSchema).toMatch(/revoke all on function public\.get_dashboard_bundle_fast\(\) from public, anon;/);
     expect(bundleSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to authenticated;");
     expect(bundleSchema).toContain("where notification.recipient_id = auth.uid()");
     expect(bundleSchema).toContain("where reminder.user_id = auth.uid()");
+    expect(safeAnonymousBundleSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to anon;");
+    expect(profileColorSchema).toContain("case when auth.uid() is null then null");
+    expect(profileColorSchema).toContain("membership.user_id = auth.uid()");
   });
 
   it("gives every membership approver a unique notification event key", () => {
