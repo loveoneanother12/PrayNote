@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { GroupRole, MembershipStatus } from "@/lib/domain";
+import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
 
 type GroupPageOverviewRow = {
   display_name?: string | null;
@@ -14,12 +15,7 @@ type GroupPageOverviewRow = {
   my_groups?: Array<{ id: string; name: string }>;
 };
 
-export async function getGroupPageOverview(supabase: SupabaseClient, groupId: string) {
-  const { data, error } = await supabase.rpc("get_group_page_overview", { target_group_id: groupId });
-  if (error) throw error;
-  if (!data) return null;
-
-  const row = data as GroupPageOverviewRow;
+function mapGroupPageOverview(row: GroupPageOverviewRow) {
   return {
     displayName: row.display_name ?? null,
     role: row.role,
@@ -27,6 +23,28 @@ export async function getGroupPageOverview(supabase: SupabaseClient, groupId: st
     memberCount: Number(row.member_count),
     myGroups: row.my_groups ?? [],
   };
+}
+
+export async function getGroupPageOverview(supabase: SupabaseClient, groupId: string) {
+  const { data, error } = await supabase.rpc("get_group_page_overview", { target_group_id: groupId });
+  if (error) throw error;
+  if (!data) return null;
+
+  const row = data as GroupPageOverviewRow;
+  return mapGroupPageOverview(row);
+}
+
+export async function getGroupPageBundle(supabase: SupabaseClient, groupId: string) {
+  const { data, error } = await supabase.rpc("get_group_page_bundle_fast", { target_group_id: groupId });
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    user_id: string;
+    email?: string | null;
+    overview?: GroupPageOverviewRow | null;
+    prayers?: PrayerSummaryRow[];
+  };
+  return { userId: row.user_id, email: row.email ?? "", overview: row.overview ? mapGroupPageOverview(row.overview) : null, prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
 }
 
 type GroupManageOverviewRow = {
@@ -54,5 +72,22 @@ export async function getGroupManageOverview(supabase: SupabaseClient, groupId: 
     role: row.role,
     group: row.group,
     memberships: row.memberships ?? [],
+  };
+}
+
+export async function getGroupManageBundle(supabase: SupabaseClient, groupId: string) {
+  const { data, error } = await supabase.rpc("get_group_manage_bundle_fast", { target_group_id: groupId });
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as { user_id: string; email?: string | null; overview?: GroupManageOverviewRow | null };
+  return {
+    userId: row.user_id,
+    email: row.email ?? "",
+    overview: row.overview ? {
+      displayName: row.overview.display_name ?? null,
+      role: row.overview.role,
+      group: row.overview.group,
+      memberships: row.overview.memberships ?? [],
+    } : null,
   };
 }

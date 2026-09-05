@@ -1,10 +1,9 @@
 "use client";
 
-import { Check, Share2, Users } from "lucide-react";
+import { Check, LoaderCircle, Share2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { sharePrayerWithGroups } from "@/app/prayer-actions";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { type FormEvent, startTransition, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type ShareGroup = { id: string; name: string };
 
@@ -13,16 +12,40 @@ export function SharePrayerModal({
   currentGroup,
   groups,
   returnTo,
+  onClose,
 }: {
   prayerId: string;
   currentGroup: ShareGroup;
   groups: ShareGroup[];
   returnTo: string;
+  onClose?: () => void;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
   const otherGroups = groups.filter((group) => group.id !== currentGroup.id);
-  const close = () => router.replace(returnTo);
+  const close = () => onClose ? onClose() : router.replace(returnTo);
+
+  async function share(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending || selected.length === 0) return;
+    setPending(true);
+    setError("");
+    const supabase = createClient();
+    const { error: mutationError } = await supabase.rpc("share_prayer_with_groups", {
+      target_prayer_id: prayerId,
+      target_group_ids: selected,
+    });
+    if (mutationError) {
+      setError("선택한 그룹에 공유하지 못했어요.");
+      setPending(false);
+      return;
+    }
+    setPending(false);
+    close();
+    startTransition(() => router.refresh());
+  }
 
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={close}>
@@ -31,9 +54,7 @@ export function SharePrayerModal({
           <div><span className="overview-icon"><Share2 size={20} /></span><div><h2 id="share-prayer-title">다른 그룹에도 공유할까요?</h2><p>방금 등록한 기도제목을 여러 공동체에 함께 나눌 수 있어요.</p></div></div>
           <button type="button" onClick={close} aria-label="닫기">×</button>
         </div>
-        <form action={sharePrayerWithGroups}>
-          <input type="hidden" name="prayerId" value={prayerId} />
-          <input type="hidden" name="returnTo" value={returnTo} />
+        <form onSubmit={share}>
           <div className="share-group-list">
             <label className="share-group-option selected disabled">
               <input type="checkbox" checked disabled readOnly />
@@ -55,9 +76,10 @@ export function SharePrayerModal({
             ))}
             {otherGroups.length === 0 && <p className="share-no-groups">추가로 공유할 다른 그룹이 없어요.</p>}
           </div>
+          {error && <p className="form-error" role="status">{error}</p>}
           <div className="composer-footer share-footer">
             <span>나중에도 기도제목 상세 화면에서 공유 그룹을 확인할 수 있어요.</span>
-            <div><button type="button" className="cancel-button" onClick={close}>지금은 안 할게요</button><PendingSubmitButton className="primary-button" pendingText="공유 중…" disabled={selected.length === 0}>선택한 그룹에 공유</PendingSubmitButton></div>
+            <div><button type="button" className="cancel-button" onClick={close} disabled={pending}>지금은 안 할게요</button><button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending || selected.length === 0}>{pending ? <><LoaderCircle className="button-spinner" size={15} />공유 중…</> : "선택한 그룹에 공유"}</button></div>
           </div>
         </form>
       </div>

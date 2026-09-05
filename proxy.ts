@@ -19,10 +19,21 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getClaims();
+  // Reads valid sessions locally and only contacts Auth when a token needs refresh.
+  // Authorization itself is always enforced by database RLS and secured RPCs.
+  await supabase.auth.getSession();
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: [
+    "/dashboard/:path*",
+    "/groups/:path*",
+    "/join/:path*",
+    "/notifications/:path*",
+    "/prayers/:path*",
+    "/search/:path*",
+    "/settings/:path*",
+    "/api/push/test",
+  ],
 };

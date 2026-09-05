@@ -1,17 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft, BookHeart, CalendarCheck, Plus, Settings, Users } from "lucide-react";
+import { ArrowLeft, BookHeart, CalendarCheck, Settings, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
-import { createPrayer } from "@/app/prayer-actions";
 import { CopyInviteButton } from "@/components/copy-invite-button";
+import { GroupPrayerComposer } from "@/components/group-prayer-composer";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordCard } from "@/components/prayer-record-card";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SharePrayerModal } from "@/components/share-prayer-modal";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
-import { getAuthIdentity } from "@/lib/auth";
-import { getGroupPageOverview } from "@/lib/group-queries";
-import { getPrayerSummaries } from "@/lib/prayer-queries";
+import { getGroupPageBundle } from "@/lib/group-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type GroupPageProps = {
@@ -22,21 +19,15 @@ type GroupPageProps = {
 export default async function GroupPage({ params, searchParams }: GroupPageProps) {
   const [{ groupId }, queryParams] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const user = await getAuthIdentity(supabase);
-
-  if (!user) redirect("/login");
-
-  const [overview, prayers] = await Promise.all([
-    getGroupPageOverview(supabase, groupId),
-    getPrayerSummaries(supabase, user.id, { groupIds: [groupId] }),
-  ]);
-
-  if (!overview) notFound();
+  const bundle = await getGroupPageBundle(supabase, groupId);
+  if (!bundle) redirect("/login");
+  if (!bundle.overview) notFound();
+  const { overview, prayers } = bundle;
   const { group, role, memberCount, myGroups } = overview;
 
   const activePrayers = prayers.filter((prayer) => prayer.status === "active");
   const resolvedPrayers = prayers.filter((prayer) => prayer.status === "completed");
-  const displayName = overview.displayName ?? user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = (overview.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
   const returnTo = `/groups/${groupId}`;
   const view = queryParams.view === "resolved" || queryParams.view === "all" ? queryParams.view : "active";
 
@@ -68,16 +59,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             <Link className="outline-button" href={`/groups/${groupId}/manage`}><Settings size={16} />그룹 관리</Link>
           </div>
 
-          <section className="inline-composer">
-            <div className="inline-composer-icon"><BookHeart size={22} /></div>
-            <form action={createPrayer}>
-              <input type="hidden" name="groupIds" value={groupId} />
-              <input type="hidden" name="returnTo" value={returnTo} />
-              <label className="sr-only" htmlFor="group-prayer-content">기도제목</label>
-              <textarea id="group-prayer-content" name="content" maxLength={2000} required placeholder="함께 기도받고 싶은 내용을 적어주세요." />
-              <div><span>등록 날짜는 한국시간 기준으로 자동 저장돼요.</span><PendingSubmitButton className="primary-button" pendingText="등록 중…"><Plus size={17} />기도제목 등록</PendingSubmitButton></div>
-            </form>
-          </section>
+          <GroupPrayerComposer currentGroup={{ id: group.id, name: group.name }} groups={myGroups} />
 
           {(queryParams.created || queryParams.updated || queryParams.deleted || queryParams.shared || queryParams.error) && (
             <div className={`page-notice ${queryParams.error ? "error" : ""}`}>
@@ -94,7 +76,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
           {(view === "active" || view === "all") && <section className="prayer-record-section">
             <div className="record-section-heading"><div><span className="status-dot active" /><h2>함께 기도 중</h2></div><strong>{activePrayers.length}</strong></div>
             <div className="record-grid">
-              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={user.id} returnTo={returnTo} />)}
+              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} />)}
               {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 기도제목이 없어요</strong><span>위 입력창에서 첫 기도제목을 나눠보세요.</span></div>}
             </div>
           </section>}
@@ -103,7 +85,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             <div className="record-section-heading"><div><span className="status-dot resolved" /><h2>해결된 기도제목들</h2></div><strong>{resolvedPrayers.length}</strong></div>
             <p className="section-description">완료한 기도제목이 해결 날짜와 함께 차곡차곡 보관됩니다.</p>
             <div className="record-grid">
-              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={user.id} returnTo={returnTo} />)}
+              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} />)}
               {resolvedPrayers.length === 0 && <div className="empty-records compact"><CalendarCheck size={24} /><strong>아직 해결 기록이 없어요</strong></div>}
             </div>
           </section>}

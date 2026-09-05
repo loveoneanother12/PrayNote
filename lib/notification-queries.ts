@@ -12,10 +12,40 @@ export type NotificationRow = {
   created_at: string;
 };
 
-type NotificationSummaryRow = NotificationRow & {
+export type NotificationSummaryRow = NotificationRow & {
   actor_name: string | null;
   group_name: string | null;
 };
+
+export function mapNotificationSummaryRow(row: NotificationSummaryRow): NotificationSummary {
+  return {
+    id: row.id,
+    type: row.type,
+    message: notificationMessage(row, row.actor_name, row.group_name),
+    groupName: row.group_name,
+    href: notificationHref(row),
+    createdAt: row.created_at,
+    readAt: row.read_at,
+  };
+}
+
+export async function getNotificationsPageBundle(supabase: SupabaseClient, limit = 100) {
+  const { data, error } = await supabase.rpc("get_notifications_page_bundle_fast", { result_limit: limit });
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    user_id: string;
+    email?: string | null;
+    display_name?: string | null;
+    notifications?: NotificationSummaryRow[];
+  };
+  return {
+    userId: row.user_id,
+    email: row.email ?? "",
+    displayName: row.display_name ?? null,
+    notifications: (row.notifications ?? []).map(mapNotificationSummaryRow),
+  };
+}
 
 function roleFrom(data: unknown) {
   if (!data || typeof data !== "object" || !("role" in data)) return null;
@@ -69,15 +99,5 @@ export async function getNotificationSummaries(
 
   const rows = (data ?? []) as NotificationSummaryRow[];
 
-  return rows.map((row) => {
-    return {
-      id: row.id,
-      type: row.type,
-      message: notificationMessage(row, row.actor_name, row.group_name),
-      groupName: row.group_name,
-      href: notificationHref(row),
-      createdAt: row.created_at,
-      readAt: row.read_at,
-    };
-  });
+  return rows.map(mapNotificationSummaryRow);
 }

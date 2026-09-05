@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { BookHeart, KeyRound, Users } from "lucide-react";
+import { BookHeart, Users } from "lucide-react";
 import { redirect } from "next/navigation";
-import { requestMembership } from "@/app/group-actions";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { InstantJoinForm } from "@/components/instant-group-actions";
 import { getAuthIdentity } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -27,12 +26,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
         {query.requested ? (
           <div className="join-result success"><strong>가입 신청을 보냈어요</strong><span>리더 또는 관리자가 승인하면 내 그룹에 표시됩니다.</span><Link href="/dashboard">대시보드로 돌아가기</Link></div>
         ) : (
-          <form action={requestMembership} className="join-form">
-            <label htmlFor="invite-code"><KeyRound size={15} />초대코드</label>
-            <input id="invite-code" name="inviteCode" placeholder="PRAY-XXXXXXXX" autoCapitalize="characters" maxLength={13} required />
-            {query.error && <span className="form-error">{query.error === "invalid-code" ? "초대코드가 올바르지 않아요." : "가입 신청을 보내지 못했어요."}</span>}
-            <PendingSubmitButton className="primary-button" pendingText="신청 중…">가입 신청 보내기</PendingSubmitButton>
-          </form>
+          <InstantJoinForm />
         )}
       </section>
     </main>

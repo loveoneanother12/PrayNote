@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft, BookHeart, CalendarDays, Check, Heart, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, BookHeart, CalendarDays, Check, Save, Trash2 } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
-import { deletePrayer, togglePrayerCompleted, toggleTodayPrayer, updatePrayer } from "@/app/prayer-actions";
+import { deletePrayer, updatePrayer } from "@/app/prayer-actions";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { InstantPrayerButton, InstantPrayerStatusButton } from "@/components/instant-prayer-actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaDate } from "@/lib/dates";
-import { getAuthIdentity } from "@/lib/auth";
-import { getPrayerSummaries } from "@/lib/prayer-queries";
+import { getPrayerDetailPageBundle } from "@/lib/prayer-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type PrayerDetailPageProps = {
@@ -21,19 +21,14 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
   if (!/^[0-9a-f-]{36}$/i.test(prayerId)) notFound();
 
   const supabase = await createClient();
-  const user = await getAuthIdentity(supabase);
-  if (!user) redirect("/login");
-
-  const [{ data: profile }, prayers] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
-    getPrayerSummaries(supabase, user.id, { prayerIds: [prayerId] }),
-  ]);
-  const prayer = prayers[0];
+  const bundle = await getPrayerDetailPageBundle(supabase, prayerId);
+  if (!bundle) redirect("/login");
+  const prayer = bundle.prayer;
   if (!prayer) notFound();
 
-  const mine = prayer.authorId === user.id;
+  const mine = prayer.authorId === bundle.userId;
   const completed = prayer.status === "completed";
-  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
   const detailPath = `/prayers/${prayer.id}`;
 
   return (
@@ -47,8 +42,8 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
             <div className="detail-dates"><span><CalendarDays size={14} />{formatKoreaDate(prayer.createdAt)} 등록</span>{completed && prayer.completedAt && <span className="resolved"><Check size={14} />{formatKoreaDate(prayer.completedAt)} 해결</span>}</div>
             <p className="prayer-full-content">{prayer.content}</p>
             <div className="detail-actions">
-              {!completed && <form action={toggleTodayPrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><PendingSubmitButton className={`daily-prayer-button detail-pray ${prayer.hasPrayed ? "done" : ""}`} pendingText="기록 중…">{prayer.hasPrayed ? <Check size={17} /> : <Heart size={17} />}{prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"}<span>누적 {prayer.responseCount}회</span></PendingSubmitButton></form>}
-              {mine && <form action={togglePrayerCompleted}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={detailPath} /><input type="hidden" name="status" value={completed ? "active" : "completed"} /><PendingSubmitButton className="resolve-button detail-resolve" pendingText="변경 중…">{completed ? "진행 중으로 되돌리기" : "해결 완료"}</PendingSubmitButton></form>}
+              {!completed && <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="daily-prayer-button detail-pray" countPrefix="누적 " iconSize={17} />}
+              {mine && <InstantPrayerStatusButton prayerId={prayer.id} initialStatus={prayer.status} initialCompletedAt={prayer.completedAt} className="resolve-button detail-resolve" />}
             </div>
             {prayer.hasPrayed && !completed && <p className="detail-help">오늘 기도완료 버튼을 다시 누르면 오늘 기록만 취소됩니다. 이전 날짜의 기록은 유지됩니다.</p>}
           </article>

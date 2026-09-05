@@ -21,6 +21,13 @@ describe("installable PrayNote PWA", () => {
     expect(worker).not.toMatch(/prayer_(content|body)|기도제목 원문/i);
   });
 
+  it("never caches personalized navigation or React server responses", () => {
+    const worker = readFileSync(join(process.cwd(), "public/sw.js"), "utf8");
+    expect(worker).toContain('request.mode === "navigate"');
+    expect(worker).toContain('url.pathname.startsWith("/_next/static/")');
+    expect(worker).not.toContain("cache.put(request, response.clone())");
+  });
+
   it("keeps the same five-item mobile navigation on every signed-in page", () => {
     const mobileNav = readFileSync(join(process.cwd(), "components/mobile-nav.tsx"), "utf8");
     expect(mobileNav).toContain("홈");

@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { GroupRole, GroupSummary } from "@/lib/domain";
+import type { GroupRole, GroupSummary, NotificationSummary, PrayerSummary } from "@/lib/domain";
+import { mapNotificationSummaryRow, type NotificationSummaryRow } from "@/lib/notification-queries";
+import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
 
 type DashboardOverviewRow = {
   display_name?: string | null;
@@ -20,6 +22,14 @@ export type DashboardOverview = {
   unreadCount: number;
 };
 
+export type DashboardBundle = DashboardOverview & {
+  userId: string;
+  email: string;
+  groupPrayers: PrayerSummary[];
+  personalPrayers: PrayerSummary[];
+  notifications: NotificationSummary[];
+};
+
 export async function getDashboardOverview(supabase: SupabaseClient): Promise<DashboardOverview> {
   const { data, error } = await supabase.rpc("get_dashboard_overview");
   if (error) throw error;
@@ -36,5 +46,37 @@ export async function getDashboardOverview(supabase: SupabaseClient): Promise<Da
       memberCount: Number(group.member_count),
       unreadCount: Number(group.unread_count),
     })),
+  };
+}
+
+export async function getDashboardBundle(supabase: SupabaseClient): Promise<DashboardBundle | null> {
+  const { data, error } = await supabase.rpc("get_dashboard_bundle_fast");
+  if (error) throw error;
+  if (!data) return null;
+  const bundle = data as {
+    user_id: string;
+    email?: string | null;
+    overview: DashboardOverviewRow;
+    group_prayers?: PrayerSummaryRow[];
+    personal_prayers?: PrayerSummaryRow[];
+    notifications?: NotificationSummaryRow[];
+  };
+  const overview = bundle.overview ?? {};
+  return {
+    userId: bundle.user_id,
+    email: bundle.email ?? "",
+    displayName: overview.display_name ?? null,
+    unreadCount: Number(overview.unread_count ?? 0),
+    groups: (overview.groups ?? []).map((group) => ({
+      id: group.id,
+      name: group.name,
+      description: group.description,
+      role: group.role,
+      memberCount: Number(group.member_count),
+      unreadCount: Number(group.unread_count),
+    })),
+    groupPrayers: (bundle.group_prayers ?? []).map(mapPrayerSummaryRow),
+    personalPrayers: (bundle.personal_prayers ?? []).map(mapPrayerSummaryRow),
+    notifications: (bundle.notifications ?? []).map(mapNotificationSummaryRow),
   };
 }

@@ -9,6 +9,7 @@ const reminderSchema = readFileSync(join(root, "supabase/migrations/202609040007
 const sharedPrayerSchema = readFileSync(join(root, "supabase/migrations/202609040008_personal_and_shared_prayers.sql"), "utf8");
 const hardenedPushSchema = readFileSync(join(root, "supabase/migrations/202609050001_harden_push_delivery.sql"), "utf8");
 const performanceSchema = readFileSync(join(root, "supabase/migrations/202609050002_performance_read_models.sql"), "utf8");
+const bundleSchema = readFileSync(join(root, "supabase/migrations/202609050003_ultra_performance.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -91,5 +92,13 @@ describe("security guardrails", () => {
     expect(performanceSchema).toContain("membership.user_id = auth.uid()");
     expect(performanceSchema).toMatch(/revoke all on function public\.get_prayer_summaries_fast[\s\S]+from public, anon;/);
     expect(performanceSchema).toContain("grant execute on function public.get_dashboard_overview() to authenticated;");
+  });
+
+  it("exposes screen bundles only to authenticated users", () => {
+    expect(bundleSchema).toContain("case when auth.uid() is null then null");
+    expect(bundleSchema).toMatch(/revoke all on function public\.get_dashboard_bundle_fast\(\) from public, anon;/);
+    expect(bundleSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to authenticated;");
+    expect(bundleSchema).toContain("where notification.recipient_id = auth.uid()");
+    expect(bundleSchema).toContain("where reminder.user_id = auth.uid()");
   });
 });

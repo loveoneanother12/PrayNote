@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   BellRing,
   BookHeart,
@@ -9,10 +10,11 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import { markNotificationRead } from "@/app/notification-actions";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { useRouter } from "next/navigation";
+import { startTransition, useEffect, useState } from "react";
 import { formatKoreaDateTime } from "@/lib/dates";
 import type { NotificationSummary, NotificationType } from "@/lib/domain";
+import { createClient } from "@/lib/supabase/client";
 
 function NotificationIcon({ type }: { type: NotificationType }) {
   if (type === "new_prayer") return <BookHeart size={18} />;
@@ -25,18 +27,39 @@ function NotificationIcon({ type }: { type: NotificationType }) {
 }
 
 export function NotificationListItem({ notification, compact = false }: { notification: NotificationSummary; compact?: boolean }) {
+  const router = useRouter();
+  const [read, setRead] = useState(Boolean(notification.readAt));
+
+  useEffect(() => {
+    const markRead = () => setRead(true);
+    window.addEventListener("praynote:notifications-read-all", markRead);
+    return () => window.removeEventListener("praynote:notifications-read-all", markRead);
+  }, []);
+
+  function openNotification() {
+    if (read) return;
+    setRead(true);
+    const supabase = createClient();
+    void supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", notification.id)
+      .then(({ error }) => {
+        if (error) setRead(false);
+        else startTransition(() => router.refresh());
+      });
+  }
+
   return (
-    <form action={markNotificationRead} className={`notification-row-form ${compact ? "compact" : ""}`}>
-      <input type="hidden" name="notificationId" value={notification.id} />
-      <input type="hidden" name="destination" value={notification.href} />
-      <PendingSubmitButton className={`notification-row ${notification.readAt ? "read" : "unread"}`} pendingText="여는 중…">
+    <div className={`notification-row-form ${compact ? "compact" : ""}`}>
+      <Link href={notification.href} onClick={openNotification} className={`notification-row ${read ? "read" : "unread"}`}>
         <span className={`notification-type-icon type-${notification.type}`}><NotificationIcon type={notification.type} /></span>
         <span className="notification-row-copy">
           <strong>{notification.message}</strong>
           <small>{formatKoreaDateTime(notification.createdAt)}</small>
         </span>
-        {!notification.readAt && <span className="notification-unread-dot" aria-label="읽지 않음" />}
-      </PendingSubmitButton>
-    </form>
+        {!read && <span className="notification-unread-dot" aria-label="읽지 않음" />}
+      </Link>
+    </div>
   );
 }

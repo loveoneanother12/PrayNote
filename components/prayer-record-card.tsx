@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { CalendarDays, Check, Heart, RotateCcw } from "lucide-react";
-import { togglePrayerCompleted, toggleTodayPrayer } from "@/app/prayer-actions";
+import { CalendarDays, Check } from "lucide-react";
+import { useState } from "react";
+import { InstantPrayerButton, InstantPrayerStatusButton } from "@/components/instant-prayer-actions";
 import { formatKoreaDate } from "@/lib/dates";
-import type { PrayerSummary } from "@/lib/domain";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
+import type { PrayerStatus, PrayerSummary } from "@/lib/domain";
 
 type PrayerRecordCardProps = {
   prayer: PrayerSummary;
@@ -12,9 +14,11 @@ type PrayerRecordCardProps = {
   showGroup?: boolean;
 };
 
-export function PrayerRecordCard({ prayer, currentUserId, returnTo, showGroup = false }: PrayerRecordCardProps) {
+export function PrayerRecordCard({ prayer, currentUserId, showGroup = false }: PrayerRecordCardProps) {
   const mine = prayer.authorId === currentUserId;
-  const completed = prayer.status === "completed";
+  const [status, setStatus] = useState<PrayerStatus>(prayer.status);
+  const [completedAt, setCompletedAt] = useState(prayer.completedAt);
+  const completed = status === "completed";
 
   return (
     <article className={`record-card ${completed ? "resolved" : ""}`}>
@@ -30,31 +34,27 @@ export function PrayerRecordCard({ prayer, currentUserId, returnTo, showGroup = 
         <p>{prayer.content}</p>
         <span>자세히 보기</span>
       </Link>
-      {completed && prayer.completedAt && (
-        <div className="resolved-date"><Check size={14} />{formatKoreaDate(prayer.completedAt)}에 해결된 기도제목으로 이관됨</div>
+      {completed && completedAt && (
+        <div className="resolved-date"><Check size={14} />{formatKoreaDate(completedAt)}에 해결된 기도제목으로 이관됨</div>
       )}
       <div className="record-actions">
         {!completed && (
-          <form action={toggleTodayPrayer}>
-            <input type="hidden" name="prayerId" value={prayer.id} />
-            <input type="hidden" name="returnTo" value={returnTo} />
-            <PendingSubmitButton className={`daily-prayer-button ${prayer.hasPrayed ? "done" : ""}`} pendingText="기록 중…" title={prayer.hasPrayed ? "다시 누르면 오늘 기록이 취소됩니다." : "한국시간 기준 오늘의 기도 기록을 남깁니다."}>
-              {prayer.hasPrayed ? <Check size={16} /> : <Heart size={16} />}
-              {prayer.hasPrayed ? "오늘 기도완료" : "오늘 기도하기"}
-              <span>누적 {prayer.responseCount}회</span>
-            </PendingSubmitButton>
-          </form>
+          <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="daily-prayer-button" countPrefix="누적 " />
         )}
         {mine && (
-          <form action={togglePrayerCompleted} className="resolve-form">
-            <input type="hidden" name="prayerId" value={prayer.id} />
-            <input type="hidden" name="returnTo" value={returnTo} />
-            <input type="hidden" name="status" value={completed ? "active" : "completed"} />
-            <PendingSubmitButton className="resolve-button" pendingText="변경 중…">
-              {completed ? <RotateCcw size={15} /> : <Check size={15} />}
-              {completed ? "진행 중으로 되돌리기" : "해결 완료"}
-            </PendingSubmitButton>
-          </form>
+          <div className="resolve-form">
+            <InstantPrayerStatusButton
+              prayerId={prayer.id}
+              initialStatus={prayer.status}
+              initialCompletedAt={prayer.completedAt}
+              status={status}
+              className="resolve-button"
+              onStatusChange={(nextStatus, nextCompletedAt) => {
+                setStatus(nextStatus);
+                setCompletedAt(nextCompletedAt);
+              }}
+            />
+          </div>
         )}
       </div>
       {prayer.hasPrayed && !completed && <span className="daily-undo-hint">다시 누르면 오늘의 기도 기록을 취소할 수 있어요.</span>}

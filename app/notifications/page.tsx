@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft, Bell, BellRing, CheckCheck } from "lucide-react";
+import { ArrowLeft, Bell, BellRing } from "lucide-react";
 import { redirect } from "next/navigation";
-import { markAllNotificationsRead } from "@/app/notification-actions";
+import { InstantMarkAllNotificationsRead } from "@/components/instant-notification-actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
-import { getAuthIdentity } from "@/lib/auth";
-import { getNotificationSummaries } from "@/lib/notification-queries";
+import { getNotificationsPageBundle } from "@/lib/notification-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type NotificationsPageProps = {
@@ -17,19 +15,15 @@ type NotificationsPageProps = {
 
 export default async function NotificationsPage({ searchParams }: NotificationsPageProps) {
   const supabase = await createClient();
-  const [user, query] = await Promise.all([getAuthIdentity(supabase), searchParams]);
-  if (!user) redirect("/login?next=/notifications");
-
-  const [{ data: profile }, notifications] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
-    getNotificationSummaries(supabase, user.id, 100),
-  ]);
+  const [bundle, query] = await Promise.all([getNotificationsPageBundle(supabase, 100), searchParams]);
+  if (!bundle) redirect("/login?next=/notifications");
+  const { notifications } = bundle;
   const unreadCount = notifications.filter((notification) => !notification.readAt).length;
   const view = query.view === "unread" ? "unread" : "all";
   const visibleNotifications = view === "unread"
     ? notifications.filter((notification) => !notification.readAt)
     : notifications;
-  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
 
   return (
     <div className="app-shell">
@@ -37,7 +31,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
-          {unreadCount > 0 && <form action={markAllNotificationsRead}><PendingSubmitButton className="mark-all-button" pendingText="처리 중…"><CheckCheck size={16} />모두 읽음</PendingSubmitButton></form>}
+          {unreadCount > 0 && <InstantMarkAllNotificationsRead />}
         </header>
         <div className="content-wrap detail-content notifications-content">
           <section className="notifications-hero">
@@ -62,7 +56,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
         </div>
       </main>
       <MobileNav />
-      <NotificationRealtime userId={user.id} />
+      <NotificationRealtime userId={bundle.userId} />
     </div>
   );
 }

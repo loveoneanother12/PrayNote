@@ -5,7 +5,6 @@ import {
   BookHeart,
   Check,
   LockKeyhole,
-  LogOut,
   Mail,
   Settings,
   Smartphone,
@@ -13,14 +12,18 @@ import {
   Users,
 } from "lucide-react";
 import { redirect } from "next/navigation";
-import { signOut, updateNotificationPreferences, updatePassword, updateProfile } from "@/app/settings/actions";
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
+import {
+  InstantNotificationPreferencesForm,
+  InstantPasswordForm,
+  InstantProfileForm,
+  InstantSignOutButton,
+} from "@/components/instant-settings-forms";
 import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
-import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
-import { getAuthIdentity } from "@/lib/auth";
+import { getSettingsBundle } from "@/lib/settings-queries";
 
 type SettingsPageProps = {
   searchParams: Promise<{ saved?: string; error?: string }>;
@@ -28,21 +31,11 @@ type SettingsPageProps = {
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const supabase = await createClient();
-  const [user, query] = await Promise.all([getAuthIdentity(supabase), searchParams]);
-  if (!user) redirect("/login?next=/settings");
+  const [bundle, query] = await Promise.all([getSettingsBundle(supabase), searchParams]);
+  if (!bundle) redirect("/login?next=/settings");
+  const { preferences, reminderTimes } = bundle;
 
-  const [{ data: profile }, { data: preferences }, { count: unreadCount }, { data: reminderTimes }] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
-    supabase
-      .from("notification_preferences")
-      .select("in_app_enabled, new_prayer_enabled, prayer_response_enabled, membership_enabled, push_enabled, email_enabled")
-      .eq("user_id", user.id)
-      .single(),
-    supabase.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", user.id).is("read_at", null),
-    supabase.from("prayer_reminder_times").select("id, time_local").eq("user_id", user.id).order("time_local"),
-  ]);
-
-  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "기도하는 이";
+  const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
   const notice = query.saved === "profile"
     ? "프로필을 저장했어요."
     : query.saved === "notifications"
@@ -61,7 +54,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
   return (
     <div className="app-shell">
-      <SubpageNav displayName={displayName} active="settings" unreadNotificationCount={unreadCount ?? 0} />
+      <SubpageNav displayName={displayName} active="settings" unreadNotificationCount={bundle.unreadCount} />
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
@@ -77,31 +70,22 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><UserRound size={18} /></span><div><h2>프로필</h2><p>그룹 멤버들에게 표시되는 이름입니다.</p></div></div>
-            <form action={updateProfile} className="profile-settings-form">
-              <label htmlFor="display-name">표시 이름</label>
-              <input id="display-name" name="displayName" defaultValue={displayName} minLength={2} maxLength={30} required />
-              <label htmlFor="account-email">로그인 이메일</label>
-              <input id="account-email" value={user.email ?? ""} readOnly aria-readonly="true" />
-              <p>로그인 이메일은 현재 변경할 수 없습니다.</p>
-              <PendingSubmitButton className="primary-button" pendingText="저장 중…"><Check size={16} />프로필 저장</PendingSubmitButton>
-            </form>
+            <InstantProfileForm userId={bundle.userId} displayName={displayName} email={bundle.email} />
           </section>
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>기존 메일 링크 계정도 여기서 비밀번호를 만들 수 있습니다.</p></div></div>
-            <form action={updatePassword} className="password-settings-form">
-              <label htmlFor="new-password">새 비밀번호</label>
-              <input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required />
-              <label htmlFor="new-password-confirm">비밀번호 확인</label>
-              <input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required />
-              <p>저장 후에는 메일 링크 없이 이메일과 비밀번호로 로그인할 수 있습니다.</p>
-              <PendingSubmitButton className="primary-button" pendingText="저장 중…"><Check size={16} />비밀번호 저장</PendingSubmitButton>
-            </form>
+            <InstantPasswordForm />
           </section>
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><Bell size={18} /></span><div><h2>인앱 알림</h2><p>PrayNote 안에서 받을 새 소식을 선택하세요.</p></div></div>
-            <form action={updateNotificationPreferences} className="notification-settings-form">
+            <InstantNotificationPreferencesForm initial={{
+              inApp: preferences?.in_app_enabled ?? true,
+              newPrayer: preferences?.new_prayer_enabled ?? true,
+              prayerResponse: preferences?.prayer_response_enabled ?? true,
+              membership: preferences?.membership_enabled ?? true,
+            }}>
               <label className="setting-toggle master-toggle">
                 <span className="setting-copy"><strong>인앱 알림 받기</strong><small>모든 새 알림을 한 번에 켜거나 끕니다.</small></span>
                 <input type="checkbox" name="inAppEnabled" defaultChecked={preferences?.in_app_enabled ?? true} />
@@ -127,15 +111,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   <span className="switch" aria-hidden="true" />
                 </label>
               </div>
-              <div className="settings-save-row"><span>기존 알림은 유지되고 새로 발생하는 알림부터 적용됩니다.</span><PendingSubmitButton className="primary-button" pendingText="저장 중…">알림 설정 저장</PendingSubmitButton></div>
-            </form>
+            </InstantNotificationPreferencesForm>
           </section>
 
           <section className="settings-panel upcoming-panel">
             <div className="settings-panel-heading"><span><Smartphone size={18} /></span><div><h2>외부 알림</h2><p>PrayNote를 열지 않았을 때도 소식을 받는 기능입니다.</p></div></div>
             <BrowserPushSettings initialEnabled={preferences?.push_enabled ?? false} vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
             <PrayerReminderSettings
-              userId={user.id}
+              userId={bundle.userId}
               initialTimes={(reminderTimes ?? []).map((item) => ({ id: item.id, timeLocal: item.time_local }))}
               pushEnabled={preferences?.push_enabled ?? false}
             />
@@ -144,7 +127,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel account-panel">
             <div><strong>로그아웃</strong><span>이 기기에서 PrayNote 사용을 종료합니다.</span></div>
-            <form action={signOut}><PendingSubmitButton className="logout-button" pendingText="로그아웃 중…"><LogOut size={16} />로그아웃</PendingSubmitButton></form>
+            <InstantSignOutButton />
           </section>
         </div>
       </main>

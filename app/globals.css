@@ -130,6 +130,7 @@ button { color: inherit; }
 .join-card small { font-size: 11px; }
 
 .bottom-grid { margin-top: 43px; display: grid; grid-template-columns: 1.4fr .8fr; gap: 16px; }
+.dashboard-group-prayers, .groups-section, .bottom-grid, .prayer-record-section, .settings-panel { content-visibility: auto; contain-intrinsic-size: auto 320px; }
 .activity-panel, .verse-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 21px; }
 .activity-item { padding: 13px 0; display: flex; align-items: center; gap: 12px; border-top: 1px solid #eef0f4; }
 .activity-icon { width: 35px; height: 35px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; }
@@ -141,7 +142,7 @@ button { color: inherit; }
 .empty-activity { min-height: 100px; color: #99a2b2; border-top: 1px solid #eef0f4; display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 12px; }
 .dashboard-notifications { border-top: 1px solid #eef0f4; }
 .notification-row-form { margin: 0; }
-.notification-row { width: 100%; min-height: 78px; padding: 13px 15px; border: 0; border-bottom: 1px solid #edf0f4; background: #fff; display: flex; align-items: center; gap: 13px; text-align: left; cursor: pointer; transition: background .16s ease; }
+.notification-row { width: 100%; min-height: 78px; padding: 13px 15px; border: 0; border-bottom: 1px solid #edf0f4; background: #fff; color: inherit; text-decoration: none; display: flex; align-items: center; gap: 13px; text-align: left; cursor: pointer; transition: background .16s ease; }
 .notification-row-form:last-child .notification-row { border-bottom: 0; }
 .notification-row:hover { background: #f8f9fd; }
 .notification-row.unread { background: #f7f8ff; }
@@ -244,6 +245,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 760px) {
+  .topbar { backdrop-filter: none; background: rgba(255,255,255,.97); }
   .sidebar { display: none; }
   .main-content { margin-left: 0; padding-bottom: 76px; }
   .topbar { height: 65px; padding: 0 18px; gap: 9px; }
@@ -596,6 +598,10 @@ button { color: inherit; }
 .member-role-badge.leader { color: #8a692f; background: #fff6df; }
 .member-role-badge.admin { color: #5266c2; background: #edf0ff; }
 .role-action-button { color: #5266c2; background: #edf0ff; }
+.review-result { min-height: 33px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 750; }
+.review-result.approved { color: #39725b; background: #e7f4ed; }
+.review-result.rejected { color: #a25161; background: #fff0f3; }
+.inline-save-message { color: var(--sage); font-size: 10px; font-weight: 700; }
 .empty-members { min-height: 75px; border-top: 1px solid #eef0f4; color: #9aa3b2; display: grid; place-items: center; font-size: 10px; }
 .settings-form { display: grid; gap: 9px; }
 .settings-form label { color: #536078; font-size: 10px; font-weight: 750; }
