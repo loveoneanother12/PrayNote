@@ -23,7 +23,6 @@ export function InstantPrayerButton({
   countPrefix = "",
   iconSize = 16,
 }: InstantPrayerButtonProps) {
-  const router = useRouter();
   const [hasPrayed, setHasPrayed] = useState(initialHasPrayed);
   const [responseCount, setResponseCount] = useState(initialResponseCount);
   const [pending, setPending] = useState(false);
@@ -49,7 +48,6 @@ export function InstantPrayerButton({
       setResponseCount((count) => Math.max(0, count + (data ? 1 : -1)));
     }
     setPending(false);
-    if (!error) startTransition(() => router.refresh());
   }
 
   return (
@@ -79,9 +77,10 @@ type InstantPrayerStatusButtonProps = {
   status?: PrayerStatus;
   className: string;
   onStatusChange?: (status: PrayerStatus, completedAt: string | null) => void;
+  refreshAfterSuccess?: boolean;
 };
 
-export function InstantPrayerStatusButton({ prayerId, initialStatus, initialCompletedAt = null, status: controlledStatus, className, onStatusChange }: InstantPrayerStatusButtonProps) {
+export function InstantPrayerStatusButton({ prayerId, initialStatus, initialCompletedAt = null, status: controlledStatus, className, onStatusChange, refreshAfterSuccess = false }: InstantPrayerStatusButtonProps) {
   const router = useRouter();
   const [localStatus, setLocalStatus] = useState(initialStatus);
   const [pending, setPending] = useState(false);
@@ -116,7 +115,7 @@ export function InstantPrayerStatusButton({ prayerId, initialStatus, initialComp
       setFailed(true);
     }
     setPending(false);
-    if (!error && data) startTransition(() => router.refresh());
+    if (!error && data && refreshAfterSuccess) startTransition(() => router.refresh());
   }
 
   return (

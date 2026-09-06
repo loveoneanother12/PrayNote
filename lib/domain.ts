@@ -18,6 +18,7 @@ export type GroupSummary = {
   role: GroupRole;
   memberCount: number;
   unreadCount: number;
+  prayerCount?: number;
 };
 
 export type PrayerSummary = {

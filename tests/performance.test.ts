@@ -50,9 +50,35 @@ describe("performance read paths", () => {
 
   it("uses optimistic browser mutations for frequent prayer interactions", () => {
     const actions = read("components/instant-prayer-actions.tsx");
+    const dailyPrayerAction = actions.split("type InstantPrayerStatusButtonProps")[0];
     expect(actions).toContain('rpc("toggle_prayer_response"');
     expect(actions).toContain("setHasPrayed(next)");
     expect(actions).toContain("disabled={pending}");
-    expect(actions).toContain("router.refresh()");
+    expect(dailyPrayerAction).not.toContain("router.refresh()");
+  });
+
+  it("switches prayer filters locally instead of refetching the page", () => {
+    const filters = read("components/prayer-record-sections.tsx");
+    const myPrayers = read("app/prayers/page.tsx");
+    const groupPrayers = read("app/groups/[groupId]/page.tsx");
+    expect(filters).toContain('setView("active")');
+    expect(filters).toContain('setView("resolved")');
+    expect(filters).toContain('setView("all")');
+    expect(myPrayers).toContain("<PrayerRecordSections");
+    expect(groupPrayers).toContain("<PrayerRecordSections");
+  });
+
+  it("limits dashboard payloads to the cards the interface can display", () => {
+    const migration = read("supabase/migrations/202609060003_dashboard_payload_optimization.sql");
+    expect(migration).toContain("'active_prayer_count'");
+    expect(migration).toContain("'personal_prayer_count'");
+    expect(migration.match(/result_limit => 3/g)).toHaveLength(2);
+    expect(migration).toContain("get_notification_summaries_fast(3)");
+  });
+
+  it("only refreshes realtime notification data for newly inserted alerts", () => {
+    const realtime = read("components/notification-realtime.tsx");
+    expect(realtime).toContain('event: "INSERT"');
+    expect(realtime).not.toContain('event: "*"');
   });
 });

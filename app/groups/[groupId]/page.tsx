@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, BookHeart, CalendarCheck, Settings, Users } from "lucide-react";
+import { ArrowLeft, CalendarCheck, Settings, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { CopyInviteButton } from "@/components/copy-invite-button";
 import { GroupPrayerComposer } from "@/components/group-prayer-composer";
 import { MobileNav } from "@/components/mobile-nav";
-import { PrayerRecordCard } from "@/components/prayer-record-card";
+import { PrayerRecordSections } from "@/components/prayer-record-sections";
 import { SharePrayerModal } from "@/components/share-prayer-modal";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
@@ -25,8 +25,6 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
   const { overview, prayers } = bundle;
   const { group, role, memberCount, myGroups } = overview;
 
-  const activePrayers = prayers.filter((prayer) => prayer.status === "active");
-  const resolvedPrayers = prayers.filter((prayer) => prayer.status === "completed");
   const displayName = (overview.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
   const returnTo = `/groups/${groupId}`;
   const view = queryParams.view === "resolved" || queryParams.view === "all" ? queryParams.view : "active";
@@ -67,28 +65,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             </div>
           )}
 
-          <nav className="prayer-filter-tabs" aria-label="기도제목 상태 필터">
-            <Link className={view === "active" ? "active" : ""} href={returnTo}>기도 중 <span>{activePrayers.length}</span></Link>
-            <Link className={view === "resolved" ? "active" : ""} href={`${returnTo}?view=resolved`}>해결됨 <span>{resolvedPrayers.length}</span></Link>
-            <Link className={view === "all" ? "active" : ""} href={`${returnTo}?view=all`}>전체 <span>{prayers.length}</span></Link>
-          </nav>
-
-          {(view === "active" || view === "all") && <section className="prayer-record-section">
-            <div className="record-section-heading"><div><span className="status-dot active" /><h2>함께 기도 중</h2></div><strong>{activePrayers.length}</strong></div>
-            <div className="record-grid">
-              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} groups={myGroups} />)}
-              {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 기도제목이 없어요</strong><span>위 입력창에서 첫 기도제목을 나눠보세요.</span></div>}
-            </div>
-          </section>}
-
-          {(view === "resolved" || view === "all") && <section className="prayer-record-section resolved-section">
-            <div className="record-section-heading"><div><span className="status-dot resolved" /><h2>해결된 기도제목들</h2></div><strong>{resolvedPrayers.length}</strong></div>
-            <p className="section-description">완료한 기도제목이 해결 날짜와 함께 차곡차곡 보관됩니다.</p>
-            <div className="record-grid">
-              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo={returnTo} groups={myGroups} />)}
-              {resolvedPrayers.length === 0 && <div className="empty-records compact"><CalendarCheck size={24} /><strong>아직 해결 기록이 없어요</strong></div>}
-            </div>
-          </section>}
+          <PrayerRecordSections prayers={prayers} currentUserId={bundle.userId} groups={myGroups} scope="group" initialView={view} />
         </div>
       </main>
       <MobileNav active="groups" />

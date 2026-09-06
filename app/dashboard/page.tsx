@@ -32,6 +32,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       unreadNotificationCount={bundle.unreadCount}
       groupCount={bundle.groupCount}
       prayerCount={bundle.prayerCount}
+      personalPrayerCount={bundle.personalPrayerCount}
       created={params.created ?? (params.left ? "left" : params.deleted ? "deleted" : undefined)}
       error={params.error}
       initialComposerOpen={params.compose === "1"}

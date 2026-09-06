@@ -16,14 +16,12 @@ export function NotificationRealtime({ userId }: { userId: string }) {
       .channel(`notifications:${userId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `recipient_id=eq.${userId}` },
-        (payload) => {
+        { event: "INSERT", schema: "public", table: "notifications", filter: `recipient_id=eq.${userId}` },
+        () => {
           router.refresh();
-          if (payload.eventType === "INSERT") {
-            setVisible(true);
-            if (timer.current) clearTimeout(timer.current);
-            timer.current = setTimeout(() => setVisible(false), 3500);
-          }
+          setVisible(true);
+          if (timer.current) clearTimeout(timer.current);
+          timer.current = setTimeout(() => setVisible(false), 3500);
         },
       )
       .subscribe();

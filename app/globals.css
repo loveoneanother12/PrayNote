@@ -423,9 +423,9 @@ button { color: inherit; }
 .prayer-stats strong { color: #4f62bf; font-size: 20px; }
 .prayer-stats span { margin-top: 3px; color: #8b95a5; font-size: 9px; }
 .prayer-filter-tabs { width: fit-content; margin-top: 26px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: #fff; display: flex; gap: 3px; }
-.prayer-filter-tabs a { min-height: 34px; padding: 0 11px; border-radius: 8px; color: #7d8798; display: flex; align-items: center; gap: 6px; text-decoration: none; font-size: 10px; font-weight: 750; }
-.prayer-filter-tabs a.active { color: #5064c2; background: #edf0ff; }
-.prayer-filter-tabs a span { min-width: 18px; height: 18px; border-radius: 20px; background: rgba(111,124,160,.12); display: grid; place-items: center; font-size: 8px; }
+.prayer-filter-tabs button { min-height: 34px; padding: 0 11px; border: 0; border-radius: 8px; color: #7d8798; background: transparent; display: flex; align-items: center; gap: 6px; text-decoration: none; font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; }
+.prayer-filter-tabs button.active { color: #5064c2; background: #edf0ff; }
+.prayer-filter-tabs button span { min-width: 18px; height: 18px; border-radius: 20px; background: rgba(111,124,160,.12); display: grid; place-items: center; font-size: 8px; }
 
 .mark-all-button { min-height: 37px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: #5266c2; background: #fff; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 11px; font-weight: 750; }
 .mark-all-button:hover { background: #f5f7ff; }
@@ -706,7 +706,7 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .prayer-stats { width: 100%; }
   .prayer-stats > div { flex: 1; }
   .prayer-filter-tabs { width: 100%; }
-  .prayer-filter-tabs a { flex: 1; justify-content: center; }
+  .prayer-filter-tabs button { flex: 1; justify-content: center; }
   .prayer-detail-content, .search-content { padding-top: 24px; }
   .prayer-detail-card { padding: 24px 19px; }
   .prayer-detail-card > .prayer-owner-actions { position: static; margin-top: 15px; }

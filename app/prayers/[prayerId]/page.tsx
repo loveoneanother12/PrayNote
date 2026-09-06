@@ -43,7 +43,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
             {mine ? <PrayerDetailContent prayer={prayer} groups={bundle.myGroups} /> : <p className="prayer-full-content">{prayer.content}</p>}
             <div className="detail-actions">
               {!completed && <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="daily-prayer-button detail-pray" countPrefix="누적 " iconSize={17} />}
-              {mine && <InstantPrayerStatusButton prayerId={prayer.id} initialStatus={prayer.status} initialCompletedAt={prayer.completedAt} className="resolve-button detail-resolve" />}
+              {mine && <InstantPrayerStatusButton prayerId={prayer.id} initialStatus={prayer.status} initialCompletedAt={prayer.completedAt} className="resolve-button detail-resolve" refreshAfterSuccess />}
             </div>
             {prayer.hasPrayed && !completed && <p className="detail-help">오늘 기도완료 버튼을 다시 누르면 오늘 기록만 취소됩니다. 이전 날짜의 기록은 유지됩니다.</p>}
           </article>

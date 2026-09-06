@@ -10,8 +10,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { formatKoreaDateTime } from "@/lib/dates";
 import type { NotificationSummary, NotificationType } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
@@ -26,8 +25,7 @@ function NotificationIcon({ type }: { type: NotificationType }) {
   return <BellRing size={18} />;
 }
 
-export function NotificationListItem({ notification, compact = false }: { notification: NotificationSummary; compact?: boolean }) {
-  const router = useRouter();
+export function NotificationListItem({ notification, compact = false, onRead }: { notification: NotificationSummary; compact?: boolean; onRead?: (id: string) => void }) {
   const [read, setRead] = useState(Boolean(notification.readAt));
 
   useEffect(() => {
@@ -39,6 +37,7 @@ export function NotificationListItem({ notification, compact = false }: { notifi
   function openNotification() {
     if (read) return;
     setRead(true);
+    onRead?.(notification.id);
     const supabase = createClient();
     void supabase
       .from("notifications")
@@ -46,7 +45,6 @@ export function NotificationListItem({ notification, compact = false }: { notifi
       .eq("id", notification.id)
       .then(({ error }) => {
         if (error) setRead(false);
-        else startTransition(() => router.refresh());
       });
   }
 

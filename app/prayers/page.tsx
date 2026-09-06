@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, BookHeart, CalendarCheck } from "lucide-react";
 import { redirect } from "next/navigation";
-import { PrayerRecordCard } from "@/components/prayer-record-card";
 import { MobileNav } from "@/components/mobile-nav";
+import { PrayerRecordSections } from "@/components/prayer-record-sections";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
 import { getMyPrayersPageBundle } from "@/lib/prayer-queries";
@@ -40,28 +40,7 @@ export default async function MyPrayersPage({ searchParams }: MyPrayersPageProps
 
           {(queryParams.updated || queryParams.deleted || queryParams.error) && <div className={`page-notice ${queryParams.error ? "error" : ""}`}>{queryParams.error ? "요청을 처리하지 못했어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : "진행 중 기도로 되돌렸어요."}</div>}
 
-          <nav className="prayer-filter-tabs" aria-label="내 기도제목 상태 필터">
-            <Link className={view === "active" ? "active" : ""} href="/prayers">기도 중 <span>{activePrayers.length}</span></Link>
-            <Link className={view === "resolved" ? "active" : ""} href="/prayers?view=resolved">해결됨 <span>{resolvedPrayers.length}</span></Link>
-            <Link className={view === "all" ? "active" : ""} href="/prayers?view=all">전체 <span>{prayers.length}</span></Link>
-          </nav>
-
-          {(view === "active" || view === "all") && <section className="prayer-record-section">
-            <div className="record-section-heading"><div><span className="status-dot active" /><h2>진행 중인 기도제목</h2></div><strong>{activePrayers.length}</strong></div>
-            <div className="record-grid">
-              {activePrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo="/prayers" showGroup groups={bundle.myGroups} />)}
-              {activePrayers.length === 0 && <div className="empty-records"><BookHeart size={25} /><strong>진행 중인 내 기도가 없어요</strong><span>메인 화면에서 개인기도나 그룹 기도제목을 등록해보세요.</span></div>}
-            </div>
-          </section>}
-
-          {(view === "resolved" || view === "all") && <section className="prayer-record-section resolved-section">
-            <div className="record-section-heading"><div><span className="status-dot resolved" /><h2>해결된 기도제목들</h2></div><strong>{resolvedPrayers.length}</strong></div>
-            <p className="section-description">해결 완료 버튼을 누른 기록이 날짜순으로 쌓입니다. 이 기록은 이후 기도 타임라인에도 사용됩니다.</p>
-            <div className="record-grid">
-              {resolvedPrayers.map((prayer) => <PrayerRecordCard key={prayer.id} prayer={prayer} currentUserId={bundle.userId} returnTo="/prayers" showGroup groups={bundle.myGroups} />)}
-              {resolvedPrayers.length === 0 && <div className="empty-records compact"><CalendarCheck size={24} /><strong>아직 해결 기록이 없어요</strong></div>}
-            </div>
-          </section>}
+          <PrayerRecordSections prayers={prayers} currentUserId={bundle.userId} groups={bundle.myGroups} scope="mine" initialView={view} />
         </div>
       </main>
       <MobileNav active="prayers" />

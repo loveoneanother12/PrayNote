@@ -15,13 +15,18 @@ type PrayerRecordCardProps = {
   returnTo: string;
   showGroup?: boolean;
   groups?: Array<{ id: string; name: string }>;
+  status?: PrayerStatus;
+  completedAt?: string | null;
+  onStatusChange?: (status: PrayerStatus, completedAt: string | null) => void;
 };
 
-export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, groups = [] }: PrayerRecordCardProps) {
+export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, groups = [], status: controlledStatus, completedAt: controlledCompletedAt, onStatusChange }: PrayerRecordCardProps) {
   const mine = prayer.authorId === currentUserId;
-  const [status, setStatus] = useState<PrayerStatus>(prayer.status);
-  const [completedAt, setCompletedAt] = useState(prayer.completedAt);
+  const [localStatus, setLocalStatus] = useState<PrayerStatus>(prayer.status);
+  const [localCompletedAt, setLocalCompletedAt] = useState(prayer.completedAt);
   const [content, setContent] = useState(prayer.content);
+  const status = controlledStatus ?? localStatus;
+  const completedAt = controlledCompletedAt === undefined ? localCompletedAt : controlledCompletedAt;
   const completed = status === "completed";
 
   return (
@@ -55,8 +60,9 @@ export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, gro
               status={status}
               className="resolve-button"
               onStatusChange={(nextStatus, nextCompletedAt) => {
-                setStatus(nextStatus);
-                setCompletedAt(nextCompletedAt);
+                setLocalStatus(nextStatus);
+                setLocalCompletedAt(nextCompletedAt);
+                onStatusChange?.(nextStatus, nextCompletedAt);
               }}
             />
           </div>

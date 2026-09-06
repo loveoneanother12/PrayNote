@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { type FormEvent, startTransition, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import {
   Bell,
   BookHeart,
@@ -21,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { InstantPrayerButton } from "@/components/instant-prayer-actions";
+import { DashboardPrayerComposer } from "@/components/dashboard-prayer-composer";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
@@ -44,6 +44,7 @@ type PrayNoteAppProps = {
   unreadNotificationCount: number;
   groupCount: number;
   prayerCount: number;
+  personalPrayerCount: number;
   created?: string;
   error?: string;
   initialComposerOpen?: boolean;
@@ -52,79 +53,37 @@ type PrayNoteAppProps = {
 const roleLabels = { leader: "LEADER", admin: "ADMIN", member: "MEMBER" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function PrayNoteApp({ displayName, profileColor, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, greeting, unreadNotificationCount, groupCount, prayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
-  const router = useRouter();
+export function PrayNoteApp({ displayName, profileColor, email, groups: initialGroups, prayers: initialPrayers, notifications, userId, todayLabel, greeting, unreadNotificationCount, groupCount, prayerCount, personalPrayerCount, created, error, initialComposerOpen = false }: PrayNoteAppProps) {
   const [opened, setOpened] = useState(true);
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
-  const [draft, setDraft] = useState("");
-  const [personalPrayer, setPersonalPrayer] = useState(false);
-  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const [optimisticGroups, setOptimisticGroups] = useState<GroupSummary[]>([]);
   const [optimisticPrayers, setOptimisticPrayers] = useState<PrayerSummary[]>([]);
   const [contentOverrides, setContentOverrides] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState<"prayer" | "group" | null>(null);
+  const [groupSubmitting, setGroupSubmitting] = useState(false);
   const [localToast, setLocalToast] = useState("");
   const [localError, setLocalError] = useState("");
   const serverToast = created === "group" ? "새 그룹을 만들었어요" : created === "prayer" ? "기도제목을 나눴어요" : created === "left" ? "그룹에서 탈퇴했어요" : created === "deleted" ? "그룹을 삭제했어요" : "";
   const toast = localToast || serverToast;
   const visibleError = localError || error;
-  const groups = [...initialGroups, ...optimisticGroups.filter((optimistic) => !initialGroups.some((group) => group.id === optimistic.id))];
-  const prayers = [...optimisticPrayers.filter((optimistic) => !initialPrayers.some((prayer) => prayer.id === optimistic.id && prayer.groupId === optimistic.groupId)), ...initialPrayers];
+  const groups = useMemo(() => [...initialGroups, ...optimisticGroups.filter((optimistic) => !initialGroups.some((group) => group.id === optimistic.id))], [initialGroups, optimisticGroups]);
+  const prayers = useMemo(() => [...optimisticPrayers.filter((optimistic) => !initialPrayers.some((prayer) => prayer.id === optimistic.id && prayer.groupId === optimistic.groupId)), ...initialPrayers], [initialPrayers, optimisticPrayers]);
   const newGroupCount = new Set(optimisticGroups.filter((group) => !initialGroups.some((initial) => initial.id === group.id)).map((group) => group.id)).size;
   const newPrayerCount = new Set(optimisticPrayers.filter((prayer) => !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
   const displayedGroupCount = groupCount + newGroupCount;
   const displayedPrayerCount = prayerCount + newPrayerCount;
-  const personalPrayers = prayers.filter((prayer) => prayer.isPersonal);
-
-  async function submitPrayer(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (submitting) return;
-    const content = draft.trim();
-    const targetGroupIds = personalPrayer ? [] : selectedGroupIds;
-    if (!content || (!personalPrayer && targetGroupIds.length === 0)) return;
-
-    setSubmitting("prayer");
-    setLocalError("");
-    const supabase = createClient();
-    const { data: prayerId, error: mutationError } = await supabase.rpc("create_prayer_with_groups", {
-      prayer_content: content,
-      target_group_ids: targetGroupIds,
-      is_personal: personalPrayer,
-    });
-
-    if (mutationError || !prayerId) {
-      setLocalError("기도제목을 등록하지 못했어요.");
-      setSubmitting(null);
-      return;
-    }
-
-    const now = new Date().toISOString();
-    const selectedGroups = groups.filter((group) => targetGroupIds.includes(group.id));
-    const sharedGroupIds = selectedGroups.map((group) => group.id);
-    const sharedGroupNames = selectedGroups.map((group) => group.name);
-    const optimisticRows: PrayerSummary[] = personalPrayer
-      ? [{ id: prayerId, groupId: null, groupName: "개인기도", groupIds: [], groupNames: [], isPersonal: true, authorId: userId, authorName: displayName, authorColor: profileColor, content, status: "active", responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }]
-      : selectedGroups.map((group) => ({ id: prayerId, groupId: group.id, groupName: group.name, groupIds: sharedGroupIds, groupNames: sharedGroupNames, isPersonal: false, authorId: userId, authorName: displayName, authorColor: profileColor, content, status: "active" as const, responseCount: 0, hasPrayed: false, createdAt: now, completedAt: null }));
-    setOptimisticPrayers((current) => [...optimisticRows, ...current]);
-    setDraft("");
-    setSelectedGroupIds([]);
-    setPersonalPrayer(false);
-    setComposerOpen(false);
-    setLocalToast("기도제목을 나눴어요");
-    setSubmitting(null);
-    startTransition(() => router.refresh());
-  }
+  const personalPrayers = useMemo(() => prayers.filter((prayer) => prayer.isPersonal), [prayers]);
+  const newPersonalPrayerCount = new Set(optimisticPrayers.filter((prayer) => prayer.isPersonal && !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
 
   async function submitGroup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting) return;
+    if (groupSubmitting) return;
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const description = String(form.get("description") ?? "").trim();
     if (name.length < 2) return;
 
-    setSubmitting("group");
+    setGroupSubmitting(true);
     setLocalError("");
     const supabase = createClient();
     const { data: groupId, error: mutationError } = await supabase.rpc("create_group", {
@@ -133,15 +92,14 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
     });
     if (mutationError || !groupId) {
       setLocalError("그룹을 만들지 못했어요.");
-      setSubmitting(null);
+      setGroupSubmitting(false);
       return;
     }
 
     setOptimisticGroups((current) => [...current, { id: groupId, name, description: description || null, role: "leader", memberCount: 1, unreadCount: 0 }]);
     setGroupModalOpen(false);
     setLocalToast("새 그룹을 만들었어요");
-    setSubmitting(null);
-    startTransition(() => router.refresh());
+    setGroupSubmitting(false);
   }
 
   return (
@@ -205,7 +163,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
                 {groups.length === 0 && <div className="section-heading compact"><div><h2>아직 그룹이 없어요</h2><span>그룹을 만들거나 초대받아 참여해보세요.</span></div></div>}
                 {personalPrayers.length > 0 && (
                   <section className="dashboard-group-prayers personal-prayer-section">
-                    <div className="section-heading compact"><div><h2><LockKeyhole size={16} />개인기도</h2><span>나만 볼 수 있는 기도제목 {personalPrayers.length}개</span></div><Link className="text-button" href="/prayers">모두 보기 <ChevronRight size={16} /></Link></div>
+                    <div className="section-heading compact"><div><h2><LockKeyhole size={16} />개인기도</h2><span>나만 볼 수 있는 기도제목 {personalPrayerCount + newPersonalPrayerCount}개</span></div><Link className="text-button" href="/prayers">모두 보기 <ChevronRight size={16} /></Link></div>
                     <div className="prayer-list">
                       {personalPrayers.slice(0, 3).map((prayer) => (
                         <article className="prayer-card" key={prayer.id}>
@@ -225,9 +183,11 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
                 {groups.map((group) => {
                   const allGroupPrayers = prayers.filter((prayer) => prayer.groupId === group.id);
                   const groupPrayers = allGroupPrayers.slice(0, 3);
+                  const newGroupPrayerCount = new Set(optimisticPrayers.filter((prayer) => prayer.groupId === group.id && !initialPrayers.some((initial) => initial.id === prayer.id && initial.groupId === group.id)).map((prayer) => prayer.id)).size;
+                  const activeGroupPrayerCount = (group.prayerCount ?? allGroupPrayers.length) + newGroupPrayerCount;
                   return (
                     <section className="dashboard-group-prayers" key={group.id}>
-                      <div className="section-heading compact"><div><h2>{group.name}</h2><span>진행 중인 기도제목 {allGroupPrayers.length}개</span></div><Link className="text-button" href={`/groups/${group.id}`}>모두 보기 <ChevronRight size={16} /></Link></div>
+                      <div className="section-heading compact"><div><h2>{group.name}</h2><span>진행 중인 기도제목 {activeGroupPrayerCount}개</span></div><Link className="text-button" href={`/groups/${group.id}`}>모두 보기 <ChevronRight size={16} /></Link></div>
                       <div className="prayer-list">
                         {groupPrayers.length === 0 && <div className="empty-prayers compact"><BookHeart size={22} /><strong>아직 진행 중인 기도제목이 없어요</strong></div>}
                         {groupPrayers.map((prayer) => (
@@ -290,40 +250,19 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
 
       <NotificationRealtime userId={userId} />
 
-      {composerOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setComposerOpen(false)}>
-          <div className="composer-modal" role="dialog" aria-modal="true" aria-labelledby="composer-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="composer-heading"><div><span className="overview-icon"><BookHeart size={21} /></span><div><h2 id="composer-title">기도제목 나누기</h2><p>등록 날짜는 한국시간 기준으로 자동 저장됩니다.</p></div></div><button onClick={() => setComposerOpen(false)} aria-label="닫기">×</button></div>
-            <form onSubmit={submitPrayer}>
-              <label>그룹을 선택해주세요 <span className="optional-label">다중선택 가능</span></label>
-              <div className={`composer-group-options ${personalPrayer ? "disabled" : ""}`} aria-disabled={personalPrayer}>
-                {groups.length === 0 && <span className="composer-no-groups">가입된 그룹이 없어도 개인기도로 저장할 수 있어요.</span>}
-                {groups.map((group) => (
-                  <label className="composer-group-option" key={group.id}>
-                    <input
-                      type="checkbox"
-                      name="groupIds"
-                      value={group.id}
-                      checked={selectedGroupIds.includes(group.id)}
-                      disabled={personalPrayer}
-                      onChange={(event) => setSelectedGroupIds((current) => event.target.checked ? [...current, group.id] : current.filter((id) => id !== group.id))}
-                    />
-                    <span>{group.name}</span><Check size={14} />
-                  </label>
-                ))}
-              </div>
-              <label className="personal-prayer-toggle">
-                <span><LockKeyhole size={17} /><span><strong>혼자 보는 개인 기도제목인가요?</strong><small>켜면 어떤 그룹에도 공유되지 않고 나만 볼 수 있어요.</small></span></span>
-                <input type="checkbox" name="personal" checked={personalPrayer} onChange={(event) => setPersonalPrayer(event.target.checked)} />
-                <span className="switch" aria-hidden="true" />
-              </label>
-              <label htmlFor="prayer-content">함께 기도받고 싶은 내용을 적어주세요</label>
-              <textarea id="prayer-content" name="content" autoFocus maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="솔직한 마음을 편안하게 나눠주세요." required />
-              <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={() => setComposerOpen(false)} disabled={submitting !== null}>취소</button><button className={`primary-button ${submitting === "prayer" ? "button-pending" : ""}`} type="submit" disabled={submitting !== null || !draft.trim() || (!personalPrayer && selectedGroupIds.length === 0)}>{submitting === "prayer" ? <><LoaderCircle className="button-spinner" size={15} />등록 중…</> : "기도제목 등록"}</button></div></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <DashboardPrayerComposer
+        open={composerOpen}
+        groups={groups}
+        userId={userId}
+        displayName={displayName}
+        profileColor={profileColor}
+        onClose={() => setComposerOpen(false)}
+        onError={setLocalError}
+        onCreated={(createdPrayers) => {
+          setOptimisticPrayers((current) => [...createdPrayers, ...current]);
+          setLocalToast("기도제목을 나눴어요");
+        }}
+      />
 
       {groupModalOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setGroupModalOpen(false)}>
@@ -334,7 +273,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
               <input id="group-name" name="name" minLength={2} maxLength={50} autoFocus required placeholder="예: 청년부 셀모임" />
               <label htmlFor="group-description">그룹 소개 <span className="optional-label">선택</span></label>
               <textarea id="group-description" name="description" maxLength={500} placeholder="그룹을 간단히 소개해주세요." />
-              <div className="composer-footer"><span>개설자는 자동으로 리더가 됩니다.</span><div><button type="button" className="cancel-button" onClick={() => setGroupModalOpen(false)} disabled={submitting !== null}>취소</button><button className={`primary-button ${submitting === "group" ? "button-pending" : ""}`} type="submit" disabled={submitting !== null}>{submitting === "group" ? <><LoaderCircle className="button-spinner" size={15} />만드는 중…</> : "그룹 만들기"}</button></div></div>
+              <div className="composer-footer"><span>개설자는 자동으로 리더가 됩니다.</span><div><button type="button" className="cancel-button" onClick={() => setGroupModalOpen(false)} disabled={groupSubmitting}>취소</button><button className={`primary-button ${groupSubmitting ? "button-pending" : ""}`} type="submit" disabled={groupSubmitting}>{groupSubmitting ? <><LoaderCircle className="button-spinner" size={15} />만드는 중…</> : "그룹 만들기"}</button></div></div>
             </form>
           </div>
         </div>

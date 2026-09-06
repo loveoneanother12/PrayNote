@@ -15,6 +15,7 @@ type DashboardOverviewRow = {
     role: GroupRole;
     member_count: number | string;
     unread_count: number | string;
+    active_prayer_count?: number | string;
   }>;
 };
 
@@ -30,6 +31,7 @@ export type DashboardBundle = DashboardOverview & {
   email: string;
   groupCount: number;
   prayerCount: number;
+  personalPrayerCount: number;
   groupPrayers: PrayerSummary[];
   personalPrayers: PrayerSummary[];
   notifications: NotificationSummary[];
@@ -51,6 +53,7 @@ export async function getDashboardOverview(supabase: SupabaseClient): Promise<Da
       role: group.role,
       memberCount: Number(group.member_count),
       unreadCount: Number(group.unread_count),
+      prayerCount: Number(group.active_prayer_count ?? 0),
     })),
   };
 }
@@ -63,7 +66,7 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
     user_id: string;
     email?: string | null;
     overview: DashboardOverviewRow;
-    counts?: { group_count?: number | string | null; prayer_count?: number | string | null };
+    counts?: { group_count?: number | string | null; prayer_count?: number | string | null; personal_prayer_count?: number | string | null };
     group_prayers?: PrayerSummaryRow[];
     personal_prayers?: PrayerSummaryRow[];
     notifications?: NotificationSummaryRow[];
@@ -84,9 +87,11 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
       role: group.role,
       memberCount: Number(group.member_count),
       unreadCount: Number(group.unread_count),
+      prayerCount: Number(group.active_prayer_count ?? 0),
     })),
     groupCount: Number(bundle.counts?.group_count ?? overview.groups?.length ?? 0),
     prayerCount: Number(bundle.counts?.prayer_count ?? new Set([...groupPrayers, ...personalPrayers].map((prayer) => prayer.id)).size),
+    personalPrayerCount: Number(bundle.counts?.personal_prayer_count ?? personalPrayers.length),
     groupPrayers,
     personalPrayers,
     notifications: (bundle.notifications ?? []).map(mapNotificationSummaryRow),
