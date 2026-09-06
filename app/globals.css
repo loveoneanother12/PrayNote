@@ -858,6 +858,128 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
 .legal-table { width: 100%; min-width: 580px; border-collapse: collapse; background: #fff; font-size: 11px; line-height: 1.55; }
 .legal-table th, .legal-table td { padding: 12px 13px; border-bottom: 1px solid #e8ebf0; border-right: 1px solid #e8ebf0; color: #667186; text-align: left; vertical-align: top; }
 .legal-table th { color: #4d596e; background: #f6f7fa; font-weight: 800; }
+
+/* Dedicated groups dashboard */
+.groups-dashboard-content { max-width: 1100px; }
+.groups-dashboard-hero { min-height: 180px; padding: 29px 31px; border: 1px solid #e0e5f5; border-radius: 20px; background: radial-gradient(circle at 88% 15%, rgba(105,125,219,.13), transparent 28%), linear-gradient(125deg, #fff, #f4f6ff); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+.groups-dashboard-title { display: flex; align-items: center; gap: 18px; }
+.groups-dashboard-icon { width: 54px; height: 54px; flex: 0 0 auto; border-radius: 17px; color: #fff; background: linear-gradient(145deg, #7386e4, #4e63c5); box-shadow: 0 11px 27px rgba(78,99,197,.22); display: grid; place-items: center; }
+.groups-dashboard-title p { margin: 0 0 6px; color: var(--blue); font-size: 11px; font-weight: 800; }
+.groups-dashboard-title h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -.045em; }
+.groups-dashboard-title > div > span { color: var(--muted); font-size: 12px; }
+.groups-dashboard-actions { display: flex; gap: 9px; }
+.groups-dashboard-actions a { text-decoration: none; }
+.groups-dashboard-section { margin-top: 32px; }
+.groups-dashboard-heading { margin-top: 0; }
+.groups-dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.groups-dashboard-card { min-height: 205px; }
+.groups-dashboard-card .group-copy { padding-right: 12px; }
+.groups-dashboard-card .group-copy > span { min-height: 34px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.55; }
+.groups-dashboard-meta { position: absolute; left: 19px; right: 44px; bottom: 17px; color: #8b95a7; display: flex; align-items: center; gap: 3px; font-size: 10px; }
+.groups-dashboard-meta span + span::before { content: ""; width: 3px; height: 3px; margin: 0 8px 2px; border-radius: 50%; background: #c4cad5; display: inline-block; }
+.groups-dashboard-empty { margin: 15px 0 0; color: #929baa; text-align: center; font-size: 11px; }
+.groups-loading-page { padding-top: 73px; }
+.skeleton-block { border-radius: 16px; background: linear-gradient(90deg, #eff1f5 25%, #f7f8fa 50%, #eff1f5 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.35s infinite linear; }
+.groups-hero-skeleton { height: 180px; }
+.groups-loading-grid { margin-top: 72px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.groups-loading-grid .skeleton-block { height: 205px; }
+@keyframes skeleton-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Google authentication and identity linking */
+.google-auth-button { width: 100%; min-height: 49px; padding: 0 16px; border: 1px solid #dfe3eb; border-radius: 11px; color: #3c475c; background: #fff; box-shadow: 0 5px 16px rgba(39,50,78,.04); display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 750; }
+.google-auth-button:hover { border-color: #cfd5e2; background: #fafbfe; }
+.google-mark { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid #e3e6ec; border-radius: 50%; color: #4285f4; background: #fff; display: inline-grid; place-items: center; font-family: Arial, sans-serif; font-size: 14px; font-weight: 800; }
+.google-mark.inverse { width: 21px; height: 21px; border: 0; font-size: 12px; }
+.auth-divider { margin: 18px 0; color: #9ba4b3; display: flex; align-items: center; gap: 11px; font-size: 10px; }
+.auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: #e7e9ee; }
+.google-consent-modal { width: min(510px, 100%); }
+.google-consent-form { margin-top: 21px; }
+.google-consent-form .auth-consent-list { gap: 13px; }
+.google-consent-form .auth-consent-list label { color: #657087; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 11px; line-height: 1.6; }
+.google-consent-form .auth-consent-list input { margin-top: 2px; }
+.google-consent-help { margin: 13px 2px 17px; color: #8892a4; font-size: 10px; line-height: 1.6; }
+.google-consent-submit { width: 100%; }
+.google-identity-setting { margin-top: 20px; padding-top: 19px; border-top: 1px solid #edf0f4; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 18px; }
+.google-identity-copy { display: flex; align-items: center; gap: 12px; }
+.google-identity-copy strong, .google-identity-copy small { display: block; }
+.google-identity-copy strong { color: #4a566c; font-size: 12px; }
+.google-identity-copy small { margin-top: 4px; color: #8c95a5; font-size: 10px; line-height: 1.5; }
+.google-link-button { min-width: 150px; font-size: 11px; }
+.google-link-button.linked { color: #438069; border-color: #d7e9df; background: #f4fbf7; }
+.google-identity-message { grid-column: 1 / -1; margin: 0; color: #a8495a; font-size: 10px; }
+
+/* Prayer history calendar */
+.prayer-calendar-panel { margin-top: 20px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 9px 28px rgba(39,50,78,.04); }
+.prayer-calendar-heading { padding-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.prayer-calendar-heading > div:first-child { display: flex; align-items: center; gap: 11px; }
+.prayer-calendar-heading-icon { width: 39px; height: 39px; flex: 0 0 auto; border-radius: 12px; color: #586cca; background: #edf0ff; display: grid; place-items: center; }
+.prayer-calendar-heading h2 { margin: 0; font-size: 15px; }
+.prayer-calendar-heading p { margin: 5px 0 0; color: var(--muted); font-size: 9px; }
+.prayer-calendar-controls { display: grid; grid-template-columns: 32px minmax(100px, auto) 32px; align-items: center; gap: 5px; }
+.prayer-calendar-controls button { width: 32px; height: 32px; border: 1px solid #e2e5ec; border-radius: 9px; color: #6e798d; background: #fff; display: grid; place-items: center; cursor: pointer; }
+.prayer-calendar-controls button:hover { color: var(--blue-dark); background: #f6f7ff; }
+.prayer-calendar-controls strong { text-align: center; font-size: 12px; }
+.prayer-calendar-weekdays, .prayer-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.prayer-calendar-weekdays { padding: 8px 0; border-top: 1px solid #eff1f4; color: #8d96a6; font-size: 9px; text-align: center; }
+.prayer-calendar-weekdays span:first-child { color: #d26e83; }
+.prayer-calendar-grid { border-top: 1px solid #eff1f4; border-left: 1px solid #eff1f4; }
+.prayer-calendar-grid > button, .prayer-calendar-blank { min-height: 62px; border: 0; border-right: 1px solid #eff1f4; border-bottom: 1px solid #eff1f4; background: #fff; }
+.prayer-calendar-grid > button { position: relative; padding: 8px 5px; color: #566278; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; cursor: pointer; font-size: 10px; }
+.prayer-calendar-grid > button:hover { background: #f8f9ff; }
+.prayer-calendar-grid > button.today > span:first-child { width: 24px; height: 24px; margin: -3px 0 -2px; border-radius: 50%; color: #5065c5; background: #edf0ff; display: grid; place-items: center; font-weight: 800; }
+.prayer-calendar-grid > button.selected { background: #f3f5ff; box-shadow: inset 0 0 0 2px #7687d9; }
+.prayer-calendar-dots { min-height: 6px; display: flex; align-items: center; justify-content: center; gap: 3px; }
+.prayer-calendar-dots i { width: 5px; height: 5px; border-radius: 50%; background: #667bd8; }
+.prayer-calendar-selected { margin-top: 19px; padding-top: 18px; border-top: 1px solid #edf0f4; }
+.prayer-calendar-selected-heading { margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.prayer-calendar-selected-heading strong { font-size: 12px; }
+.prayer-calendar-selected-heading > span { min-width: 26px; height: 24px; padding: 0 7px; border-radius: 999px; color: #5266c3; background: #edf0ff; display: grid; place-items: center; font-size: 9px; font-weight: 800; }
+.prayer-calendar-selected-list { display: grid; }
+.prayer-calendar-selected-list > a { min-height: 62px; padding: 10px 5px; border-top: 1px solid #eff1f4; color: inherit; display: flex; align-items: center; gap: 11px; text-decoration: none; }
+.prayer-calendar-selected-list > a:hover { background: #fafbfe; }
+.calendar-prayer-status { width: 33px; height: 33px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; }
+.calendar-prayer-status.active { color: #596ecd; background: #edf0ff; }
+.calendar-prayer-status.completed { color: #4b876f; background: #e8f4ee; }
+.calendar-prayer-copy { min-width: 0; flex: 1; display: grid; gap: 5px; }
+.calendar-prayer-copy strong { overflow: hidden; color: #465269; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.calendar-prayer-copy small { color: #8c95a5; display: flex; align-items: center; gap: 4px; font-size: 9px; }
+.calendar-prayer-label { padding: 5px 8px; border-radius: 7px; font-size: 8px; font-weight: 800; }
+.calendar-prayer-label.active { color: #5266c3; background: #edf0ff; }
+.calendar-prayer-label.completed { color: #4b806b; background: #eaf4ef; }
+.prayer-calendar-selected-list > a > svg { color: #a1a9b6; }
+.prayer-calendar-empty { min-height: 62px; border-top: 1px solid #eff1f4; color: #98a1b1; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 10px; }
+
+@media (max-width: 1050px) {
+  .groups-dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .groups-dashboard-hero { padding: 23px; align-items: stretch; flex-direction: column; }
+  .groups-dashboard-actions { width: 100%; }
+  .groups-dashboard-actions > * { flex: 1; }
+  .groups-dashboard-card { min-height: 185px; }
+  .groups-loading-page { padding-top: 0; }
+  .groups-loading-grid { grid-template-columns: repeat(2, 1fr); }
+  .google-identity-setting { grid-template-columns: 1fr; }
+  .google-link-button { width: 100%; }
+  .prayer-calendar-panel { padding: 18px 15px; }
+  .prayer-calendar-heading { align-items: flex-start; flex-direction: column; }
+  .prayer-calendar-controls { width: 100%; grid-template-columns: 32px 1fr 32px; }
+  .prayer-calendar-grid > button, .prayer-calendar-blank { min-height: 55px; }
+}
+
+@media (max-width: 460px) {
+  .groups-dashboard-title { align-items: flex-start; }
+  .groups-dashboard-icon { width: 47px; height: 47px; border-radius: 14px; }
+  .groups-dashboard-title h1 { font-size: 25px; }
+  .groups-dashboard-title > div > span { line-height: 1.55; }
+  .groups-dashboard-actions { flex-direction: column-reverse; }
+  .groups-dashboard-grid, .groups-loading-grid { grid-template-columns: 1fr; }
+  .groups-dashboard-card { min-height: 170px; }
+  .calendar-prayer-label { display: none; }
+  .prayer-calendar-selected-list > a > svg { display: none; }
+  .prayer-calendar-grid > button { padding-inline: 2px; }
+}
 .legal-table tr:last-child td { border-bottom: 0; }
 .legal-table th:last-child, .legal-table td:last-child { border-right: 0; }
 .legal-table-wrap.wide .legal-table { min-width: 760px; }

@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
 import { AccountDeletion } from "@/components/account-deletion";
+import { GoogleIdentitySettings } from "@/components/google-identity-settings";
 import {
   InstantNotificationPreferencesForm,
   InstantPasswordForm,
@@ -27,7 +28,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSettingsBundle } from "@/lib/settings-queries";
 
 type SettingsPageProps = {
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; linked?: string }>;
 };
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
@@ -37,7 +38,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const { preferences, reminderTimes } = bundle;
 
   const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
-  const notice = query.saved === "profile"
+  const notice = query.linked === "google"
+    ? "Google 계정을 연결했어요. 이제 Google로도 로그인할 수 있습니다."
+    : query.saved === "profile"
     ? "프로필을 저장했어요."
     : query.saved === "notifications"
       ? "알림 설정을 저장했어요. 앞으로 도착하는 알림부터 적용됩니다."
@@ -45,7 +48,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         ? "비밀번호를 저장했어요. 다음 로그인부터 사용할 수 있습니다."
       : "";
 
-  const errorMessage = query.error === "invalid-name"
+  const errorMessage = query.error === "google-link-failed"
+    ? "Google 계정을 연결하지 못했습니다. 다시 시도해주세요."
+    : query.error === "invalid-name"
     ? "이름은 2~30자로 입력해주세요."
     : query.error === "weak-password"
       ? "비밀번호는 8자 이상으로 입력해주세요."
@@ -72,6 +77,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><UserRound size={18} /></span><div><h2>프로필</h2><p>그룹 멤버들에게 표시되는 이름과 색입니다.</p></div></div>
             <InstantProfileForm userId={bundle.userId} displayName={displayName} email={bundle.email} initialColor={bundle.profileColor} />
+            <GoogleIdentitySettings />
           </section>
 
           <section className="settings-panel">

@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { safeInternalPath } from "@/lib/navigation";
+
+function validConsentTimestamp(value: string | undefined) {
+  return value && !Number.isNaN(Date.parse(value)) ? value : null;
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -8,10 +13,36 @@ export async function GET(request: Request) {
   const next = safeInternalPath(url.searchParams.get("next"));
 
   if (code) {
+    const cookieStore = await cookies();
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, url.origin));
+    if (!error) {
+      const acceptedAt = validConsentTimestamp(cookieStore.get("praynote_google_consent")?.value);
+      if (acceptedAt) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metadata = user.user_metadata ?? {};
+          const displayName = String(metadata.display_name || metadata.full_name || metadata.name || user.email?.split("@")[0] || "기도하는 이").trim().slice(0, 30);
+          const { error: metadataError } = await supabase.auth.updateUser({
+            data: {
+              display_name: displayName,
+              terms_accepted_at: metadata.terms_accepted_at || acceptedAt,
+              privacy_accepted_at: metadata.privacy_accepted_at || acceptedAt,
+              sensitive_info_accepted_at: metadata.sensitive_info_accepted_at || acceptedAt,
+              age_14_confirmed_at: metadata.age_14_confirmed_at || acceptedAt,
+              policy_version: metadata.policy_version || "2026-09-06",
+            },
+          });
+          if (metadataError) console.error("Google consent metadata update failed", { code: metadataError.code, status: metadataError.status });
+          const { error: profileError } = await supabase.from("profiles").update({ display_name: displayName }).eq("id", user.id);
+          if (profileError) console.error("Google profile name update failed", { code: profileError.code, message: profileError.message });
+        }
+        cookieStore.delete("praynote_google_consent");
+      }
+      return NextResponse.redirect(new URL(next, url.origin));
+    }
   }
 
-  return NextResponse.redirect(new URL("/login?error=callback-failed", url.origin));
+  const errorPath = next.startsWith("/settings") ? "/settings?error=google-link-failed" : "/login?error=callback-failed";
+  return NextResponse.redirect(new URL(errorPath, url.origin));
 }

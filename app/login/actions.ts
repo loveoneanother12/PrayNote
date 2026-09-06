@@ -1,8 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeInternalPath } from "@/lib/navigation";
+import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
 const emailSchema = z.string().trim().email();
@@ -11,6 +13,43 @@ const displayNameSchema = z.string().trim().min(2).max(30);
 
 function loginPath(mode: "login" | "signup", error: string, next: string) {
   return `/login?mode=${mode}&error=${error}&next=${encodeURIComponent(next)}`;
+}
+
+export async function signInWithGoogle(formData: FormData) {
+  const mode = formData.get("mode") === "signup" ? "signup" : "login";
+  const next = safeInternalPath(formData.get("next"));
+  const termsAgreed = formData.get("termsAgreed") === "yes";
+  const ageConfirmed = formData.get("ageConfirmed") === "yes";
+  const sensitiveInfoAgreed = formData.get("sensitiveInfoAgreed") === "yes";
+
+  if (!termsAgreed) redirect(loginPath(mode, "agreement-required", next));
+  if (!ageConfirmed) redirect(loginPath(mode, "age-required", next));
+  if (!sensitiveInfoAgreed) redirect(loginPath(mode, "sensitive-consent-required", next));
+
+  const acceptedAt = new Date().toISOString();
+  const cookieStore = await cookies();
+  cookieStore.set("praynote_google_consent", acceptedAt, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 10 * 60,
+    path: "/",
+  });
+
+  const supabase = await createClient();
+  const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`;
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: callbackUrl, skipBrowserRedirect: true },
+  });
+
+  if (error || !data.url) {
+    cookieStore.delete("praynote_google_consent");
+    console.error("Google OAuth start failed", { code: error?.code, status: error?.status });
+    redirect(loginPath(mode, "google-unavailable", next));
+  }
+
+  redirect(data.url);
 }
 
 export async function signInWithPassword(formData: FormData) {

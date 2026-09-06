@@ -14,6 +14,7 @@ const multiApproverJoinSchema = readFileSync(join(root, "supabase/migrations/202
 const dashboardCountSchema = readFileSync(join(root, "supabase/migrations/202609050005_dashboard_scope_counts.sql"), "utf8");
 const profileColorSchema = readFileSync(join(root, "supabase/migrations/202609060001_profile_colors_and_prayer_tools.sql"), "utf8");
 const safeAnonymousBundleSchema = readFileSync(join(root, "supabase/migrations/202609060002_safe_anonymous_bundle_entry.sql"), "utf8");
+const groupsDashboardOverviewSchema = readFileSync(join(root, "supabase/migrations/202609070001_groups_dashboard_overview.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -122,5 +123,12 @@ describe("security guardrails", () => {
     expect(dashboardCountSchema).toContain("membership.status = 'active'");
     expect(dashboardCountSchema).toContain("app_group.deleted_at is null");
     expect(dashboardCountSchema).toContain("count(distinct prayer.id) as prayer_count");
+  });
+
+  it("keeps the groups dashboard scoped and handles expired sessions safely", () => {
+    expect(groupsDashboardOverviewSchema).toContain("case when auth.uid() is null then null");
+    expect(groupsDashboardOverviewSchema).toContain("membership.user_id = auth.uid()");
+    expect(groupsDashboardOverviewSchema).toContain("prayer.status = 'active'");
+    expect(groupsDashboardOverviewSchema).toContain("grant execute on function public.get_dashboard_overview() to authenticated, anon;");
   });
 });

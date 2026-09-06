@@ -3,8 +3,9 @@ import { ArrowLeft, BookHeart, CalendarCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordSections } from "@/components/prayer-record-sections";
+import { PrayerCalendar } from "@/components/prayer-calendar";
 import { SubpageNav } from "@/components/subpage-nav";
-import { formatKoreaToday } from "@/lib/dates";
+import { formatKoreaToday, koreaDateKey } from "@/lib/dates";
 import { getMyPrayersPageBundle } from "@/lib/prayer-queries";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,6 +38,8 @@ export default async function MyPrayersPage({ searchParams }: MyPrayersPageProps
             <div><p>나의 기도 여정</p><h1>내 기도제목</h1><span>등록한 날부터 해결된 날까지, 기도의 시간을 기억해요.</span></div>
             <div className="prayer-stats"><div><strong>{activePrayers.length}</strong><span>기도 중</span></div><div><strong>{resolvedPrayers.length}</strong><span>해결됨</span></div></div>
           </section>
+
+          <PrayerCalendar prayers={prayers} todayKey={koreaDateKey()} />
 
           {(queryParams.updated || queryParams.deleted || queryParams.error) && <div className={`page-notice ${queryParams.error ? "error" : ""}`}>{queryParams.error ? "요청을 처리하지 못했어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : "진행 중 기도로 되돌렸어요."}</div>}
 

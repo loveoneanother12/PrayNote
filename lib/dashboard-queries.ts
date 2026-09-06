@@ -37,11 +37,12 @@ export type DashboardBundle = DashboardOverview & {
   notifications: NotificationSummary[];
 };
 
-export async function getDashboardOverview(supabase: SupabaseClient): Promise<DashboardOverview> {
+export async function getDashboardOverview(supabase: SupabaseClient): Promise<DashboardOverview | null> {
   const { data, error } = await supabase.rpc("get_dashboard_overview");
   if (error) throw error;
+  if (!data) return null;
 
-  const row = (data ?? {}) as DashboardOverviewRow;
+  const row = data as DashboardOverviewRow;
   return {
     displayName: row.display_name ?? null,
     profileColor: normalizeProfileColor(row.profile_color),

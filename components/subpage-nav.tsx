@@ -19,7 +19,7 @@ export function SubpageNav({ displayName, profileColor = "indigo", active, unrea
       </Link>
       <nav className="side-nav">
         <Link className="nav-item" href="/dashboard"><Home size={19} />홈</Link>
-        <Link className={`nav-item ${active === "groups" ? "active" : ""}`} href="/dashboard#groups"><Users size={19} />내 그룹</Link>
+        <Link className={`nav-item ${active === "groups" ? "active" : ""}`} href="/groups"><Users size={19} />내 그룹</Link>
         <Link className={`nav-item ${active === "prayers" ? "active" : ""}`} href="/prayers"><BookHeart size={19} />내 기도</Link>
         <Link className={`nav-item ${active === "notifications" ? "active" : ""}`} href="/notifications"><Bell size={19} />알림{unreadNotificationCount > 0 && <span className="nav-count">{unreadNotificationCount}</span>}</Link>
       </nav>

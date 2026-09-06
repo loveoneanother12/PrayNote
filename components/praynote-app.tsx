@@ -112,7 +112,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
 
         <nav className="side-nav">
           <a className="nav-item active" href="#top"><Home size={19} />홈</a>
-          <a className="nav-item" href="#groups"><Users size={19} />내 그룹</a>
+          <Link className="nav-item" href="/groups"><Users size={19} />내 그룹</Link>
           <Link className="nav-item" href="/prayers"><BookHeart size={19} />내 기도</Link>
           <Link className="nav-item" href="/notifications"><Bell size={19} />알림{unreadNotificationCount > 0 && <span className="nav-count">{unreadNotificationCount}</span>}</Link>
         </nav>

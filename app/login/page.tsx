@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookHeart, Check, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { signInWithPassword, signUpWithPassword } from "./actions";
+import { GoogleAuthButton } from "@/components/google-auth-button";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 
 type LoginPageProps = {
@@ -19,6 +20,7 @@ const errors: Record<string, string> = {
   "agreement-required": "이용약관과 개인정보 처리 안내에 동의해주세요.",
   "age-required": "만 14세 이상만 가입할 수 있습니다.",
   "sensitive-consent-required": "기도제목에 포함될 수 있는 민감정보 처리에 동의해주세요.",
+  "google-unavailable": "Google 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.",
 };
 
 function modeHref(mode: "login" | "signup", next?: string) {
@@ -66,6 +68,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               {params.notice === "confirm-email" && <p className="auth-notice">가입 확인 메일을 확인한 뒤 로그인해주세요.</p>}
               {params.notice === "account-deleted" && <p className="auth-notice">회원 탈퇴가 완료되었습니다.</p>}
               {params.error && <p className="auth-error" role="alert">{errors[params.error] ?? "문제가 발생했습니다."}</p>}
+
+              <GoogleAuthButton mode={mode} next={next} />
 
               {mode === "signup" ? (
                 <form action={signUpWithPassword} className="auth-form">
