@@ -22,7 +22,10 @@ describe("legal documents and signup consent", () => {
     expect(privacyPage).toContain("Vercel Inc.");
     expect(privacyPage).toContain("ap-northeast-2");
     expect(privacyPage).toContain("icn1");
-    expect(privacyPage).toContain("(탈퇴한 사용자)");
+    expect(privacyPage).toContain("서버 응답으로부터 1시간");
+    expect(privacyPage).toContain("서버 응답으로부터 1일");
+    expect(privacyPage).not.toContain("현재 요금제 기준");
+    expect(privacyPage).not.toContain("회원 탈퇴 시 개인 기도제목은 삭제하며");
   });
 
   it("publishes terms matching the product and withdrawal policy", () => {

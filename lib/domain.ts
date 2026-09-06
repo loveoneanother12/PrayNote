@@ -1,7 +1,27 @@
 export type GroupRole = "member" | "admin" | "leader";
 export type MembershipStatus = "pending" | "active" | "rejected";
 export type PrayerStatus = "active" | "completed";
-export type ProfileColor = "indigo" | "sky" | "teal" | "green" | "amber" | "rose" | "violet" | "slate";
+export type ProfileColor =
+  | "indigo"
+  | "sky"
+  | "teal"
+  | "green"
+  | "amber"
+  | "rose"
+  | "violet"
+  | "slate"
+  | "coral"
+  | "orange"
+  | "lime"
+  | "mint"
+  | "cyan"
+  | "blue"
+  | "navy"
+  | "grape"
+  | "magenta"
+  | "red"
+  | "brown"
+  | "charcoal";
 export type NotificationType =
   | "new_prayer"
   | "prayer_response"
@@ -28,7 +48,7 @@ export type PrayerSummary = {
   groupIds: string[];
   groupNames: string[];
   isPersonal: boolean;
-  authorId: string;
+  authorId: string | null;
   authorName: string;
   authorColor: ProfileColor;
   content: string;

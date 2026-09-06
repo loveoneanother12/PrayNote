@@ -21,7 +21,7 @@ export type PrayerSummaryRow = {
   group_ids: string[] | null;
   group_names: string[] | null;
   is_personal: boolean;
-  author_id: string;
+  author_id: string | null;
   author_name: string;
   author_color?: string | null;
   content: string;

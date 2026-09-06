@@ -9,6 +9,8 @@ import { getAuthIdentity } from "@/lib/auth";
 const displayNameSchema = z.string().trim().min(2).max(30);
 const passwordSchema = z.string().min(8).max(72);
 
+export type DeleteAccountState = { error: string };
+
 async function requireUser() {
   const supabase = await createClient();
   const user = await getAuthIdentity(supabase);
@@ -81,4 +83,27 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login?signedOut=1");
+}
+
+export async function deleteAccount(
+  _previousState: DeleteAccountState,
+  formData: FormData,
+): Promise<DeleteAccountState> {
+  if (formData.get("withdrawalConfirmed") !== "yes") {
+    return { error: "탈퇴 안내 확인란에 체크해주세요." };
+  }
+
+  const { supabase } = await requireUser();
+  const { error } = await supabase.rpc("delete_my_account", {
+    delete_all_prayers: formData.get("deleteAllPrayers") === "yes",
+    confirmation: "DELETE_MY_ACCOUNT",
+  });
+
+  if (error) {
+    console.error("Failed to delete account", { code: error.code, message: error.message });
+    return { error: "회원 탈퇴를 처리하지 못했습니다. 잠시 후 다시 시도해주세요." };
+  }
+
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/login?notice=account-deleted");
 }

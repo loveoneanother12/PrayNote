@@ -22,8 +22,8 @@ describe("prayer owner tools", () => {
 });
 
 describe("profile colors", () => {
-  it("offers eight safe colors and falls back to indigo", () => {
-    expect(PROFILE_COLORS).toHaveLength(8);
+  it("offers twenty safe colors and falls back to indigo", () => {
+    expect(PROFILE_COLORS).toHaveLength(20);
     expect(normalizeProfileColor("teal")).toBe("teal");
     expect(normalizeProfileColor("not-allowed")).toBe("indigo");
   });

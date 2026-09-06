@@ -53,6 +53,18 @@ button { color: inherit; }
 .profile-color-rose { background: linear-gradient(145deg, #ef91aa, #c95476); }
 .profile-color-violet { background: linear-gradient(145deg, #ac8be3, #7653bd); }
 .profile-color-slate { background: linear-gradient(145deg, #98a5b8, #68758b); }
+.profile-color-coral { background: linear-gradient(145deg, #ff9b8f, #df6459); }
+.profile-color-orange { background: linear-gradient(145deg, #f6a95f, #d87828); }
+.profile-color-lime { background: linear-gradient(145deg, #b4d85b, #719f2b); }
+.profile-color-mint { background: linear-gradient(145deg, #74d9b4, #36a77e); }
+.profile-color-cyan { background: linear-gradient(145deg, #62d5dc, #249ba7); }
+.profile-color-blue { background: linear-gradient(145deg, #729ff0, #386bc8); }
+.profile-color-navy { background: linear-gradient(145deg, #627ba9, #354b77); }
+.profile-color-grape { background: linear-gradient(145deg, #9c73c9, #65438e); }
+.profile-color-magenta { background: linear-gradient(145deg, #e274c5, #b43d91); }
+.profile-color-red { background: linear-gradient(145deg, #eb7777, #bf4141); }
+.profile-color-brown { background: linear-gradient(145deg, #ad876d, #775844); }
+.profile-color-charcoal { background: linear-gradient(145deg, #6f7784, #3d4552); }
 
 .main-content { min-height: 100vh; margin-left: 246px; }
 .topbar { height: 73px; padding: 0 42px; position: sticky; top: 0; z-index: 15; background: rgba(255,255,255,.88); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(226,229,236,.85); display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
@@ -467,7 +479,7 @@ button { color: inherit; }
 .profile-color-fieldset { grid-column: 1 / -1; margin: 5px 0; padding: 15px; border: 1px solid #e4e7ed; border-radius: 12px; }
 .profile-color-fieldset legend { padding: 0 6px; color: #566278; font-size: 11px; font-weight: 750; }
 .profile-color-fieldset > p { margin: 0 0 13px; color: #929bab; font-size: 9px; }
-.profile-color-picker { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.profile-color-picker { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 8px; }
 .profile-color-option { min-width: 0; margin: 0; padding: 10px 4px 8px; border: 1px solid #e5e8ee; border-radius: 11px; background: #fafbfc; display: grid; justify-items: center; gap: 7px; cursor: pointer; }
 .profile-color-option:hover { border-color: #cfd6f2; background: #f7f8ff; }
 .profile-color-option.selected { border-color: #7b8bd8; background: #eef1ff; box-shadow: 0 0 0 2px #e5e9ff; }
@@ -551,6 +563,22 @@ button { color: inherit; }
 .account-panel > div span { margin-top: 5px; color: #9a858c; font-size: 10px; }
 .logout-button { min-height: 39px; padding: 0 13px; border: 1px solid #e5cdd2; border-radius: 9px; color: #995565; background: #fff; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 750; }
 .logout-button:hover { background: #fff5f7; }
+.withdrawal-panel { margin-top: -12px; background: #fffafb; }
+.withdrawal-panel > div strong { color: #9b4d5d; }
+.withdrawal-button:hover { background: #fff0f3; }
+.withdrawal-modal { width: min(520px, 100%); }
+.withdrawal-modal-copy { margin: 9px 0 0; color: #7d8798; font-size: 11px; line-height: 1.7; }
+.withdrawal-warning { margin-top: 18px; padding: 13px 14px; border: 1px solid #f0d9de; border-radius: 11px; color: #8f5360; background: #fff6f7; font-size: 10px; line-height: 1.65; }
+.withdrawal-form { margin-top: 18px !important; display: grid; gap: 12px; }
+.withdrawal-choice { margin: 0 !important; padding: 13px; border: 1px solid #e3e6eb; border-radius: 11px; background: #fafbfc; display: flex !important; align-items: flex-start; gap: 10px; cursor: pointer; }
+.withdrawal-choice input { width: 17px !important; height: 17px !important; margin: 2px 0 0; flex: 0 0 auto; accent-color: #b34e61; }
+.withdrawal-choice span { min-width: 0; color: #566176; font-size: 10px; line-height: 1.55; }
+.withdrawal-choice span strong { display: block; margin-bottom: 3px; color: #424e64; font-size: 11px; }
+.withdrawal-error { margin: 0; color: #b0495d; font-size: 10px; line-height: 1.5; }
+.withdrawal-actions { margin-top: 4px; display: flex; justify-content: flex-end; gap: 8px; }
+.withdrawal-actions button { min-height: 41px; padding: 0 15px; border-radius: 9px; font-size: 10px; font-weight: 750; }
+.withdrawal-actions .cancel { border: 1px solid #dfe3ea; color: #687388; background: #fff; }
+.withdrawal-actions .confirm { border: 1px solid #b64e62; color: #fff; background: #b64e62; }
 
 .state-page { min-height: 100vh; padding: 24px; background: radial-gradient(circle at 18% 15%, #eef1ff, transparent 27%), var(--canvas); display: grid; place-items: center; }
 .state-card { width: min(470px, 100%); padding: 42px 35px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 22px 65px rgba(39,50,78,.1); text-align: center; }
@@ -737,6 +765,10 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .profile-settings-form .primary-button, .password-settings-form .primary-button { width: 100%; margin-top: 4px; }
   .profile-color-fieldset { grid-column: 1; }
   .profile-color-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .account-panel { align-items: flex-start; flex-direction: column; }
+  .account-panel button { width: 100%; justify-content: center; }
+  .withdrawal-actions { flex-direction: column-reverse; }
+  .withdrawal-actions button { width: 100%; justify-content: center; }
   .prayer-card > .prayer-owner-actions { position: static; grid-column: 2; margin: 7px 0 0; justify-content: flex-start; }
   .prayer-card:has(> .prayer-owner-actions) { flex-wrap: wrap; }
   .prayer-card:has(> .prayer-owner-actions) .prayer-copy { width: calc(100% - 52px); flex: none; }

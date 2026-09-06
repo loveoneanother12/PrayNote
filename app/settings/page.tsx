@@ -14,6 +14,7 @@ import {
 import { redirect } from "next/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
+import { AccountDeletion } from "@/components/account-deletion";
 import {
   InstantNotificationPreferencesForm,
   InstantPasswordForm,
@@ -128,6 +129,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           <section className="settings-panel account-panel">
             <div><strong>로그아웃</strong><span>이 기기에서 PrayNote 사용을 종료합니다.</span></div>
             <InstantSignOutButton />
+          </section>
+
+          <section className="settings-panel account-panel withdrawal-panel">
+            <div><strong>회원 탈퇴</strong><span>계정과 개인 데이터를 영구적으로 정리합니다.</span></div>
+            <AccountDeletion />
           </section>
         </div>
       </main>
