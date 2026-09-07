@@ -14,6 +14,9 @@ describe("account deletion", () => {
     expect(component).toContain("네, 삭제하겠습니다");
     expect(component).toContain('name="withdrawalConfirmed"');
     expect(component).toContain("disabled={pending}");
+    expect(component).toContain("createPortal(");
+    expect(component).toContain("document.body");
+    expect(component).toContain("withdrawal-backdrop");
   });
 
   it("rechecks authentication and never accepts a user id from the client", () => {

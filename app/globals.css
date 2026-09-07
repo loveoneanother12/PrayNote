@@ -566,6 +566,7 @@ button { color: inherit; }
 .withdrawal-panel { margin-top: -12px; background: #fffafb; }
 .withdrawal-panel > div strong { color: #9b4d5d; }
 .withdrawal-button:hover { background: #fff0f3; }
+.withdrawal-backdrop { z-index: 90; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
 .withdrawal-modal { width: min(520px, 100%); }
 .withdrawal-modal-copy { margin: 9px 0 0; color: #7d8798; font-size: 11px; line-height: 1.7; }
 .withdrawal-warning { margin-top: 18px; padding: 13px 14px; border: 1px solid #f0d9de; border-radius: 11px; color: #8f5360; background: #fff6f7; font-size: 10px; line-height: 1.65; }

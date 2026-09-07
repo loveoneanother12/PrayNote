@@ -2,6 +2,7 @@
 
 import { LoaderCircle, Trash2, X } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { deleteAccount, type DeleteAccountState } from "@/app/settings/actions";
 
 const initialState: DeleteAccountState = { error: "" };
@@ -12,11 +13,15 @@ export function AccountDeletion() {
 
   useEffect(() => {
     if (!open) return;
+    document.body.classList.add("modal-open");
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !pending) setOpen(false);
     };
     document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.classList.remove("modal-open");
+      document.removeEventListener("keydown", closeOnEscape);
+    };
   }, [open, pending]);
 
   return (
@@ -24,11 +29,11 @@ export function AccountDeletion() {
       <button className="danger-button withdrawal-button" type="button" onClick={() => setOpen(true)}>
         <Trash2 size={16} />회원 탈퇴
       </button>
-      {open && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
+      {open && createPortal(
+        <div className="modal-backdrop withdrawal-backdrop" role="presentation" onMouseDown={(event) => {
           if (event.target === event.currentTarget && !pending) setOpen(false);
         }}>
-          <section className="composer-modal withdrawal-modal" role="dialog" aria-modal="true" aria-labelledby="withdrawal-title">
+          <section className="composer-modal withdrawal-modal" role="dialog" aria-modal="true" aria-labelledby="withdrawal-title" onMouseDown={(event) => event.stopPropagation()}>
             <div className="modal-head">
               <div><span>ACCOUNT WITHDRAWAL</span><h2 id="withdrawal-title">회원 탈퇴</h2></div>
               <button type="button" aria-label="닫기" onClick={() => setOpen(false)} disabled={pending}><X size={19} /></button>
@@ -54,7 +59,8 @@ export function AccountDeletion() {
               </div>
             </form>
           </section>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
