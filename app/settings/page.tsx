@@ -81,7 +81,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </section>
 
           <section className="settings-panel">
-            <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>기존 메일 링크 계정도 여기서 비밀번호를 만들 수 있습니다.</p></div></div>
+            <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>로그인에 사용할 비밀번호를 안전하게 변경할 수 있습니다.</p></div></div>
             <InstantPasswordForm />
           </section>
 

@@ -67,7 +67,7 @@ export function InstantPasswordForm() {
     setPending(false); setMessage(error ? "저장하지 못했어요." : "비밀번호를 저장했어요.");
     if (!error) formElement.reset();
   }
-  return <form onSubmit={save} className="password-settings-form"><label htmlFor="new-password">새 비밀번호</label><input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /><label htmlFor="new-password-confirm">비밀번호 확인</label><input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /><p>{message || "저장 후에는 메일 링크 없이 이메일과 비밀번호로 로그인할 수 있습니다."}</p><SaveButton pending={pending}><Check size={16} />비밀번호 저장</SaveButton></form>;
+  return <form onSubmit={save} className="password-settings-form"><label htmlFor="new-password">새 비밀번호</label><input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /><label htmlFor="new-password-confirm">비밀번호 확인</label><input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /><p>{message || "저장 후에는 새 비밀번호로 로그인할 수 있습니다."}</p><SaveButton pending={pending}><Check size={16} />비밀번호 저장</SaveButton></form>;
 }
 
 type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean };
