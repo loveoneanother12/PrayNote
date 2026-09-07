@@ -6,6 +6,7 @@ import {
   Check,
   LockKeyhole,
   Mail,
+  Megaphone,
   Settings,
   Smartphone,
   UserRound,
@@ -79,6 +80,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <InstantProfileForm userId={bundle.userId} displayName={displayName} email={bundle.email} initialColor={bundle.profileColor} />
             <GoogleIdentitySettings />
           </section>
+
+          <Link className="settings-notice-link" href="/notices">
+            <span className="settings-notice-icon"><Megaphone size={19} /></span>
+            <span><strong>공지사항</strong><small>PrayNote의 새로운 기능과 중요한 안내를 확인하세요.</small></span>
+            <span className="settings-notice-action">보러 가기</span>
+          </Link>
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>로그인에 사용할 비밀번호를 안전하게 변경할 수 있습니다.</p></div></div>

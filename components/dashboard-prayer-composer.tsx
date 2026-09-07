@@ -1,6 +1,6 @@
 "use client";
 
-import { BookHeart, Check, LoaderCircle, LockKeyhole } from "lucide-react";
+import { BookHeart, Check, ChevronDown, LoaderCircle, LockKeyhole, Users } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import type { GroupSummary, PrayerSummary, ProfileColor } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
@@ -27,6 +27,7 @@ export function DashboardPrayerComposer({
   const [draft, setDraft] = useState("");
   const [personalPrayer, setPersonalPrayer] = useState(false);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [groupsOpen, setGroupsOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
   if (!open) return null;
@@ -73,19 +74,32 @@ export function DashboardPrayerComposer({
       <div className="composer-modal" role="dialog" aria-modal="true" aria-labelledby="composer-title" onMouseDown={(event) => event.stopPropagation()}>
         <div className="composer-heading"><div><span className="overview-icon"><BookHeart size={21} /></span><div><h2 id="composer-title">기도제목 나누기</h2><p>등록 날짜는 한국시간 기준으로 자동 저장됩니다.</p></div></div><button onClick={onClose} disabled={pending} aria-label="닫기">×</button></div>
         <form onSubmit={submit}>
-          <label>그룹을 선택해주세요 <span className="optional-label">다중선택 가능</span></label>
-          <div className={`composer-group-options ${personalPrayer ? "disabled" : ""}`} aria-disabled={personalPrayer}>
-            {groups.length === 0 && <span className="composer-no-groups">가입된 그룹이 없어도 개인기도로 저장할 수 있어요.</span>}
-            {groups.map((group) => (
-              <label className="composer-group-option" key={group.id}>
-                <input type="checkbox" name="groupIds" value={group.id} checked={selectedGroupIds.includes(group.id)} disabled={personalPrayer} onChange={(event) => setSelectedGroupIds((current) => event.target.checked ? [...current, group.id] : current.filter((id) => id !== group.id))} />
-                <span>{group.name}</span><Check size={14} />
-              </label>
-            ))}
+          <label>공유할 그룹 <span className="optional-label">다중선택 가능</span></label>
+          <button
+            className={`composer-group-trigger ${groupsOpen ? "open" : ""}`}
+            type="button"
+            onClick={() => setGroupsOpen((current) => !current)}
+            aria-expanded={groupsOpen}
+            aria-controls="composer-group-options"
+            disabled={personalPrayer}
+          >
+            <span><Users size={17} /><span><strong>{selectedGroupIds.length > 0 ? `${selectedGroupIds.length}개 그룹 선택됨` : "그룹 선택하기"}</strong><small>{selectedGroupIds.length > 0 ? groups.filter((group) => selectedGroupIds.includes(group.id)).map((group) => group.name).join(", ") : "눌러서 공유할 그룹을 골라주세요."}</small></span></span>
+            <ChevronDown size={18} />
+          </button>
+          <div id="composer-group-options" className={`composer-group-collapse ${groupsOpen && !personalPrayer ? "open" : ""}`}>
+            <div className="composer-group-options">
+              {groups.length === 0 && <span className="composer-no-groups">가입된 그룹이 없어도 개인기도로 저장할 수 있어요.</span>}
+              {groups.map((group) => (
+                <label className="composer-group-option" key={group.id}>
+                  <input type="checkbox" name="groupIds" value={group.id} checked={selectedGroupIds.includes(group.id)} disabled={personalPrayer} onChange={(event) => setSelectedGroupIds((current) => event.target.checked ? [...current, group.id] : current.filter((id) => id !== group.id))} />
+                  <span>{group.name}</span><Check size={14} />
+                </label>
+              ))}
+            </div>
           </div>
           <label className="personal-prayer-toggle">
             <span><LockKeyhole size={17} /><span><strong>혼자 보는 개인 기도제목인가요?</strong><small>켜면 어떤 그룹에도 공유되지 않고 나만 볼 수 있어요.</small></span></span>
-            <input type="checkbox" name="personal" checked={personalPrayer} onChange={(event) => setPersonalPrayer(event.target.checked)} />
+            <input type="checkbox" name="personal" checked={personalPrayer} onChange={(event) => { setPersonalPrayer(event.target.checked); if (event.target.checked) setGroupsOpen(false); }} />
             <span className="switch" aria-hidden="true" />
           </label>
           <label htmlFor="prayer-content">함께 기도받고 싶은 내용을 적어주세요</label>

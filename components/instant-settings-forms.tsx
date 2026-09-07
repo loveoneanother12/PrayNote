@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, LoaderCircle, LogOut } from "lucide-react";
+import { Check, ChevronDown, LoaderCircle, LogOut, Palette, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type FormEvent, type ReactNode, startTransition, useState } from "react";
+import { type FormEvent, type ReactNode, startTransition, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import { ProfileDot } from "@/components/profile-dot";
 import type { ProfileColor } from "@/lib/domain";
@@ -10,6 +11,51 @@ import { PROFILE_COLORS } from "@/lib/profile-colors";
 
 function SaveButton({ pending, children }: { pending: boolean; children: ReactNode }) {
   return <button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending}>{pending ? <><LoaderCircle className="button-spinner" size={15} />저장 중…</> : children}</button>;
+}
+
+function ProfileColorPicker({ color, onChange }: { color: ProfileColor; onChange: (color: ProfileColor) => void }) {
+  const [open, setOpen] = useState(false);
+  const selected = PROFILE_COLORS.find((option) => option.value === color) ?? PROFILE_COLORS[0];
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add("modal-open");
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.classList.remove("modal-open");
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
+  return <>
+    <button className="profile-color-trigger" type="button" onClick={() => setOpen(true)} aria-haspopup="dialog">
+      <span><ProfileDot color={color} label={selected.label} size="medium" /><span><strong>{selected.label}</strong><small>눌러서 다른 색 고르기</small></span></span>
+      <ChevronDown size={17} />
+    </button>
+    {open && createPortal(
+      <div className="modal-backdrop color-picker-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+        <section className="composer-modal color-picker-modal" role="dialog" aria-modal="true" aria-labelledby="color-picker-title" onMouseDown={(event) => event.stopPropagation()}>
+          <div className="modal-head">
+            <div><span>PROFILE COLOR</span><h2 id="color-picker-title">나를 나타내는 색</h2></div>
+            <button type="button" aria-label="닫기" onClick={() => setOpen(false)}><X size={19} /></button>
+          </div>
+          <p className="color-picker-copy"><Palette size={15} />선명한 색과 부드러운 파스텔 색 중 마음에 드는 색을 골라주세요.</p>
+          <div className="profile-color-picker" role="radiogroup" aria-label="프로필 색상">
+            {PROFILE_COLORS.map((option) => <button className={`profile-color-option ${color === option.value ? "selected" : ""}`} type="button" role="radio" aria-checked={color === option.value} onClick={() => onChange(option.value)} key={option.value}>
+              <ProfileDot color={option.value} label={option.label} size="medium" />
+              <span>{option.label}</span>
+              {color === option.value && <Check size={12} aria-hidden="true" />}
+            </button>)}
+          </div>
+          <button className="primary-button color-picker-done" type="button" onClick={() => setOpen(false)}>선택 완료</button>
+        </section>
+      </div>,
+      document.body,
+    )}
+  </>;
 }
 
 export function InstantProfileForm({ userId, displayName, email, initialColor }: { userId: string; displayName: string; email: string; initialColor: ProfileColor }) {
@@ -35,13 +81,7 @@ export function InstantProfileForm({ userId, displayName, email, initialColor }:
     <fieldset className="profile-color-fieldset">
       <legend>나를 나타내는 색</legend>
       <p>기도제목과 멤버 목록에서 프로필 사진 대신 이 색으로 표시됩니다.</p>
-      <div className="profile-color-picker">
-        {PROFILE_COLORS.map((option) => <label className={`profile-color-option ${color === option.value ? "selected" : ""}`} key={option.value}>
-          <input type="radio" name="profileColor" value={option.value} checked={color === option.value} onChange={() => setColor(option.value)} />
-          <ProfileDot color={option.value} label={option.label} size="large" />
-          <span>{option.label}</span>
-        </label>)}
-      </div>
+      <ProfileColorPicker color={color} onChange={setColor} />
     </fieldset>
     <label htmlFor="account-email">로그인 이메일</label>
     <input id="account-email" value={email} readOnly aria-readonly="true" />

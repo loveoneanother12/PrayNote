@@ -21,7 +21,15 @@ export type ProfileColor =
   | "magenta"
   | "red"
   | "brown"
-  | "charcoal";
+  | "charcoal"
+  | "lavender"
+  | "lilac"
+  | "blush"
+  | "peach"
+  | "butter"
+  | "sage"
+  | "aqua"
+  | "periwinkle";
 export type NotificationType =
   | "new_prayer"
   | "prayer_response"

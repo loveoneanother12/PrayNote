@@ -7,6 +7,7 @@ export type SettingsBundle = {
   email: string;
   displayName: string | null;
   profileColor: ProfileColor;
+  isSuperAdmin: boolean;
   unreadCount: number;
   preferences: {
     in_app_enabled?: boolean;
@@ -28,6 +29,7 @@ export async function getSettingsBundle(supabase: SupabaseClient): Promise<Setti
     email?: string | null;
     display_name?: string | null;
     profile_color?: string | null;
+    is_super_admin?: boolean;
     unread_count?: number | string;
     preferences?: SettingsBundle["preferences"];
     reminder_times?: SettingsBundle["reminderTimes"];
@@ -37,6 +39,7 @@ export async function getSettingsBundle(supabase: SupabaseClient): Promise<Setti
     email: row.email ?? "",
     displayName: row.display_name ?? null,
     profileColor: normalizeProfileColor(row.profile_color),
+    isSuperAdmin: row.is_super_admin === true,
     unreadCount: Number(row.unread_count ?? 0),
     preferences: row.preferences ?? {},
     reminderTimes: row.reminder_times ?? [],
