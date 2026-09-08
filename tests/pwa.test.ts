@@ -14,6 +14,11 @@ describe("installable PrayNote PWA", () => {
     ]));
   });
 
+  it("allows camera capture only from PrayNote itself", () => {
+    const config = readFileSync(join(process.cwd(), "next.config.ts"), "utf8");
+    expect(config).toContain('camera=(self), microphone=(), geolocation=()');
+  });
+
   it("opens notification destinations without embedding prayer content", () => {
     const worker = readFileSync(join(process.cwd(), "public/sw.js"), "utf8");
     expect(worker).toContain('self.addEventListener("push"');
