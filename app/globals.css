@@ -483,6 +483,9 @@ button { color: inherit; }
 .prayer-streak-strip.complete .prayer-streak-copy > div { color: #4f8466; }
 .prayer-streak-copy strong { color: #4b5363; font-size: 11px; }
 .prayer-streak-copy > span { color: #8d94a1; text-align: right; font-size: 8px; line-height: 1.45; }
+.prayer-streak-share-button { min-height: 25px; padding: 0 8px; border: 1px solid rgba(201,142,80,.25); border-radius: 999px; color: #a76c38; background: rgba(255,255,255,.75); display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 8px; font-weight: 800; white-space: nowrap; }
+.prayer-streak-strip.complete .prayer-streak-share-button { border-color: rgba(83,147,107,.22); color: #4f8062; }
+.prayer-streak-share-button:hover { filter: brightness(.97); }
 .prayer-streak-progress { height: 5px; margin-top: 9px; border-radius: 999px; background: #ece9e4; overflow: hidden; }
 .prayer-streak-progress > span { min-width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f1ad62, #ea8641); display: block; transition: width .35s ease; }
 .prayer-streak-strip.complete .prayer-streak-progress > span { background: linear-gradient(90deg, #77b58b, #53936b); }
@@ -493,6 +496,26 @@ button { color: inherit; }
 .profile-edit-intro { margin: 9px 0 0; color: #8892a4; font-size: 10px; line-height: 1.6; }
 .profile-edit-modal .profile-settings-form { margin-top: 9px; padding-top: 15px; }
 .profile-edit-modal .google-identity-setting { margin-top: 17px; }
+.tracker-share-backdrop { z-index: 90; }
+.tracker-share-modal { width: min(620px, 100%); max-height: min(94dvh, 900px); }
+.tracker-share-intro { margin: 10px 0 17px; color: #7f899b; font-size: 10px; line-height: 1.6; }
+.tracker-preview-frame { width: min(100%, 460px); margin: 0 auto; padding: 7px; border: 1px solid #e1e5ee; border-radius: 20px; background: #f3f4f8; box-shadow: 0 13px 36px rgba(33,44,71,.11); }
+.tracker-preview-frame canvas { width: 100%; height: auto; aspect-ratio: 1; border-radius: 14px; display: block; }
+.tracker-customize-row { width: min(100%, 460px); margin: 14px auto 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tracker-theme-toggle { padding: 3px; border: 1px solid #e1e5ed; border-radius: 10px; background: #f5f6f9; display: inline-flex; gap: 3px; }
+.tracker-theme-toggle button { min-height: 31px; padding: 0 9px; border: 0; border-radius: 7px; color: #7d8799; background: transparent; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 8px; font-weight: 750; }
+.tracker-theme-toggle button.active { color: #5266c3; background: #fff; box-shadow: 0 2px 7px rgba(37,48,75,.09); }
+.tracker-photo-remove { min-height: 31px; padding: 0 8px; border: 0; color: #7d8799; background: transparent; cursor: pointer; font-size: 8px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
+.tracker-camera-input { display: none; }
+.tracker-camera-button { width: min(100%, 460px); min-height: 40px; margin: 11px auto 0; padding: 0 13px; border: 1px dashed #cbd2e5; border-radius: 11px; color: #586bc4; background: #f8f9ff; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 800; }
+.tracker-camera-button:hover { border-color: #aeb9de; background: #f2f4ff; }
+.tracker-share-actions { width: min(100%, 460px); margin: 14px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tracker-share-actions button { min-height: 58px; padding: 8px 5px; border: 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 8px; font-weight: 800; }
+.tracker-share-actions button.instagram { color: #fff; background: linear-gradient(135deg, #7a4bd8, #dc397f 58%, #f09a3c); }
+.tracker-share-actions button.kakao { color: #342c18; background: #fee500; }
+.tracker-share-actions button.save { color: #5265bd; background: #edf0fc; }
+.tracker-share-help { width: min(100%, 460px); margin: 11px auto 0; color: #969eac; font-size: 8px; line-height: 1.55; text-align: center; }
+.tracker-share-message { width: min(100%, 460px); margin: 9px auto 0; padding: 9px 11px; border-radius: 9px; color: #4f6f60; background: #edf6f1; font-size: 8px; line-height: 1.5; text-align: center; }
 .prayer-filter-tabs { width: fit-content; margin-top: 26px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: #fff; display: flex; gap: 3px; }
 .prayer-filter-tabs button { min-height: 34px; padding: 0 11px; border: 0; border-radius: 8px; color: #7d8798; background: transparent; display: flex; align-items: center; gap: 6px; text-decoration: none; font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; }
 .prayer-filter-tabs button.active { color: #5064c2; background: #edf0ff; }
@@ -846,6 +869,7 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .prayer-streak-copy > span { text-align: left; }
   .profile-edit-modal { max-height: 91dvh; padding: 20px; }
   .profile-edit-modal .profile-settings-form { grid-template-columns: 1fr; }
+  .tracker-share-modal { width: min(560px, 100%); }
   .prayer-filter-tabs { width: 100%; }
   .prayer-filter-tabs button { flex: 1; justify-content: center; }
   .prayer-detail-content, .search-content { padding-top: 24px; }
@@ -1107,6 +1131,12 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .my-prayer-mini-stats { grid-column: 1 / -1; margin-top: 0; }
   .prayer-streak-strip { align-items: flex-start; padding: 13px; }
   .prayer-streak-meta { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .tracker-share-backdrop { padding: 0; place-items: end center; }
+  .tracker-share-modal { width: 100%; max-height: 95dvh; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 22px 22px 0 0; }
+  .tracker-share-intro { margin-bottom: 13px; }
+  .tracker-preview-frame { width: min(100%, 390px); }
+  .tracker-customize-row, .tracker-camera-button, .tracker-share-actions, .tracker-share-help, .tracker-share-message { width: min(100%, 390px); }
+  .tracker-share-actions button { min-height: 55px; }
 }
 .legal-table tr:last-child td { border-bottom: 0; }
 .legal-table th:last-child, .legal-table td:last-child { border-right: 0; }

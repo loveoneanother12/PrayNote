@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { GoogleIdentitySettings } from "@/components/google-identity-settings";
 import { InstantProfileForm } from "@/components/instant-settings-forms";
+import { PrayerTrackerShare } from "@/components/prayer-tracker-share";
 import { ProfileDot } from "@/components/profile-dot";
 import type { ProfileColor } from "@/lib/domain";
 
@@ -91,7 +92,7 @@ export function MyProfileCard({
         <span className="prayer-streak-icon"><Flame size={19} /></span>
         <div className="prayer-streak-content">
           <div className="prayer-streak-copy">
-            <div><Sparkles size={13} /><strong>{copy.title}</strong></div>
+            <div><Sparkles size={13} /><strong>{copy.title}</strong><PrayerTrackerShare displayName={displayName} profileColor={profileColor} currentStreak={currentStreak} prayedToday={prayedToday} milestone={milestone} progress={progress} /></div>
             <span>{copy.description}</span>
           </div>
           <div className="prayer-streak-progress" role="progressbar" aria-label={`${milestone}일 기도 목표`} aria-valuemin={0} aria-valuemax={milestone} aria-valuenow={currentStreak}>

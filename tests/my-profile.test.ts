@@ -9,6 +9,7 @@ describe("My profile and prayer streak", () => {
   const page = read("app/prayers/page.tsx");
   const card = read("components/my-profile-card.tsx");
   const settings = read("app/settings/page.tsx");
+  const trackerShare = read("components/prayer-tracker-share.tsx");
   const migration = read("supabase/migrations/202609080001_my_profile_prayer_streak.sql");
 
   it("moves profile editing from settings into the My profile dialog", () => {
@@ -29,11 +30,16 @@ describe("My profile and prayer streak", () => {
     expect(migration).toContain("current_streak");
   });
 
-  it("shows compact counts and a motivational progress bar without sharing yet", () => {
+  it("shows compact counts, a motivational progress bar, and tracker sharing", () => {
     expect(card).toContain("my-prayer-mini-stats");
     expect(card).toContain('role="progressbar"');
     expect(card).toContain("일째 기도 중이에요!");
-    expect(card).not.toContain("인스타그램");
-    expect(card).not.toContain("카톡");
+    expect(card).toContain("<PrayerTrackerShare");
+    expect(trackerShare).toContain('width={1080} height={1080}');
+    expect(trackerShare).toContain('capture="environment"');
+    expect(trackerShare).toContain("인스타그램");
+    expect(trackerShare).toContain("카카오톡");
+    expect(trackerShare).toContain("이미지 저장");
+    expect(trackerShare).toContain("navigator.share");
   });
 });
