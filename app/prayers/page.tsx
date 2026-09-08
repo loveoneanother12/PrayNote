@@ -43,6 +43,7 @@ export default async function MyPrayersPage({ searchParams }: MyPrayersPageProps
             activePrayerCount={activePrayers.length}
             resolvedPrayerCount={resolvedPrayers.length}
             currentStreak={bundle.prayerRhythm.currentStreak}
+            longestStreak={bundle.prayerRhythm.longestStreak}
             prayedToday={bundle.prayerRhythm.prayedToday}
           />
 

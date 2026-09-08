@@ -60,6 +60,7 @@ type PrayerPageBundleRow = {
   my_groups?: Array<{ id: string; name: string }>;
   prayer_rhythm?: {
     current_streak?: number | string;
+    longest_streak?: number | string;
     prayed_today?: boolean;
   };
   prayers?: PrayerSummaryRow[];
@@ -86,6 +87,7 @@ export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
     myGroups: row.my_groups ?? [],
     prayerRhythm: {
       currentStreak: Number(row.prayer_rhythm?.current_streak ?? 0),
+      longestStreak: Number(row.prayer_rhythm?.longest_streak ?? 0),
       prayedToday: row.prayer_rhythm?.prayed_today === true,
     },
     prayers: (row.prayers ?? []).map(mapPrayerSummaryRow),
