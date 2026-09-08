@@ -77,6 +77,7 @@ button { color: inherit; }
 .main-content { min-height: 100vh; margin-left: 246px; }
 .topbar { height: 73px; padding: 0 42px; position: sticky; top: 0; z-index: 15; background: rgba(255,255,255,.88); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(226,229,236,.85); display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
 .mobile-brand { display: none; }
+.mobile-search-button { display: none; color: var(--ink); }
 .search-box { width: min(330px, 40vw); margin-right: auto; height: 40px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px; color: #9aa3b2; display: flex; align-items: center; gap: 9px; font-size: 13px; background: #fbfbfd; }
 .search-box input { min-width: 0; flex: 1; border: 0; outline: none; color: var(--ink); background: transparent; }
 .search-box input::placeholder { color: #9aa3b2; }
@@ -103,6 +104,20 @@ button { color: inherit; }
 .cancel-button { color: #6f7a8e; background: #f3f4f7; }
 
 .prayer-overview { border: 1px solid #e2e5ee; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+.overview-header { position: relative; }
+.overview-header .overview-trigger { padding-right: 206px; }
+.dashboard-preview-filter-button { position: absolute; z-index: 3; top: 50%; right: 55px; min-height: 32px; padding: 0 10px; transform: translateY(-50%); border: 1px solid #dce1ee; border-radius: 9px; color: #5f6d86; background: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 9px; font-weight: 750; }
+.dashboard-preview-filter-button.active { color: #4f64c3; border-color: #cdd5f4; background: #f1f3ff; }
+.dashboard-preview-filter { position: absolute; z-index: 20; top: calc(100% - 8px); right: 55px; width: min(315px, calc(100vw - 42px)); max-height: 330px; padding: 14px; overflow-y: auto; border: 1px solid #dfe3ee; border-radius: 13px; background: #fff; box-shadow: 0 18px 46px rgba(37, 47, 76, .17); display: grid; gap: 7px; }
+.dashboard-preview-filter > strong { padding: 2px 2px 7px; color: #3f4d65; font-size: 11px; }
+.dashboard-preview-filter label { min-height: 38px; padding: 0 10px; border: 1px solid #e6e9f0; border-radius: 9px; color: #536079; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 10px; font-weight: 700; }
+.dashboard-preview-filter label:has(input:checked) { border-color: #ccd4f3; background: #f4f6ff; }
+.dashboard-preview-filter input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.filter-checkbox { width: 17px; height: 17px; border: 1px solid #cdd3df; border-radius: 5px; color: transparent; display: grid; place-items: center; }
+.dashboard-preview-filter input:checked + .filter-checkbox { color: #fff; border-color: #6075d4; background: #6075d4; }
+.dashboard-preview-filter > button { min-height: 34px; border: 0; border-radius: 8px; color: #fff; background: #6075d4; cursor: pointer; font-size: 10px; font-weight: 750; }
+.show-all-prayer-previews { width: 100%; min-height: 43px; margin: 4px 0 8px; border: 1px solid #dfe4f2; border-radius: 11px; color: #5368c5; background: #f7f8ff; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 10px; font-weight: 750; }
+.dashboard-preview-empty { min-height: 90px; color: #929bac; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 10px; }
 .overview-trigger { width: 100%; min-height: 86px; padding: 18px 22px; border: 0; background: linear-gradient(110deg, #fbfcff, #f7f8ff); display: flex; align-items: center; gap: 14px; cursor: pointer; text-align: left; }
 .overview-icon { width: 43px; height: 43px; border-radius: 13px; background: var(--blue-soft); color: var(--blue); display: inline-flex; align-items: center; justify-content: center; }
 .overview-title { display: grid; gap: 5px; }
@@ -390,15 +405,15 @@ button { color: inherit; }
 .back-link { display: inline-flex; align-items: center; gap: 7px; color: #59667c; text-decoration: none; font-size: 13px; font-weight: 700; }
 .today-pill { padding: 8px 12px; border-radius: 999px; color: #5367c7; background: #eef1ff; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 750; }
 .detail-content { padding-top: 38px; }
-.group-hero { min-height: 210px; padding: 31px 34px; border-radius: 20px; color: #fff; background: radial-gradient(circle at 85% 10%, rgba(255,255,255,.17), transparent 28%), linear-gradient(135deg, #6075d6, #4358ba); box-shadow: 0 17px 42px rgba(66, 86, 182, .2); display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.group-hero { min-height: 118px; padding: 20px 25px; border-radius: 20px; color: #fff; background: radial-gradient(circle at 85% 10%, rgba(255,255,255,.17), transparent 28%), linear-gradient(135deg, #6075d6, #4358ba); box-shadow: 0 17px 42px rgba(66, 86, 182, .2); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .hero-role { display: inline-flex; color: #fff; opacity: .72; }
-.group-hero h1 { margin: 11px 0 9px; font-size: clamp(28px, 4vw, 41px); letter-spacing: -.045em; }
+.group-hero h1 { margin: 7px 0 5px; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.045em; }
 .group-hero p { max-width: 560px; margin: 0; color: rgba(255,255,255,.76); font-size: 13px; line-height: 1.7; }
-.member-summary { margin-top: 21px; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; opacity: .82; }
-.invite-code-box { min-width: 225px; padding: 19px; border: 1px solid rgba(255,255,255,.18); border-radius: 16px; background: rgba(255,255,255,.12); backdrop-filter: blur(10px); }
+.member-summary { margin-top: 10px; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; opacity: .82; }
+.invite-code-box { min-width: 265px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 13px; background: rgba(255,255,255,.12); backdrop-filter: blur(10px); }
 .invite-code-box > span, .invite-code-box > strong { display: block; }
 .invite-code-box > span { font-size: 10px; opacity: .72; }
-.invite-code-box > strong { margin: 8px 0 15px; font-size: 18px; letter-spacing: .08em; }
+.invite-code-box > strong { margin: 4px 0 9px; font-size: 16px; letter-spacing: .08em; }
 .copy-code-button { width: 100%; min-height: 37px; border: 0; border-radius: 9px; color: #4055b3; background: #fff; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-size: 11px; font-weight: 750; }
 .invite-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .copy-code-button.secondary { color: #fff; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); }
@@ -1170,4 +1185,76 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .legal-section h2 { font-size: 16px; }
   .legal-section p, .legal-section li { font-size: 13px; line-height: 1.8; }
   .legal-highlight-section { padding: 18px 16px; }
+}
+
+/* Keep the compact overrides last so they win over the legacy responsive rules. */
+.setting-category-icon.notice { color: #956a35; background: #fff4d9; }
+.browser-push-toggle { min-width: 82px; display: flex; align-items: center; justify-content: flex-end; gap: 7px; cursor: pointer; }
+.browser-push-toggle > span:first-child { color: #8b94a4; font-size: 9px; font-weight: 800; }
+.browser-push-toggle.enabled > span:first-child { color: #5368c5; }
+.browser-push-toggle input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.browser-push-toggle .switch { display: block; }
+.browser-push-toggle.pending { cursor: wait; opacity: .65; }
+.browser-push-toggle input:disabled + .switch { opacity: .48; }
+.password-change-trigger { margin: 17px 0 0 auto; }
+.password-change-modal { width: min(500px, 100%); }
+.password-change-modal .password-settings-form { margin-top: 18px; }
+
+.prayer-trash { margin: 30px 0 8px; border: 1px solid #e1e4eb; border-radius: 15px; background: #fff; overflow: hidden; box-shadow: 0 8px 25px rgba(39,50,78,.035); }
+.prayer-trash-trigger { width: 100%; min-height: 64px; padding: 0 18px; border: 0; color: #566277; background: #fbfbfc; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: pointer; }
+.prayer-trash-trigger > span { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+.prayer-trash-trigger strong { color: #3f4c63; font-size: 13px; }
+.prayer-trash-trigger em { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; color: #697487; background: #e9ebef; display: grid; place-items: center; font-style: normal; font-size: 9px; font-weight: 750; }
+.prayer-trash-trigger svg.open { transform: rotate(180deg); }
+.prayer-trash-body { padding: 13px 15px 15px; border-top: 1px solid #eceef2; }
+.prayer-trash-toolbar { min-height: 36px; margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.prayer-trash-toolbar > span { color: #8992a2; font-size: 9px; }
+.prayer-trash-toolbar > div { display: flex; gap: 6px; }
+.prayer-trash-toolbar button { min-height: 31px; padding: 0 10px; border: 1px solid #dfe3ea; border-radius: 8px; color: #607087; background: #fff; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 9px; font-weight: 750; }
+.prayer-trash-toolbar button.permanent-delete { color: #a14d5d; border-color: #efd5da; background: #fffafb; }
+.prayer-trash-message { margin: 0 0 8px; padding: 8px 10px; border-radius: 8px; color: #4e7565; background: #edf7f2; font-size: 9px; }
+.prayer-trash-list { display: grid; gap: 5px; }
+.prayer-trash-item { width: 100%; min-height: 48px; padding: 7px 10px; border: 1px solid #eceef2; border-radius: 9px; color: inherit; background: #fff; display: flex; align-items: center; gap: 9px; cursor: pointer; text-align: left; }
+.prayer-trash-item.selected { border-color: #bdc8ef; background: #f2f4ff; }
+.trash-checkbox { width: 17px; height: 17px; flex: 0 0 auto; border: 1px solid #ccd2dd; border-radius: 5px; color: #fff; display: grid; place-items: center; }
+.prayer-trash-item.selected .trash-checkbox { border-color: #6075d4; background: #6075d4; }
+.trash-prayer-copy { min-width: 0; display: grid; gap: 3px; }
+.trash-prayer-copy strong { overflow: hidden; color: #48556c; font-size: 10px; font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+.trash-prayer-copy small { color: #99a1af; font-size: 8px; }
+.prayer-trash-empty { min-height: 90px; color: #9aa2af; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 10px; }
+
+.mobile-search-backdrop { align-items: flex-start; padding: 72px 16px 16px; }
+.mobile-search-modal { width: min(480px, 100%); padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 22px 60px rgba(28,37,58,.25); }
+.mobile-search-heading { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.mobile-search-heading strong { color: #36435a; font-size: 14px; }
+.mobile-search-heading button { width: 32px; height: 32px; border: 0; border-radius: 9px; color: #788296; background: #f2f3f6; display: grid; place-items: center; cursor: pointer; }
+.mobile-search-form { min-height: 47px; padding: 5px 5px 5px 12px; border: 1px solid #dfe3ec; border-radius: 12px; color: #8b95a6; display: flex; align-items: center; gap: 8px; }
+.mobile-search-form input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; }
+.mobile-search-form .primary-button { min-height: 36px; padding: 0 13px; font-size: 10px; }
+
+.group-hero { min-height: 112px; padding: 19px 25px; }
+.group-hero h1 { margin: 6px 0 4px; font-size: clamp(25px, 3vw, 34px); }
+.member-summary { margin-top: 10px; }
+.invite-code-box { padding: 12px 14px; }
+.invite-code-box > strong { margin: 5px 0 9px; }
+
+@media (max-width: 760px) {
+  .mobile-search-button { display: grid; }
+  .overview-header .overview-trigger { padding: 16px 94px 16px 16px; }
+  .dashboard-preview-filter-button { right: 43px; width: 35px; min-height: 35px; padding: 0; justify-content: center; }
+  .dashboard-preview-filter-button span { display: none; }
+  .dashboard-preview-filter { right: 12px; }
+  .group-hero { min-height: 0; padding: 17px 18px; flex-direction: row; align-items: center; gap: 13px; }
+  .group-hero > div:first-child { min-width: 0; flex: 1; }
+  .group-hero h1 { margin: 5px 0 3px; font-size: 23px; }
+  .group-hero p { max-height: 36px; overflow: hidden; font-size: 10px; line-height: 1.7; }
+  .member-summary { margin-top: 7px; font-size: 9px; }
+  .invite-code-box { min-width: 135px; padding: 10px; }
+  .invite-code-box > strong { font-size: 13px; }
+  .invite-actions { grid-template-columns: 1fr; gap: 5px; }
+  .copy-code-button { min-height: 29px; font-size: 8px; }
+  .prayer-trash-trigger { padding: 0 14px; }
+  .prayer-trash-trigger > span:last-child { font-size: 0; }
+  .prayer-trash-toolbar { align-items: flex-start; flex-direction: column; }
+  .prayer-trash-toolbar > div, .prayer-trash-toolbar button { width: 100%; }
 }

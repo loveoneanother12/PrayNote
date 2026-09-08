@@ -51,7 +51,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
           {query.updated && <div className="page-notice">기도제목을 수정했어요.</div>}
           {query.error && <div className="page-notice error">요청을 처리하지 못했어요.</div>}
 
-          {mine && <section className="prayer-edit-panel prayer-delete-panel"><div className="prayer-delete-row"><div><strong>기도제목 삭제</strong><span>삭제하면 공유된 그룹과 내 기도 목록에서 보이지 않게 됩니다.</span></div><form action={deletePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={prayer.groupId ? `/groups/${prayer.groupId}` : "/prayers"} /><ConfirmSubmitButton className="danger-button" message="이 기도제목을 삭제할까요?"><Trash2 size={15} />삭제</ConfirmSubmitButton></form></div></section>}
+          {mine && <section className="prayer-edit-panel prayer-delete-panel"><div className="prayer-delete-row"><div><strong>기도제목 삭제</strong><span>삭제한 기도제목은 마이 탭의 휴지통에서 복원하거나 완전히 삭제할 수 있습니다.</span></div><form action={deletePrayer}><input type="hidden" name="prayerId" value={prayer.id} /><input type="hidden" name="returnTo" value={prayer.groupId ? `/groups/${prayer.groupId}` : "/prayers"} /><ConfirmSubmitButton className="danger-button" message="이 기도제목을 휴지통으로 이동할까요?"><Trash2 size={15} />휴지통으로 이동</ConfirmSubmitButton></form></div></section>}
         </div>
       </main>
       <MobileNav active={mine ? "prayers" : "groups"} />

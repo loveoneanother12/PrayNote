@@ -37,7 +37,8 @@ export type NotificationType =
   | "membership_approved"
   | "membership_rejected"
   | "role_changed"
-  | "group_updated";
+  | "group_updated"
+  | "notice_published";
 
 export type GroupSummary = {
   id: string;

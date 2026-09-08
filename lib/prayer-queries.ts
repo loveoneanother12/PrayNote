@@ -63,6 +63,14 @@ type PrayerPageBundleRow = {
     prayed_today?: boolean;
   };
   prayers?: PrayerSummaryRow[];
+  trash?: Array<{
+    id: string;
+    content: string;
+    status: PrayerStatus;
+    created_at: string;
+    deleted_at: string;
+    group_names: string[] | null;
+  }>;
 };
 
 export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
@@ -81,6 +89,7 @@ export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
       prayedToday: row.prayer_rhythm?.prayed_today === true,
     },
     prayers: (row.prayers ?? []).map(mapPrayerSummaryRow),
+    trash: (row.trash ?? []).map((item) => ({ id: item.id, content: item.content, status: item.status, createdAt: item.created_at, deletedAt: item.deleted_at, groupNames: item.group_names ?? [] })),
   };
 }
 

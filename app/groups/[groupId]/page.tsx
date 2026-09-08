@@ -61,7 +61,7 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
 
           {(queryParams.created || queryParams.updated || queryParams.deleted || queryParams.shared || queryParams.error) && (
             <div className={`page-notice ${queryParams.error ? "error" : ""}`}>
-              {queryParams.shared ? "선택한 그룹에도 기도제목을 공유했어요." : queryParams.created ? "기도제목이 등록됐어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : queryParams.updated === "active" ? "진행 중 기도로 되돌렸어요." : "요청을 처리하지 못했어요."}
+              {queryParams.shared ? "선택한 그룹에도 기도제목을 공유했어요." : queryParams.created ? "기도제목이 등록됐어요." : queryParams.deleted ? "휴지통으로 이동되었습니다." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : queryParams.updated === "active" ? "진행 중 기도로 되돌렸어요." : "요청을 처리하지 못했어요."}
             </div>
           )}
 

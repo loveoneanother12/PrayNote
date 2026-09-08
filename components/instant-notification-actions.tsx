@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function InstantMarkAllNotificationsRead() {
+export function InstantMarkAllNotificationsRead({ disabled = false }: { disabled?: boolean }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(false);
 
   async function markAllRead() {
-    if (pending || done) return;
+    if (pending || done || disabled) return;
     setPending(true);
     setDone(true);
     window.dispatchEvent(new Event("praynote:notifications-read-all"));
@@ -28,9 +28,9 @@ export function InstantMarkAllNotificationsRead() {
   }
 
   return (
-    <button className={`mark-all-button ${pending ? "button-pending" : ""}`} type="button" onClick={markAllRead} disabled={pending || done} aria-busy={pending}>
+    <button className={`mark-all-button ${pending ? "button-pending" : ""}`} type="button" onClick={markAllRead} disabled={pending || done || disabled} aria-busy={pending}>
       {pending ? <LoaderCircle className="button-spinner" size={16} /> : <CheckCheck size={16} />}
-      {done ? "읽음 완료" : "모두 읽음"}
+      {done ? "모두 읽음 완료" : "모든 알림 읽음 처리"}
     </button>
   );
 }

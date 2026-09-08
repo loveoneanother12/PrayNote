@@ -22,6 +22,7 @@ function NotificationIcon({ type }: { type: NotificationType }) {
   if (type === "membership_approved") return <CheckCircle2 size={18} />;
   if (type === "role_changed") return <ShieldCheck size={18} />;
   if (type === "group_updated") return <Users size={18} />;
+  if (type === "notice_published") return <BellRing size={18} />;
   return <BellRing size={18} />;
 }
 

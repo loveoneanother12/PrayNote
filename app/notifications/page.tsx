@@ -31,7 +31,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
       <main className="main-content subpage-main">
         <header className="topbar subpage-topbar">
           <Link className="back-link" href="/dashboard"><ArrowLeft size={18} />대시보드</Link>
-          {unreadCount > 0 && <InstantMarkAllNotificationsRead />}
+          <InstantMarkAllNotificationsRead disabled={unreadCount === 0} />
         </header>
         <div className="content-wrap detail-content notifications-content">
           <section className="notifications-hero">

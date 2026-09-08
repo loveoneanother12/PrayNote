@@ -17,7 +17,7 @@ import { BrowserPushSettings } from "@/components/browser-push-settings";
 import { AccountDeletion } from "@/components/account-deletion";
 import {
   InstantNotificationPreferencesForm,
-  InstantPasswordForm,
+  PasswordChangeSetting,
   InstantSignOutButton,
 } from "@/components/instant-settings-forms";
 import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
@@ -78,7 +78,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>로그인에 사용할 비밀번호를 안전하게 변경할 수 있습니다.</p></div></div>
-            <InstantPasswordForm />
+            <PasswordChangeSetting />
           </section>
 
           <section className="settings-panel">
@@ -88,6 +88,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               newPrayer: preferences?.new_prayer_enabled ?? true,
               prayerResponse: preferences?.prayer_response_enabled ?? true,
               membership: preferences?.membership_enabled ?? true,
+              notice: preferences?.notice_enabled ?? true,
             }}>
               <label className="setting-toggle master-toggle">
                 <span className="setting-copy"><strong>인앱 알림 받기</strong><small>모든 새 알림을 한 번에 켜거나 끕니다.</small></span>
@@ -99,6 +100,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   <span className="setting-category-icon prayer"><BookHeart size={17} /></span>
                   <span className="setting-copy"><strong>새 기도제목</strong><small>그룹에 새 기도제목이 등록되면 알려드려요.</small></span>
                   <input type="checkbox" name="newPrayerEnabled" defaultChecked={preferences?.new_prayer_enabled ?? true} />
+                  <span className="switch" aria-hidden="true" />
+                </label>
+                <label className="setting-toggle">
+                  <span className="setting-category-icon notice"><Megaphone size={17} /></span>
+                  <span className="setting-copy"><strong>공지사항 알림</strong><small>새 공지사항이 게시되면 알려드려요.</small></span>
+                  <input type="checkbox" name="noticeEnabled" defaultChecked={preferences?.notice_enabled ?? true} />
                   <span className="switch" aria-hidden="true" />
                 </label>
                 <label className="setting-toggle">

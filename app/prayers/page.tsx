@@ -5,6 +5,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { MyProfileCard } from "@/components/my-profile-card";
 import { PrayerRecordSections } from "@/components/prayer-record-sections";
 import { PrayerCalendar } from "@/components/prayer-calendar";
+import { PrayerTrash } from "@/components/prayer-trash";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday, koreaDateKey } from "@/lib/dates";
 import { getMyPrayersPageBundle } from "@/lib/prayer-queries";
@@ -49,9 +50,10 @@ export default async function MyPrayersPage({ searchParams }: MyPrayersPageProps
 
           <PrayerCalendar prayers={prayers} todayKey={koreaDateKey()} />
 
-          {(queryParams.updated || queryParams.deleted || queryParams.error) && <div className={`page-notice ${queryParams.error ? "error" : ""}`}>{queryParams.error === "google-link-failed" ? "Google 계정을 연결하지 못했어요. 이미 다른 PrayNote 계정에서 사용 중인지 확인해주세요." : queryParams.error ? "요청을 처리하지 못했어요." : queryParams.deleted ? "기도제목을 삭제했어요." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : "진행 중 기도로 되돌렸어요."}</div>}
+          {(queryParams.updated || queryParams.deleted || queryParams.error) && <div className={`page-notice ${queryParams.error ? "error" : ""}`}>{queryParams.error === "google-link-failed" ? "Google 계정을 연결하지 못했어요. 이미 다른 PrayNote 계정에서 사용 중인지 확인해주세요." : queryParams.error ? "요청을 처리하지 못했어요." : queryParams.deleted ? "휴지통으로 이동되었습니다." : queryParams.updated === "completed" ? "해결된 기도제목으로 이관했어요." : "진행 중 기도로 되돌렸어요."}</div>}
 
           <PrayerRecordSections prayers={prayers} currentUserId={bundle.userId} groups={bundle.myGroups} scope="mine" initialView={view} />
+          <PrayerTrash initialPrayers={bundle.trash} />
         </div>
       </main>
       <MobileNav active="prayers" />

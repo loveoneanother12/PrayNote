@@ -107,10 +107,43 @@ export function InstantPasswordForm() {
     setPending(false); setMessage(error ? "저장하지 못했어요." : "비밀번호를 저장했어요.");
     if (!error) formElement.reset();
   }
-  return <form onSubmit={save} className="password-settings-form"><label htmlFor="new-password">새 비밀번호</label><input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /><label htmlFor="new-password-confirm">비밀번호 확인</label><input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /><p>{message || "저장 후에는 새 비밀번호로 로그인할 수 있습니다."}</p><SaveButton pending={pending}><Check size={16} />비밀번호 저장</SaveButton></form>;
+  return <form onSubmit={save} className="password-settings-form"><label htmlFor="new-password">새 비밀번호 입력</label><input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /><label htmlFor="new-password-confirm">비밀번호 확인</label><input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /><p>{message || "저장 후에는 새 비밀번호로 로그인할 수 있습니다."}</p><SaveButton pending={pending}><Check size={16} />비밀번호 저장</SaveButton></form>;
 }
 
-type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean };
+export function PasswordChangeSetting() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add("modal-open");
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.classList.remove("modal-open");
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
+  return <>
+    <button className="outline-button password-change-trigger" type="button" onClick={() => setOpen(true)}>비밀번호 변경</button>
+    {open && createPortal(
+      <div className="modal-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+        <section className="composer-modal password-change-modal" role="dialog" aria-modal="true" aria-labelledby="password-change-title" onMouseDown={(event) => event.stopPropagation()}>
+          <div className="modal-head">
+            <div><span>ACCOUNT SECURITY</span><h2 id="password-change-title">비밀번호 변경</h2></div>
+            <button type="button" aria-label="닫기" onClick={() => setOpen(false)}><X size={19} /></button>
+          </div>
+          <InstantPasswordForm />
+        </section>
+      </div>,
+      document.body,
+    )}
+  </>;
+}
+
+type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean; notice: boolean };
 
 export function InstantNotificationPreferencesForm({ initial, children }: { initial: PreferenceProps; children: ReactNode }) {
   const [pending, setPending] = useState(false);
@@ -126,6 +159,7 @@ export function InstantNotificationPreferencesForm({ initial, children }: { init
       new_prayer_enabled: form.get("newPrayerEnabled") === "on",
       prayer_response_enabled: form.get("prayerResponseEnabled") === "on",
       membership_enabled: form.get("membershipEnabled") === "on",
+      notice_enabled: form.get("noticeEnabled") === "on",
     });
     setPending(false); setMessage(error ? "저장하지 못했어요." : "저장했어요.");
   }

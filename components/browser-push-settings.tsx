@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Check, Download, Smartphone } from "lucide-react";
+import { BellRing, Download, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -178,11 +178,17 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       </div>
       <div className="browser-push-actions">
         {state === "on" && <button className={workingAction === "test" ? "button-pending" : ""} type="button" onClick={sendTest} disabled={workingAction !== null}>{workingAction === "test" ? "발송 중…" : "테스트"}</button>}
-        {(state === "on" || state === "off") && (
-          <button className={`${state === "on" ? "secondary" : "primary"} ${workingAction === "enable" || workingAction === "disable" ? "button-pending" : ""}`} type="button" onClick={state === "on" ? disablePush : enablePush} disabled={workingAction !== null}>
-            {workingAction === "enable" ? "켜는 중…" : workingAction === "disable" ? "끄는 중…" : state === "on" ? "끄기" : "켜기"}{state === "on" && !workingAction && <Check size={13} />}
-          </button>
-        )}
+        <label className={`browser-push-toggle ${state === "on" ? "enabled" : ""} ${workingAction ? "pending" : ""}`}>
+          <span>{state === "on" ? "ON" : "OFF"}</span>
+          <input
+            type="checkbox"
+            checked={state === "on"}
+            disabled={(state !== "on" && state !== "off") || workingAction !== null}
+            onChange={() => void (state === "on" ? disablePush() : enablePush())}
+            aria-label={`브라우저 푸시 ${state === "on" ? "끄기" : "켜기"}`}
+          />
+          <span className="switch" aria-hidden="true" />
+        </label>
       </div>
     </div>
   );

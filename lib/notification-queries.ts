@@ -56,6 +56,12 @@ function roleFrom(data: unknown) {
   return role === "admin" || role === "member" ? role : null;
 }
 
+function noticeTitleFrom(data: unknown) {
+  if (!data || typeof data !== "object" || !("title" in data)) return null;
+  const title = (data as { title?: unknown }).title;
+  return typeof title === "string" && title.trim() ? title.trim() : null;
+}
+
 export function notificationMessage(row: NotificationRow, actorName: string | null, groupName: string | null) {
   const actor = actorName ? `${actorName}님이` : "누군가가";
   const group = groupName ? `‘${groupName}’` : "그룹";
@@ -77,12 +83,15 @@ export function notificationMessage(row: NotificationRow, actorName: string | nu
         : `${group}의 역할이 Member로 변경됐어요.`;
     case "group_updated":
       return `${group} 정보가 변경됐어요.`;
+    case "notice_published":
+      return noticeTitleFrom(row.data) ? `새 공지 ‘${noticeTitleFrom(row.data)}’가 등록됐어요.` : "새 공지사항이 등록됐어요.";
   }
 }
 
 export function notificationHref(row: NotificationRow) {
   if (row.type === "membership_requested" && row.group_id) return `/groups/${row.group_id}/manage`;
   if (row.type === "membership_rejected" && row.group_id) return `/join/${row.group_id}`;
+  if (row.type === "notice_published") return "/notices";
   if (row.prayer_id) return `/prayers/${row.prayer_id}`;
   if (row.group_id) return `/groups/${row.group_id}`;
   return "/notifications";

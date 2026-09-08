@@ -33,6 +33,7 @@ function pushTitle(type: NotificationRow["type"]) {
     case "membership_rejected": return "그룹 가입 결과가 도착했어요";
     case "role_changed": return "그룹 역할이 변경됐어요";
     case "group_updated": return "그룹 정보가 변경됐어요";
+    case "notice_published": return "새 공지사항이 등록됐어요";
   }
 }
 

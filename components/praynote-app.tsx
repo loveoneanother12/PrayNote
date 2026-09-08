@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronRight,
   CircleAlert,
+  ListFilter,
   Home,
   LockKeyhole,
   LoaderCircle,
@@ -24,6 +25,7 @@ import { DashboardPrayerComposer } from "@/components/dashboard-prayer-composer"
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
+import { MobilePrayerSearch } from "@/components/mobile-prayer-search";
 import { InstallGuideModal } from "@/components/install-guide-modal";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
 import { ProfileDot } from "@/components/profile-dot";
@@ -57,6 +59,9 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
   const [opened, setOpened] = useState(true);
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [previewFilterOpen, setPreviewFilterOpen] = useState(false);
+  const [showAllPreviews, setShowAllPreviews] = useState(false);
+  const [selectedPreviewKeys, setSelectedPreviewKeys] = useState<string[]>(() => ["personal", initialGroups[0]?.id].filter(Boolean) as string[]);
   const [optimisticGroups, setOptimisticGroups] = useState<GroupSummary[]>([]);
   const [optimisticPrayers, setOptimisticPrayers] = useState<PrayerSummary[]>([]);
   const [contentOverrides, setContentOverrides] = useState<Record<string, string>>({});
@@ -74,6 +79,13 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
   const displayedPrayerCount = prayerCount + newPrayerCount;
   const personalPrayers = useMemo(() => prayers.filter((prayer) => prayer.isPersonal), [prayers]);
   const newPersonalPrayerCount = new Set(optimisticPrayers.filter((prayer) => prayer.isPersonal && !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
+  const previewGroups = showAllPreviews ? groups : groups.filter((group) => selectedPreviewKeys.includes(group.id));
+  const showPersonalPreview = showAllPreviews || selectedPreviewKeys.includes("personal");
+
+  function togglePreviewKey(key: string) {
+    setShowAllPreviews(false);
+    setSelectedPreviewKeys((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]);
+  }
 
   async function submitGroup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,6 +143,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
           <a className="mobile-brand" href="#top"><span className="brand-mark"><BookHeart size={19} /></span>PrayNote</a>
           <form className="search-box" action="/search" method="get"><Search size={18} /><input name="q" aria-label="기도제목 검색" placeholder="기도제목 검색" /><kbd>⌘ K</kbd></form>
           <InstallGuideModal />
+          <MobilePrayerSearch />
           <Link className="icon-button notification-button" href="/notifications" aria-label={`읽지 않은 알림 ${unreadNotificationCount}개`}><Bell size={20} />{unreadNotificationCount > 0 && <span />}</Link>
           <ProfileDot color={profileColor} label={displayName} className="top-avatar" />
         </header>
@@ -146,22 +159,26 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
           </section>
 
           <section className="prayer-overview" id="prayers">
-            <button
-              className="overview-trigger"
-              type="button"
-              aria-expanded={opened}
-              onClick={() => setOpened((value) => !value)}
-            >
-              <span className="overview-icon"><BookHeart size={22} /></span>
-              <span className="overview-title"><strong>기도제목 열어보기</strong><small>개인기도 + 가입 그룹 {displayedGroupCount}개 · 기도제목 총 {displayedPrayerCount}개 (중복 제외)</small></span>
-              {displayedPrayerCount > 0 && <span className="unread-chip">기도 {displayedPrayerCount}</span>}
-              <ChevronDown className={opened ? "chevron-open" : ""} size={21} />
-            </button>
+            <div className="overview-header">
+              <button className="overview-trigger" type="button" aria-expanded={opened} onClick={() => setOpened((value) => !value)}>
+                <span className="overview-icon"><BookHeart size={22} /></span>
+                <span className="overview-title"><strong>기도제목 열어보기</strong><small>개인기도 + 가입 그룹 {displayedGroupCount}개 · 기도제목 총 {displayedPrayerCount}개 (중복 제외)</small></span>
+                {displayedPrayerCount > 0 && <span className="unread-chip">기도 {displayedPrayerCount}</span>}
+                <ChevronDown className={opened ? "chevron-open" : ""} size={21} />
+              </button>
+              <button className={`dashboard-preview-filter-button ${previewFilterOpen ? "active" : ""}`} type="button" aria-expanded={previewFilterOpen} onClick={() => setPreviewFilterOpen((value) => !value)}><ListFilter size={15} /><span>미리보기 그룹 선택</span></button>
+              {previewFilterOpen && <div className="dashboard-preview-filter" role="group" aria-label="대시보드 미리보기에 띄울 그룹 선택">
+                <strong>대시보드 미리보기에 띄울 그룹 선택</strong>
+                <label><input type="checkbox" checked={selectedPreviewKeys.includes("personal")} onChange={() => togglePreviewKey("personal")} /><span className="filter-checkbox"><Check size={12} /></span><LockKeyhole size={15} />개인기도</label>
+                {groups.map((group) => <label key={group.id}><input type="checkbox" checked={selectedPreviewKeys.includes(group.id)} onChange={() => togglePreviewKey(group.id)} /><span className="filter-checkbox"><Check size={12} /></span><Users size={15} />{group.name}</label>)}
+                <button type="button" onClick={() => setPreviewFilterOpen(false)}>선택 완료</button>
+              </div>}
+            </div>
 
             {opened && (
               <div className="overview-body">
                 {groups.length === 0 && <div className="section-heading compact"><div><h2>아직 그룹이 없어요</h2><span>그룹을 만들거나 초대받아 참여해보세요.</span></div></div>}
-                {personalPrayers.length > 0 && (
+                {showPersonalPreview && personalPrayers.length > 0 && (
                   <section className="dashboard-group-prayers personal-prayer-section">
                     <div className="section-heading compact"><div><h2><LockKeyhole size={16} />개인기도</h2><span>나만 볼 수 있는 기도제목 {personalPrayerCount + newPersonalPrayerCount}개</span></div><Link className="text-button" href="/prayers">모두 보기 <ChevronRight size={16} /></Link></div>
                     <div className="prayer-list">
@@ -180,7 +197,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
                     </div>
                   </section>
                 )}
-                {groups.map((group) => {
+                {previewGroups.map((group) => {
                   const allGroupPrayers = prayers.filter((prayer) => prayer.groupId === group.id);
                   const groupPrayers = allGroupPrayers.slice(0, 3);
                   const newGroupPrayerCount = new Set(optimisticPrayers.filter((prayer) => prayer.groupId === group.id && !initialPrayers.some((initial) => initial.id === prayer.id && initial.groupId === group.id)).map((prayer) => prayer.id)).size;
@@ -206,6 +223,8 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
                     </section>
                   );
                 })}
+                {!showAllPreviews && !showPersonalPreview && previewGroups.length === 0 && <div className="dashboard-preview-empty"><ListFilter size={20} /><span>미리보기에서 확인할 그룹을 선택해주세요.</span></div>}
+                <button className="show-all-prayer-previews" type="button" onClick={() => setShowAllPreviews((value) => !value)}>{showAllPreviews ? "선택한 그룹만 보기" : "모든 기도제목/그룹 보기"}<ChevronRight size={16} /></button>
               </div>
             )}
           </section>
