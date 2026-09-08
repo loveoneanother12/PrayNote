@@ -232,6 +232,11 @@ button { color: inherit; }
 .mobile-nav { display: none; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; padding: 20px; background: rgba(28, 35, 52, .45); backdrop-filter: blur(4px); display: grid; place-items: center; animation: fade-in .15s ease-out; }
 .composer-modal { width: min(570px, 100%); max-height: min(90vh, 760px); padding: 25px; border-radius: 18px; background: #fff; box-shadow: 0 30px 80px rgba(27, 35, 56, .24); overflow-y: auto; }
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.modal-head > div > span { color: var(--blue); display: block; font-size: 8px; font-weight: 850; letter-spacing: .1em; }
+.modal-head h2 { margin: 4px 0 0; color: #344158; font-size: 19px; letter-spacing: -.035em; }
+.modal-head > button { width: 35px; height: 35px; flex: 0 0 auto; padding: 0; border: 0; border-radius: 10px; color: #778196; background: #f3f4f7; display: grid; place-items: center; cursor: pointer; }
+.modal-head > button:hover { color: #5365bd; background: #ecefff; }
 .composer-heading, .composer-heading > div { display: flex; align-items: center; }
 .composer-heading { justify-content: space-between; }
 .composer-heading > div { gap: 12px; }
