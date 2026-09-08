@@ -512,11 +512,8 @@ button { color: inherit; }
 .tracker-camera-input { display: none; }
 .tracker-camera-button { width: min(100%, 460px); min-height: 40px; margin: 11px auto 0; padding: 0 13px; border: 1px dashed #cbd2e5; border-radius: 11px; color: #586bc4; background: #f8f9ff; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 800; }
 .tracker-camera-button:hover { border-color: #aeb9de; background: #f2f4ff; }
-.tracker-share-actions { width: min(100%, 460px); margin: 14px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.tracker-share-actions button { min-height: 58px; padding: 8px 5px; border: 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 8px; font-weight: 800; }
-.tracker-share-actions button.instagram { color: #fff; background: linear-gradient(135deg, #7a4bd8, #dc397f 58%, #f09a3c); }
-.tracker-share-actions button.kakao { color: #342c18; background: #fee500; }
-.tracker-share-actions button.save { color: #5265bd; background: #edf0fc; }
+.tracker-share-actions { width: min(100%, 460px); margin: 14px auto 0; }
+.tracker-share-actions button { width: 100%; min-height: 45px; padding: 0 15px; border: 0; border-radius: 12px; color: #fff; background: linear-gradient(135deg, #7184df, #5267c7); box-shadow: 0 8px 18px rgba(79,99,194,.2); display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 800; }
 .tracker-share-help { width: min(100%, 460px); margin: 11px auto 0; color: #969eac; font-size: 8px; line-height: 1.55; text-align: center; }
 .tracker-share-message { width: min(100%, 460px); margin: 9px auto 0; padding: 9px 11px; border-radius: 9px; color: #4f6f60; background: #edf6f1; font-size: 8px; line-height: 1.5; text-align: center; }
 .prayer-filter-tabs { width: fit-content; margin-top: 26px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: #fff; display: flex; gap: 3px; }

@@ -37,9 +37,9 @@ describe("My profile and prayer streak", () => {
     expect(card).toContain("<PrayerTrackerShare");
     expect(trackerShare).toContain('width={1080} height={1080}');
     expect(trackerShare).toContain('capture="environment"');
-    expect(trackerShare).toContain("인스타그램");
-    expect(trackerShare).toContain("카카오톡");
-    expect(trackerShare).toContain("이미지 저장");
+    expect(trackerShare).toContain("이미지 저장 / 공유하기");
+    expect(trackerShare).not.toContain("인스타그램");
+    expect(trackerShare).not.toContain("카카오톡");
     expect(trackerShare).toContain("navigator.share");
     expect(trackerShare).toContain("await navigator.share({ files: [file] })");
     expect(trackerShare).not.toContain("공유창에서 Instagram 스토리를 선택해주세요");

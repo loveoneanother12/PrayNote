@@ -1,12 +1,11 @@
 "use client";
 
-import { Camera, Check, Download, Instagram, MessageCircle, Moon, Share2, Sun, X } from "lucide-react";
+import { Camera, Check, Moon, Share2, Sun, X } from "lucide-react";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { ProfileColor } from "@/lib/domain";
 
 type TrackerTheme = "white" | "black";
-type ShareTarget = "instagram" | "kakao";
 
 type PrayerTrackerShareProps = {
   displayName: string;
@@ -80,7 +79,7 @@ export function PrayerTrackerShare({
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<TrackerTheme>("white");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [busy, setBusy] = useState<ShareTarget | "save" | null>(null);
+  const [busy, setBusy] = useState(false);
   const [previewReady, setPreviewReady] = useState(false);
   const [message, setMessage] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -242,45 +241,24 @@ export function PrayerTrackerShare({
     window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
   };
 
-  const share = async (target: ShareTarget) => {
+  const shareOrSave = async () => {
     if (busy) return;
-    setBusy(target);
+    setBusy(true);
     setMessage("");
     try {
       const file = trackerFile();
       if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
         await navigator.share({ files: [file] });
-        setMessage("기도 트래커 이미지를 공유했어요.");
+        setMessage("기도 트래커 이미지를 저장하거나 공유했어요.");
       } else {
         downloadFile(file);
-        setMessage("이 기기에서는 앱으로 바로 보낼 수 없어 이미지를 저장했어요. 해당 앱에서 불러와주세요.");
+        setMessage("기도 트래커 이미지를 저장했어요.");
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       setMessage("이미지를 공유하지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
-      setBusy(null);
-    }
-  };
-
-  const save = async () => {
-    if (busy) return;
-    setBusy("save");
-    setMessage("");
-    try {
-      const file = trackerFile();
-      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      if (isIos && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({ files: [file] });
-        setMessage("공유창에서 ‘이미지 저장’을 선택하면 사진 앱에 저장돼요.");
-      } else {
-        downloadFile(file);
-        setMessage("기도 트래커 이미지를 저장했어요.");
-      }
-    } catch {
-      setMessage("이미지를 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
-    } finally {
-      setBusy(null);
+      setBusy(false);
     }
   };
 
@@ -313,11 +291,9 @@ export function PrayerTrackerShare({
             <button className="tracker-camera-button" type="button" onClick={() => fileInputRef.current?.click()} disabled={Boolean(busy)}><Camera size={17} />{photoUrl ? "사진 다시 찍기" : "사진 찍기"}</button>
 
             <div className="tracker-share-actions">
-              <button type="button" className="instagram" onClick={() => share("instagram")} disabled={Boolean(busy) || !previewReady} aria-busy={busy === "instagram"}><Instagram size={18} /><span>{busy === "instagram" ? "준비 중…" : "인스타그램"}</span></button>
-              <button type="button" className="kakao" onClick={() => share("kakao")} disabled={Boolean(busy) || !previewReady} aria-busy={busy === "kakao"}><MessageCircle size={18} /><span>{busy === "kakao" ? "준비 중…" : "카카오톡"}</span></button>
-              <button type="button" className="save" onClick={save} disabled={Boolean(busy) || !previewReady} aria-busy={busy === "save"}><Download size={18} /><span>{busy === "save" ? "저장 중…" : "이미지 저장"}</span></button>
+              <button type="button" className="share-save" onClick={shareOrSave} disabled={busy || !previewReady} aria-busy={busy}><Share2 size={17} /><span>{busy ? "이미지 준비 중…" : "이미지 저장 / 공유하기"}</span></button>
             </div>
-            <p className="tracker-share-help">인스타그램·카카오톡 버튼을 누르면 기기의 공유창이 열립니다. 공유할 앱과 스토리 또는 채팅방을 선택해주세요.</p>
+            <p className="tracker-share-help">지원되는 모바일에서는 공유창이 열립니다. 이미지 저장 또는 공유할 앱을 선택해주세요.</p>
             {message && <p className="tracker-share-message" role="status">{message}</p>}
           </section>
         </div>,
