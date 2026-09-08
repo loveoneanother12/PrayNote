@@ -27,7 +27,9 @@ describe("notice board authorization", () => {
   const actions = read("app/notices/actions.ts");
 
   it("shows notice composition only to database-designated super admins", () => {
-    expect(page).toContain("{bundle.isSuperAdmin && (");
+    expect(page).toContain('query.compose === "1"');
+    expect(page).toContain('href={composing ? "/notices" : "/notices?compose=1"}');
+    expect(page).toContain("{composing && (");
     expect(page).toContain("공지사항 작성");
     expect(migration).toContain("create table if not exists public.super_admins");
     expect(migration).toContain("create or replace function public.is_super_admin()");

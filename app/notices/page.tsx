@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, BellRing, Megaphone, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, BellRing, Megaphone, ShieldCheck, SquarePen, Trash2, X } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { MobileNav } from "@/components/mobile-nav";
@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createNotice, deleteNotice } from "./actions";
 
 type NoticesPageProps = {
-  searchParams: Promise<{ created?: string; deleted?: string; error?: string }>;
+  searchParams: Promise<{ created?: string; deleted?: string; error?: string; compose?: string }>;
 };
 
 export default async function NoticesPage({ searchParams }: NoticesPageProps) {
@@ -18,6 +18,7 @@ export default async function NoticesPage({ searchParams }: NoticesPageProps) {
   const [bundle, query] = await Promise.all([getNoticesPageBundle(supabase), searchParams]);
   if (!bundle) redirect("/login?next=/notices");
   const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
+  const composing = bundle.isSuperAdmin && query.compose === "1";
   const message = query.error === "forbidden"
     ? "공지사항 작성 권한이 없습니다."
     : query.error
@@ -40,11 +41,12 @@ export default async function NoticesPage({ searchParams }: NoticesPageProps) {
           <section className="notices-hero">
             <span className="notices-hero-icon"><Megaphone size={24} /></span>
             <div><p>PrayNote에서 전하는 소식</p><h1>공지사항</h1><span>새로운 기능과 중요한 안내를 이곳에서 확인하세요.</span></div>
+            {bundle.isSuperAdmin && <Link className="notice-compose-link" href={composing ? "/notices" : "/notices?compose=1"}>{composing ? <X size={14} /> : <SquarePen size={14} />}{composing ? "작성 닫기" : "공지사항 작성"}</Link>}
           </section>
 
           {message && <div className={`page-notice ${query.error ? "error" : ""}`}>{message}</div>}
 
-          {bundle.isSuperAdmin && (
+          {composing && (
             <section className="notice-admin-panel">
               <div className="notice-admin-heading"><span><ShieldCheck size={18} /></span><div><h2>공지사항 작성</h2><p>이 영역은 슈퍼어드민에게만 표시됩니다.</p></div></div>
               <form action={createNotice} className="notice-compose-form">
@@ -63,7 +65,7 @@ export default async function NoticesPage({ searchParams }: NoticesPageProps) {
                 <div className="notice-card-head"><span><Megaphone size={15} />공지</span><time dateTime={notice.createdAt}>{formatKoreaDateTime(notice.createdAt)}</time></div>
                 <h2>{notice.title}</h2>
                 <p>{notice.content}</p>
-                {bundle.isSuperAdmin && <form action={deleteNotice}><input type="hidden" name="noticeId" value={notice.id} /><ConfirmSubmitButton className="notice-delete-button" message="이 공지사항을 삭제할까요?"><Trash2 size={14} />삭제</ConfirmSubmitButton></form>}
+                {composing && <form action={deleteNotice}><input type="hidden" name="noticeId" value={notice.id} /><ConfirmSubmitButton className="notice-delete-button" message="이 공지사항을 삭제할까요?"><Trash2 size={14} />삭제</ConfirmSubmitButton></form>}
               </article>
             ))}
             {bundle.notices.length === 0 && <div className="empty-notices"><Megaphone size={28} /><strong>아직 등록된 공지사항이 없어요</strong><span>새로운 소식이 생기면 이곳에서 알려드릴게요.</span></div>}

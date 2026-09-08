@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Heart, LoaderCircle, RotateCcw } from "lucide-react";
+import { Check, Heart, LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 import type { PrayerStatus } from "@/lib/domain";
@@ -121,15 +121,16 @@ export function InstantPrayerStatusButton({ prayerId, initialStatus, initialComp
   return (
     <>
       <button
-        className={`${className} ${pending ? "button-pending" : ""}`.trim()}
+        className={`${className} ${completed ? "completed" : ""} ${pending ? "button-pending" : ""}`.trim()}
         type="button"
         onClick={toggle}
         disabled={pending}
+        aria-pressed={completed}
         aria-busy={pending}
-        title={failed ? "상태를 저장하지 못했어요. 다시 시도해주세요." : undefined}
+        title={failed ? "상태를 저장하지 못했어요. 다시 시도해주세요." : completed ? "다시 누르면 진행 중인 기도로 되돌립니다." : "해결된 기도제목으로 이관합니다."}
       >
-        {pending ? <LoaderCircle className="button-spinner" size={15} /> : completed ? <RotateCcw size={15} /> : <Check size={15} />}
-        {completed ? "진행 중으로 되돌리기" : "해결 완료"}
+        {pending ? <LoaderCircle className="button-spinner" size={15} /> : <span className={`resolve-checkbox ${completed ? "checked" : ""}`} aria-hidden="true">{completed && <Check size={11} strokeWidth={3} />}</span>}
+        {completed ? "해결 완료됨" : "해결 완료"}
       </button>
       {failed && <span className="sr-only" role="status">기도 상태를 저장하지 못했어요.</span>}
     </>

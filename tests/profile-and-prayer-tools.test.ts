@@ -19,6 +19,15 @@ describe("prayer owner tools", () => {
     expect(detail).toContain("<PrayerDetailContent");
     expect(detail).not.toContain("updatePrayer");
   });
+
+  it("preserves entered line breaks and shows completion as a checkbox", () => {
+    const styles = read("app/globals.css");
+    const actions = read("components/instant-prayer-actions.tsx");
+    expect(styles).toMatch(/\.dashboard-prayer-link[^}]*white-space: pre-wrap/);
+    expect(actions).toContain("resolve-checkbox");
+    expect(actions).toContain("aria-pressed={completed}");
+    expect(actions).not.toContain("RotateCcw");
+  });
 });
 
 describe("profile colors", () => {

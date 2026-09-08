@@ -133,7 +133,7 @@ button { color: inherit; }
 .prayer-meta strong { color: #465269; font-size: 12px; }
 .prayer-meta em { display: inline-flex; align-items: center; gap: 3px; padding: 4px 7px; border-radius: 7px; color: var(--sage); background: #eaf4ef; font-style: normal; font-weight: 700; }
 .prayer-copy p { max-width: 770px; margin: 9px 0 12px; color: #3f4b61; font-size: 14px; line-height: 1.7; word-break: keep-all; }
-.dashboard-prayer-link { max-width: 770px; margin: 9px 0 12px; color: #3f4b61; display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; text-decoration: none; font-size: 14px; line-height: 1.7; word-break: keep-all; }
+.dashboard-prayer-link { max-width: 770px; margin: 9px 0 12px; color: #3f4b61; display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical; text-decoration: none; white-space: pre-wrap; font-size: 14px; line-height: 1.7; word-break: keep-all; }
 .dashboard-prayer-link:hover { color: var(--blue-dark); }
 .pray-button { padding: 6px 9px; margin-left: -9px; border: 0; border-radius: 8px; background: transparent; color: #8a94a6; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 11px; font-weight: 650; }
 .pray-button:hover, .pray-button.selected { color: var(--pink); background: var(--pink-soft); }
@@ -447,6 +447,9 @@ button { color: inherit; }
 .daily-undo-hint { margin-top: 8px; color: #8f98a8; display: block; font-size: 9px; }
 .resolve-form { margin-left: auto; }
 .resolve-button { color: #4d846f; background: #e9f4ef; }
+.resolve-button.completed { color: #3f775f; background: #e3f1e9; }
+.resolve-checkbox { width: 16px; height: 16px; flex: 0 0 auto; border: 1.5px solid #76a18f; border-radius: 4px; background: #fff; display: inline-grid; place-items: center; transition: border-color .15s ease, background-color .15s ease, color .15s ease; }
+.resolve-checkbox.checked { border-color: #4d8c71; color: #fff; background: #4d8c71; }
 .empty-records { min-height: 170px; padding: 30px; border: 1px dashed #dfe3ea; border-radius: 15px; color: #9aa3b2; background: rgba(255,255,255,.5); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
 .empty-records strong { color: #566278; font-size: 12px; }
 .empty-records span { font-size: 10px; }
@@ -686,6 +689,8 @@ button { color: inherit; }
 .notices-hero p { margin: 0 0 5px; color: var(--blue); font-size: 10px; font-weight: 750; }
 .notices-hero h1 { margin: 0 0 7px; font-size: 28px; letter-spacing: -.04em; }
 .notices-hero > div > span { color: var(--muted); font-size: 11px; }
+.notice-compose-link { min-height: 33px; margin-left: auto; padding: 0 10px; border: 1px solid #d7ddef; border-radius: 9px; color: #5368c3; background: #fff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; white-space: nowrap; font-size: 9px; font-weight: 800; }
+.notice-compose-link:hover { border-color: #bec8e9; background: #f7f8ff; }
 .notice-admin-panel { margin-top: 18px; padding: 22px; border: 1px solid #dfe4f1; border-radius: 17px; background: #fff; box-shadow: 0 8px 26px rgba(39,50,78,.035); }
 .notice-admin-heading { padding-bottom: 15px; border-bottom: 1px solid #edf0f4; display: flex; align-items: center; gap: 11px; }
 .notice-admin-heading > span { width: 37px; height: 37px; border-radius: 11px; color: #5a70ce; background: #edf0ff; display: grid; place-items: center; }
@@ -908,6 +913,7 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .settings-notice-action { display: none; }
   .notices-hero { padding: 22px; }
   .notices-hero > div > span { display: none; }
+  .notice-compose-link { margin-left: auto; }
   .notice-admin-panel { padding: 18px; }
   .notice-compose-form .primary-button { width: 100%; }
   .notice-card { padding: 18px; }
