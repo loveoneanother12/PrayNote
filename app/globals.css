@@ -456,6 +456,38 @@ button { color: inherit; }
 .prayer-stats strong, .prayer-stats span { display: block; }
 .prayer-stats strong { color: #4f62bf; font-size: 20px; }
 .prayer-stats span { margin-top: 3px; color: #8b95a5; font-size: 9px; }
+.my-profile-card { border: 1px solid #dfe4f2; border-radius: 20px; background: radial-gradient(circle at 90% 0, rgba(111,130,220,.11), transparent 35%), #fff; box-shadow: var(--shadow); overflow: hidden; }
+.my-profile-summary { min-height: 125px; padding: 24px 28px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.my-profile-identity { min-width: 0; }
+.my-profile-identity > span { color: var(--blue); font-size: 9px; font-weight: 800; letter-spacing: .04em; }
+.my-profile-identity h1 { margin: 4px 0; color: #313d54; font-size: 23px; letter-spacing: -.04em; }
+.my-profile-identity p { margin: 0; overflow: hidden; color: #9099a9; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
+.profile-edit-button { min-height: 35px; padding: 0 11px; border: 1px solid #dbe0ed; border-radius: 9px; color: #5b6fc7; background: rgba(255,255,255,.84); display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 9px; font-weight: 800; }
+.profile-edit-button:hover { border-color: #c9d1ef; background: #f7f8ff; }
+.my-prayer-mini-stats { grid-column: 2 / -1; margin-top: -3px; color: #8791a3; display: flex; align-items: center; gap: 8px; font-size: 8px; }
+.my-prayer-mini-stats span { display: inline-flex; align-items: baseline; gap: 3px; }
+.my-prayer-mini-stats strong { color: #5267c5; font-size: 11px; }
+.my-prayer-mini-stats i { width: 3px; height: 3px; border-radius: 50%; background: #ccd1dc; }
+.prayer-streak-strip { margin: 0 11px 11px; padding: 14px 16px; border: 1px solid #f1dfc9; border-radius: 14px; background: linear-gradient(110deg, #fffaf3, #fffdf9); display: flex; align-items: center; gap: 12px; }
+.prayer-streak-strip.complete { border-color: #dce8d9; background: linear-gradient(110deg, #f7fcf7, #fbfdfa); }
+.prayer-streak-icon { width: 36px; height: 36px; flex: 0 0 auto; border-radius: 11px; color: #e78d42; background: #fff0df; display: grid; place-items: center; }
+.prayer-streak-strip.complete .prayer-streak-icon { color: #56906d; background: #e7f3e9; }
+.prayer-streak-content { min-width: 0; flex: 1; }
+.prayer-streak-copy { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.prayer-streak-copy > div { min-width: 0; color: #c97635; display: flex; align-items: center; gap: 5px; }
+.prayer-streak-strip.complete .prayer-streak-copy > div { color: #4f8466; }
+.prayer-streak-copy strong { color: #4b5363; font-size: 11px; }
+.prayer-streak-copy > span { color: #8d94a1; text-align: right; font-size: 8px; line-height: 1.45; }
+.prayer-streak-progress { height: 5px; margin-top: 9px; border-radius: 999px; background: #ece9e4; overflow: hidden; }
+.prayer-streak-progress > span { min-width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f1ad62, #ea8641); display: block; transition: width .35s ease; }
+.prayer-streak-strip.complete .prayer-streak-progress > span { background: linear-gradient(90deg, #77b58b, #53936b); }
+.prayer-streak-meta { margin-top: 6px; color: #a1a6af; display: flex; justify-content: space-between; gap: 10px; font-size: 7px; }
+.prayer-streak-meta strong { color: #8c7e70; font-size: 7px; }
+.profile-edit-backdrop { z-index: 85; }
+.profile-edit-modal { width: min(620px, 100%); }
+.profile-edit-intro { margin: 9px 0 0; color: #8892a4; font-size: 10px; line-height: 1.6; }
+.profile-edit-modal .profile-settings-form { margin-top: 9px; padding-top: 15px; }
+.profile-edit-modal .google-identity-setting { margin-top: 17px; }
 .prayer-filter-tabs { width: fit-content; margin-top: 26px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: #fff; display: flex; gap: 3px; }
 .prayer-filter-tabs button { min-height: 34px; padding: 0 11px; border: 0; border-radius: 8px; color: #7d8798; background: transparent; display: flex; align-items: center; gap: 6px; text-decoration: none; font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; }
 .prayer-filter-tabs button.active { color: #5064c2; background: #edf0ff; }
@@ -804,6 +836,11 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .my-prayers-hero { align-items: flex-start; flex-wrap: wrap; }
   .prayer-stats { width: 100%; }
   .prayer-stats > div { flex: 1; }
+  .my-profile-summary { padding: 21px 20px 15px; }
+  .prayer-streak-copy { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .prayer-streak-copy > span { text-align: left; }
+  .profile-edit-modal { max-height: 91dvh; padding: 20px; }
+  .profile-edit-modal .profile-settings-form { grid-template-columns: 1fr; }
   .prayer-filter-tabs { width: 100%; }
   .prayer-filter-tabs button { flex: 1; justify-content: center; }
   .prayer-detail-content, .search-content { padding-top: 24px; }
@@ -1060,6 +1097,11 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .calendar-prayer-label { display: none; }
   .prayer-calendar-selected-list > a > svg { display: none; }
   .prayer-calendar-grid > button { padding-inline: 2px; }
+  .my-profile-summary { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
+  .profile-edit-button { grid-column: 1 / -1; width: 100%; }
+  .my-prayer-mini-stats { grid-column: 1 / -1; margin-top: 0; }
+  .prayer-streak-strip { align-items: flex-start; padding: 13px; }
+  .prayer-streak-meta { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
 .legal-table tr:last-child td { border-bottom: 0; }
 .legal-table th:last-child, .legal-table td:last-child { border-right: 0; }

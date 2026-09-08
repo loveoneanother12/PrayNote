@@ -4,7 +4,7 @@ import { Check, Link2, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function GoogleIdentitySettings() {
+export function GoogleIdentitySettings({ returnTo = "/settings" }: { returnTo?: string }) {
   const [loading, setLoading] = useState(true);
   const [linking, setLinking] = useState(false);
   const [linked, setLinked] = useState(false);
@@ -27,7 +27,9 @@ export function GoogleIdentitySettings() {
     setLinking(true);
     setMessage("");
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent("/settings?linked=google")}`;
+    const separator = returnTo.includes("?") ? "&" : "?";
+    const next = `${returnTo}${separator}linked=google`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
     const { error } = await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } });
     if (error) {
       setMessage(error.message.toLowerCase().includes("manual linking")

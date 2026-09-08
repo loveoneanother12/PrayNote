@@ -43,6 +43,10 @@ export async function GET(request: Request) {
     }
   }
 
-  const errorPath = next.startsWith("/settings") ? "/settings?error=google-link-failed" : "/login?error=callback-failed";
+  const errorPath = next.startsWith("/settings")
+    ? "/settings?error=google-link-failed"
+    : next.startsWith("/prayers")
+      ? "/prayers?error=google-link-failed"
+      : "/login?error=callback-failed";
   return NextResponse.redirect(new URL(errorPath, url.origin));
 }

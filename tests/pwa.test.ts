@@ -32,12 +32,12 @@ describe("installable PrayNote PWA", () => {
     const mobileNav = readFileSync(join(process.cwd(), "components/mobile-nav.tsx"), "utf8");
     expect(mobileNav).toContain("홈");
     expect(mobileNav).toContain("그룹");
-    expect(mobileNav).toContain("내 기도");
+    expect(mobileNav).toContain("마이");
     expect(mobileNav).toContain("설정");
     expect(mobileNav).not.toContain("<span>알림</span>");
     expect(mobileNav.indexOf("홈")).toBeLessThan(mobileNav.indexOf("그룹"));
-    expect(mobileNav.indexOf("그룹")).toBeLessThan(mobileNav.indexOf("내 기도"));
-    expect(mobileNav.indexOf("내 기도")).toBeLessThan(mobileNav.indexOf("설정"));
+    expect(mobileNav.indexOf("그룹")).toBeLessThan(mobileNav.indexOf("마이"));
+    expect(mobileNav.indexOf("마이")).toBeLessThan(mobileNav.indexOf("설정"));
   });
 
   it("disables server-action buttons while their work is pending", () => {

@@ -58,6 +58,10 @@ type PrayerPageBundleRow = {
   display_name?: string | null;
   profile_color?: string | null;
   my_groups?: Array<{ id: string; name: string }>;
+  prayer_rhythm?: {
+    current_streak?: number | string;
+    prayed_today?: boolean;
+  };
   prayers?: PrayerSummaryRow[];
 };
 
@@ -66,7 +70,18 @@ export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
   if (error) throw error;
   if (!data) return null;
   const row = data as PrayerPageBundleRow;
-  return { userId: row.user_id, email: row.email ?? "", displayName: row.display_name ?? null, profileColor: normalizeProfileColor(row.profile_color), myGroups: row.my_groups ?? [], prayers: (row.prayers ?? []).map(mapPrayerSummaryRow) };
+  return {
+    userId: row.user_id,
+    email: row.email ?? "",
+    displayName: row.display_name ?? null,
+    profileColor: normalizeProfileColor(row.profile_color),
+    myGroups: row.my_groups ?? [],
+    prayerRhythm: {
+      currentStreak: Number(row.prayer_rhythm?.current_streak ?? 0),
+      prayedToday: row.prayer_rhythm?.prayed_today === true,
+    },
+    prayers: (row.prayers ?? []).map(mapPrayerSummaryRow),
+  };
 }
 
 export async function getPrayerDetailPageBundle(supabase: SupabaseClient, prayerId: string) {

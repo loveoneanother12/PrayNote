@@ -25,6 +25,7 @@ describe("Google authentication", () => {
   it("links Google as an identity of the current Supabase user", () => {
     expect(settingsIdentity).toContain('getUserIdentities()');
     expect(settingsIdentity).toContain('linkIdentity({ provider: "google"');
-    expect(settingsIdentity).toContain('/settings?linked=google');
+    expect(settingsIdentity).toContain('returnTo = "/settings"');
+    expect(settingsIdentity).toContain('`${returnTo}${separator}linked=google`');
   });
 });
