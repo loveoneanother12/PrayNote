@@ -41,5 +41,8 @@ describe("My profile and prayer streak", () => {
     expect(trackerShare).toContain("카카오톡");
     expect(trackerShare).toContain("이미지 저장");
     expect(trackerShare).toContain("navigator.share");
+    expect(trackerShare).toContain("await navigator.share({ files: [file] })");
+    expect(trackerShare).not.toContain("공유창에서 Instagram 스토리를 선택해주세요");
+    expect(trackerShare).not.toContain("공유창에서 카카오톡과 채팅방을 선택해주세요");
   });
 });

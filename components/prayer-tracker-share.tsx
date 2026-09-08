@@ -249,12 +249,8 @@ export function PrayerTrackerShare({
     try {
       const file = trackerFile();
       if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({
-          files: [file],
-          title: `${displayName}님의 PrayNote 기도 기록`,
-          text: target === "instagram" ? "공유창에서 Instagram 스토리를 선택해주세요." : "공유창에서 카카오톡과 채팅방을 선택해주세요.",
-        });
-        setMessage(target === "instagram" ? "인스타그램 공유창으로 이미지를 보냈어요." : "카카오톡 공유창으로 이미지를 보냈어요.");
+        await navigator.share({ files: [file] });
+        setMessage("기도 트래커 이미지를 공유했어요.");
       } else {
         downloadFile(file);
         setMessage("이 기기에서는 앱으로 바로 보낼 수 없어 이미지를 저장했어요. 해당 앱에서 불러와주세요.");
@@ -275,7 +271,7 @@ export function PrayerTrackerShare({
       const file = trackerFile();
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
       if (isIos && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({ files: [file], title: `${displayName}님의 PrayNote 기도 기록` });
+        await navigator.share({ files: [file] });
         setMessage("공유창에서 ‘이미지 저장’을 선택하면 사진 앱에 저장돼요.");
       } else {
         downloadFile(file);
