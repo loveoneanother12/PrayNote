@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useMemo, useState } from "react";
-import { Check, ChevronRight, CircleAlert, KeyRound, LoaderCircle, Plus, Users, X } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { Check, ChevronRight, CircleAlert, KeyRound, ListOrdered, LoaderCircle, Plus, Users, X } from "lucide-react";
+import { GroupOrderModal } from "@/components/group-order-modal";
 import type { GroupSummary } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,15 +15,12 @@ const roleLabels = { leader: "리더", admin: "관리자", member: "멤버" } as
 const groupTones = ["blue", "sage", "lavender"];
 
 export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
-  const [createdGroups, setCreatedGroups] = useState<GroupSummary[]>([]);
+  const [groups, setGroups] = useState<GroupSummary[]>(initialGroups);
   const [modalOpen, setModalOpen] = useState(false);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const groups = useMemo(
-    () => [...initialGroups, ...createdGroups.filter((created) => !initialGroups.some((group) => group.id === created.id))],
-    [createdGroups, initialGroups],
-  );
 
   async function submitGroup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,7 +50,7 @@ export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
       return;
     }
 
-    setCreatedGroups((current) => [
+    setGroups((current) => [
       ...current,
       { id: groupId, name, description: description || null, role: "leader", memberCount: 1, unreadCount: 0, prayerCount: 0 },
     ]);
@@ -80,6 +78,7 @@ export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
       <section className="groups-dashboard-section">
         <div className="section-heading groups-dashboard-heading">
           <div><h2>가입한 그룹</h2><span>총 {groups.length}개의 공동체와 함께하고 있어요.</span></div>
+          {groups.length > 1 && <button className="group-order-trigger" type="button" onClick={() => setOrderModalOpen(true)}><ListOrdered size={15} />순서 수정</button>}
         </div>
         <div className="group-grid groups-dashboard-grid">
           {groups.map((group, index) => (
@@ -105,6 +104,15 @@ export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
         </div>
         {groups.length === 0 && <p className="groups-dashboard-empty">아직 가입한 그룹이 없어요. 새 그룹을 만들거나 초대코드로 참여해보세요.</p>}
       </section>
+
+      {orderModalOpen && <GroupOrderModal
+        groups={groups}
+        onClose={() => setOrderModalOpen(false)}
+        onSaved={(orderedIds) => {
+          setGroups((current) => orderedIds.map((id) => current.find((group) => group.id === id)).filter((group): group is GroupSummary => Boolean(group)));
+          setMessage("그룹 순서를 저장했어요.");
+        }}
+      />}
 
       {modalOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => !submitting && setModalOpen(false)}>

@@ -10,6 +10,7 @@ import {
   ChevronRight,
   CircleAlert,
   ListFilter,
+  ListOrdered,
   Home,
   LockKeyhole,
   LoaderCircle,
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { InstantPrayerButton } from "@/components/instant-prayer-actions";
 import { DashboardPrayerComposer } from "@/components/dashboard-prayer-composer";
+import { GroupOrderModal } from "@/components/group-order-modal";
 import { NotificationListItem } from "@/components/notification-list-item";
 import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
@@ -60,8 +62,10 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
   const [composerOpen, setComposerOpen] = useState(initialComposerOpen);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [previewFilterOpen, setPreviewFilterOpen] = useState(false);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [showAllPreviews, setShowAllPreviews] = useState(false);
   const [selectedPreviewKeys, setSelectedPreviewKeys] = useState<string[]>(() => ["personal", initialGroups[0]?.id].filter(Boolean) as string[]);
+  const [groupOrder, setGroupOrder] = useState<string[]>(() => initialGroups.map((group) => group.id));
   const [optimisticGroups, setOptimisticGroups] = useState<GroupSummary[]>([]);
   const [optimisticPrayers, setOptimisticPrayers] = useState<PrayerSummary[]>([]);
   const [contentOverrides, setContentOverrides] = useState<Record<string, string>>({});
@@ -71,7 +75,11 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
   const serverToast = created === "group" ? "새 그룹을 만들었어요" : created === "prayer" ? "기도제목을 나눴어요" : created === "left" ? "그룹에서 탈퇴했어요" : created === "deleted" ? "그룹을 삭제했어요" : "";
   const toast = localToast || serverToast;
   const visibleError = localError || error;
-  const groups = useMemo(() => [...initialGroups, ...optimisticGroups.filter((optimistic) => !initialGroups.some((group) => group.id === optimistic.id))], [initialGroups, optimisticGroups]);
+  const groups = useMemo(() => {
+    const combined = [...initialGroups, ...optimisticGroups.filter((optimistic) => !initialGroups.some((group) => group.id === optimistic.id))];
+    const positions = new Map(groupOrder.map((id, index) => [id, index]));
+    return combined.sort((left, right) => (positions.get(left.id) ?? Number.MAX_SAFE_INTEGER) - (positions.get(right.id) ?? Number.MAX_SAFE_INTEGER));
+  }, [groupOrder, initialGroups, optimisticGroups]);
   const prayers = useMemo(() => [...optimisticPrayers.filter((optimistic) => !initialPrayers.some((prayer) => prayer.id === optimistic.id && prayer.groupId === optimistic.groupId)), ...initialPrayers], [initialPrayers, optimisticPrayers]);
   const newGroupCount = new Set(optimisticGroups.filter((group) => !initialGroups.some((initial) => initial.id === group.id)).map((group) => group.id)).size;
   const newPrayerCount = new Set(optimisticPrayers.filter((prayer) => !initialPrayers.some((initial) => initial.id === prayer.id)).map((prayer) => prayer.id)).size;
@@ -109,6 +117,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
     }
 
     setOptimisticGroups((current) => [...current, { id: groupId, name, description: description || null, role: "leader", memberCount: 1, unreadCount: 0 }]);
+    setGroupOrder((current) => [...current, groupId]);
     setGroupModalOpen(false);
     setLocalToast("새 그룹을 만들었어요");
     setGroupSubmitting(false);
@@ -168,7 +177,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
               </button>
               <button className={`dashboard-preview-filter-button ${previewFilterOpen ? "active" : ""}`} type="button" aria-expanded={previewFilterOpen} onClick={() => setPreviewFilterOpen((value) => !value)}><ListFilter size={15} /><span>미리보기 그룹 선택</span></button>
               {previewFilterOpen && <div className="dashboard-preview-filter" role="group" aria-label="대시보드 미리보기에 띄울 그룹 선택">
-                <strong>대시보드 미리보기에 띄울 그룹 선택</strong>
+                <div className="dashboard-preview-filter-head"><strong>대시보드 미리보기에 띄울 그룹 선택</strong>{groups.length > 1 && <button type="button" onClick={() => setOrderModalOpen(true)}><ListOrdered size={14} />순서 수정</button>}</div>
                 <label><input type="checkbox" checked={selectedPreviewKeys.includes("personal")} onChange={() => togglePreviewKey("personal")} /><span className="filter-checkbox"><Check size={12} /></span><LockKeyhole size={15} />개인기도</label>
                 {groups.map((group) => <label key={group.id}><input type="checkbox" checked={selectedPreviewKeys.includes(group.id)} onChange={() => togglePreviewKey(group.id)} /><span className="filter-checkbox"><Check size={12} /></span><Users size={15} />{group.name}</label>)}
                 <button type="button" onClick={() => setPreviewFilterOpen(false)}>선택 완료</button>
@@ -228,6 +237,8 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
               </div>
             )}
           </section>
+
+          {orderModalOpen && <GroupOrderModal groups={groups} onClose={() => setOrderModalOpen(false)} onSaved={(orderedIds) => { setGroupOrder(orderedIds); setLocalToast("그룹 순서를 저장했어요"); }} />}
 
           <section className="groups-section" id="groups">
             <div className="section-heading">
