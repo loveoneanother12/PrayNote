@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowLeft,
+  BarChart3,
   Bell,
   BookHeart,
   Check,
@@ -69,6 +70,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </section>
 
           {(notice || query.error) && <div className={`page-notice ${query.error ? "error" : ""}`}>{notice || errorMessage}</div>}
+
+          {bundle.isSuperAdmin && <Link className="settings-admin-link" href="/admin/insights">
+            <span className="settings-admin-icon"><BarChart3 size={20} /></span>
+            <span><strong>관리자 센터</strong><small>전체 인사이트와 회원 계정을 안전하게 관리하세요.</small></span>
+            <span className="settings-admin-action">바로가기</span>
+          </Link>}
 
           <Link className="settings-notice-link" href="/notices">
             <span className="settings-notice-icon"><Megaphone size={19} /></span>
