@@ -18,8 +18,9 @@ describe("dashboard, notices, and prayer trash", () => {
   it("returns new invitees to the invite after opening signup first", () => {
     const invite = read("app/join/[groupId]/page.tsx");
     const signup = read("app/login/actions.ts");
+    expect(invite.indexOf("supabase.auth.getUser()")).toBeLessThan(invite.indexOf('supabase.rpc("get_join_page_bundle_fast"'));
     expect(invite).toContain("/login?mode=signup&next=");
-    expect(signup).toContain("redirect(next)");
+    expect(signup).toContain("redirect(onboardingDashboardPath(next))");
   });
 
   it("adds notice preferences and creates one notification per profile", () => {

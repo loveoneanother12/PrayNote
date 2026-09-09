@@ -12,10 +12,12 @@ type InvitePageProps = {
 export default async function InvitePage({ params, searchParams }: InvitePageProps) {
   const [{ groupId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?mode=signup&next=${encodeURIComponent(`/join/${groupId}`)}`);
+
   const { data, error } = await supabase.rpc("get_join_page_bundle_fast", { target_group_id: groupId });
   if (error || !data?.preview) notFound();
   const bundle = data as { authenticated: boolean; preview: { id: string; name: string; description: string | null }; membership_status: string | null };
-  if (!bundle.authenticated) redirect(`/login?mode=signup&next=${encodeURIComponent(`/join/${groupId}`)}`);
   if (bundle.membership_status === "active") redirect(`/groups/${groupId}`);
   const group = bundle.preview;
 

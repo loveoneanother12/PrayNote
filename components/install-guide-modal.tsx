@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Download, HelpCircle, MoreHorizontal, Share2, ShieldAlert, Smartphone, X } from "lucide-react";
+import { BellRing, Download, HelpCircle, Home, MoreHorizontal, Share2, ShieldAlert, Smartphone, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ export function InstallGuideModal({ initialOpen = false, onCompleteHref }: Insta
             <GuidePlatform name="iOS · iPhone" badge="iOS" steps={iosSteps} />
             <GuidePlatform name="Android" badge="AOS" steps={androidSteps} />
           </div>
-          <footer className="guide-footer"><MoreHorizontal size={17} /><span>기기와 브라우저 버전에 따라 메뉴 이름이 조금 다를 수 있어요.</span></footer>
+          <footer className="guide-footer"><Home size={17} /><div><strong>웹앱 설치는 메인 대시보드의 ‘홈’ 탭에서 진행해주세요.</strong><span>기기와 브라우저 버전에 따라 메뉴 이름이 조금 다를 수 있어요.</span></div></footer>
         </section>
       </div>, document.body)}
     </>

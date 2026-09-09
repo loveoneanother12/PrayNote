@@ -246,6 +246,8 @@ button { color: inherit; }
 .guide-platform li svg { margin-right: 4px; vertical-align: -3px; color: #6578ca; }
 .guide-platform li strong { color: #3f4c63; }
 .guide-footer { margin-top: 15px; padding: 11px 13px; border-radius: 10px; color: #8b95a5; background: #f3f4f7; display: flex; align-items: center; gap: 8px; font-size: 9px; }
+.guide-footer > div { display: grid; gap: 3px; }
+.guide-footer strong { color: #56647b; font-size: 10px; font-weight: 650; }
 @keyframes guide-up { from { opacity: 0; transform: translateY(35px); } to { opacity: 1; transform: translateY(0); } }
 
 .mobile-nav { display: none; }
