@@ -56,7 +56,7 @@ const series = (value: unknown): AdminMetricSeries => Array.isArray(value)
 
 export async function isSuperAdmin(supabase: SupabaseClient) {
   const { data, error } = await supabase.rpc("is_super_admin");
-  if (error) throw error;
+  if (error) return false;
   return data === true;
 }
 

@@ -33,8 +33,10 @@ describe("super-admin center", () => {
 
   it("only exposes the admin entry point to a super-admin settings bundle", () => {
     const settings = read("app/settings/page.tsx");
+    const queries = read("lib/admin-queries.ts");
     expect(settings).toContain("bundle.isSuperAdmin &&");
     expect(settings).toContain('href="/admin/insights"');
+    expect(queries).toContain("if (error) return false");
     expect(read("proxy.ts")).toContain('"/admin/:path*"');
   });
 
