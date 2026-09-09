@@ -21,7 +21,16 @@ export async function proxy(request: NextRequest) {
 
   // Reads valid sessions locally and only contacts Auth when a token needs refresh.
   // Authorization itself is always enforced by database RLS and secured RPCs.
-  await supabase.auth.getSession();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  const isJoinPage = request.nextUrl.pathname === "/join" || request.nextUrl.pathname.startsWith("/join/");
+  if (isJoinPage && !session) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("mode", "signup");
+    loginUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(loginUrl);
+  }
+
   return response;
 }
 
