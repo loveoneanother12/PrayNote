@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { safeInternalPath } from "@/lib/navigation";
+import { onboardingDashboardPath, safeInternalPath } from "@/lib/navigation";
 
 function validConsentTimestamp(value: string | undefined) {
   return value && !Number.isNaN(Date.parse(value)) ? value : null;
@@ -11,6 +11,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const next = safeInternalPath(url.searchParams.get("next"));
+  const isSignup = url.searchParams.get("intent") === "signup";
 
   if (code) {
     const cookieStore = await cookies();
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
         }
         cookieStore.delete("praynote_google_consent");
       }
-      return NextResponse.redirect(new URL(next, url.origin));
+      return NextResponse.redirect(new URL(isSignup ? onboardingDashboardPath(next) : next, url.origin));
     }
   }
 

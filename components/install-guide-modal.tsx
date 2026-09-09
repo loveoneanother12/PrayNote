@@ -1,8 +1,9 @@
 "use client";
 
 import { BellRing, Download, HelpCircle, MoreHorizontal, Share2, ShieldAlert, Smartphone, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 
 const iosSteps = [
   <>최신 버전의 <strong>Safari</strong>로 접속해주세요.</>,
@@ -18,29 +19,39 @@ const androidSteps = [
   <><BellRing size={15} /> <strong>설정 탭 &gt; 외부 알림 &gt; 브라우저 푸시</strong>에서 푸시 알림을 ON으로 설정하고, 권한 허용 창이 뜨면 <strong>허용</strong>을 눌러주세요.</>,
 ];
 
-export function InstallGuideModal() {
-  const [open, setOpen] = useState(false);
+type InstallGuideModalProps = {
+  initialOpen?: boolean;
+  onCompleteHref?: string;
+};
+
+export function InstallGuideModal({ initialOpen = false, onCompleteHref }: InstallGuideModalProps) {
+  const router = useRouter();
+  const [open, setOpen] = useState(initialOpen);
+  const closeGuide = useCallback(() => {
+    setOpen(false);
+    if (initialOpen) router.replace(onCompleteHref || "/dashboard", { scroll: false });
+  }, [initialOpen, onCompleteHref, router]);
 
   useEffect(() => {
     if (!open) return;
-    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && closeGuide();
     window.addEventListener("keydown", closeOnEscape);
     document.body.classList.add("modal-open");
     return () => {
       window.removeEventListener("keydown", closeOnEscape);
       document.body.classList.remove("modal-open");
     };
-  }, [open]);
+  }, [closeGuide, open]);
 
   return (
     <>
       <button className="install-guide-button" type="button" onClick={() => setOpen(true)}><HelpCircle size={17} /><span>사용 가이드</span></button>
-      {open && createPortal(<div className="guide-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+      {open && createPortal(<div className="guide-backdrop" role="presentation" onMouseDown={closeGuide}>
         <section className="install-guide-sheet" role="dialog" aria-modal="true" aria-labelledby="install-guide-title" onMouseDown={(event) => event.stopPropagation()}>
           <div className="guide-handle" aria-hidden="true" />
           <header className="guide-heading">
             <div><span><Download size={21} /></span><div><p>사용 가이드</p><h2 id="install-guide-title">웹앱 설치 방법</h2></div></div>
-            <button type="button" onClick={() => setOpen(false)} aria-label="사용 가이드 닫기"><X size={20} /></button>
+            <button type="button" onClick={closeGuide} aria-label="사용 가이드 닫기"><X size={20} /></button>
           </header>
           <p className="guide-intro">홈 화면에 추가하면 일반 앱처럼 빠르게 열고 브라우저 푸시 알림도 받을 수 있어요.</p>
           <div className="guide-platform-grid">

@@ -2,10 +2,11 @@ import { redirect } from "next/navigation";
 import { PrayNoteApp } from "@/components/praynote-app";
 import { formatKoreaToday, getKoreaGreeting } from "@/lib/dates";
 import { getDashboardBundle } from "@/lib/dashboard-queries";
+import { safeInternalPath } from "@/lib/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 type DashboardPageProps = {
-  searchParams: Promise<{ created?: string; left?: string; deleted?: string; error?: string; compose?: string }>;
+  searchParams: Promise<{ created?: string; left?: string; deleted?: string; error?: string; compose?: string; guide?: string; afterGuide?: string }>;
 };
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -36,6 +37,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       created={params.created ?? (params.left ? "left" : params.deleted ? "deleted" : undefined)}
       error={params.error}
       initialComposerOpen={params.compose === "1"}
+      initialGuideOpen={params.guide === "1"}
+      guideNextPath={params.guide === "1" && params.afterGuide ? safeInternalPath(params.afterGuide, "") : undefined}
     />
   );
 }

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { safeInternalPath } from "../lib/navigation";
+import { onboardingDashboardPath, safeInternalPath } from "../lib/navigation";
 
 const root = process.cwd();
 
@@ -13,6 +13,20 @@ describe("safeInternalPath", () => {
   it("blocks external and protocol-relative redirects", () => {
     expect(safeInternalPath("https://example.com")).toBe("/dashboard");
     expect(safeInternalPath("//example.com", "/login")).toBe("/login");
+  });
+});
+
+describe("onboardingDashboardPath", () => {
+  it("opens the guide on the dashboard for a normal signup", () => {
+    expect(onboardingDashboardPath("/dashboard")).toBe("/dashboard?guide=1");
+  });
+
+  it("preserves an invite destination until after the guide", () => {
+    expect(onboardingDashboardPath("/join/group-id")).toBe("/dashboard?guide=1&afterGuide=%2Fjoin%2Fgroup-id");
+  });
+
+  it("rejects external continuation paths", () => {
+    expect(onboardingDashboardPath("https://example.com")).toBe("/dashboard?guide=1");
   });
 });
 

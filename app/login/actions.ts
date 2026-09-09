@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { safeInternalPath } from "@/lib/navigation";
+import { onboardingDashboardPath, safeInternalPath } from "@/lib/navigation";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,7 +37,7 @@ export async function signInWithGoogle(formData: FormData) {
   });
 
   const supabase = await createClient();
-  const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`;
+  const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}&intent=${mode}`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: callbackUrl, skipBrowserRedirect: true },
@@ -113,8 +113,8 @@ export async function signUpWithPassword(formData: FormData) {
   }
 
   if (!data.session) {
-    redirect(`/login?mode=login&notice=confirm-email&next=${encodeURIComponent(next)}`);
+    redirect(`/login?mode=login&notice=confirm-email&next=${encodeURIComponent(onboardingDashboardPath(next))}`);
   }
 
-  redirect(next);
+  redirect(onboardingDashboardPath(next));
 }
