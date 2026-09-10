@@ -52,12 +52,21 @@ export function GroupChallenges({ groupId, groupName, role, memberCount, initial
   async function run(name: string, request: () => PromiseLike<{ error: { message: string } | null }>) {
     if (pending) return false;
     setPending(name); setMessage("");
-    const { error } = await request();
-    if (error) {
-      setMessage(error.message.includes("active_challenge_exists") ? "이미 진행 중이거나 예정된 챌린지가 있어요." : "요청을 처리하지 못했어요. 잠시 후 다시 시도해주세요.");
-      setPending(null); return false;
+    try {
+      const { error } = await request();
+      if (error) {
+        setMessage(error.message.includes("active_challenge_exists") ? "이미 진행 중이거나 예정된 챌린지가 있어요." : error.message.includes("leader_permission_required") ? "그룹 리더만 챌린지를 만들거나 관리할 수 있어요." : "요청을 처리하지 못했어요. 잠시 후 다시 시도해주세요.");
+        return false;
+      }
+      await refreshBundle();
+      return true;
+    } catch (error) {
+      console.error("Challenge request failed", error);
+      setMessage("연결이 불안정해 요청 결과를 확인하지 못했어요. 잠시 후 다시 시도해주세요.");
+      return false;
+    } finally {
+      setPending(null);
     }
-    await refreshBundle(); setPending(null); return true;
   }
 
   async function toggleJoin(challengeId: string) { await run("join", () => createClient().rpc("toggle_challenge_participation", { target_challenge_id: challengeId })); }

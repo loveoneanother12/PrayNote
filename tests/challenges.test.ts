@@ -25,6 +25,13 @@ describe("group prayer challenges", () => {
     expect(migration).not.toContain("grant insert on table public.prayer_challenges");
   });
 
+  it("keeps challenge creation identity and enum status explicit", () => {
+    const migration = read("supabase/migrations/202609100005_fix_challenge_creation_identity.sql");
+    expect(migration).toContain("caller_id uuid := auth.uid()");
+    expect(migration).toContain("public.has_group_role(target_group_id, array['leader']::public.group_role[], caller_id)");
+    expect(migration).toContain("::public.challenge_status");
+  });
+
   it("integrates challenge alerts with preferences and group destinations", () => {
     expect(read("lib/domain.ts")).toContain('"challenge_update"');
     expect(read("lib/push.ts")).toContain('case "challenge_update"');
