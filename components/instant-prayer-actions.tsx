@@ -48,6 +48,7 @@ export function InstantPrayerButton({
       setResponseCount((count) => Math.max(0, count + (data ? 1 : -1)));
     }
     setPending(false);
+    if (!error) window.dispatchEvent(new CustomEvent("praynote:challenge-activity"));
   }
 
   return (

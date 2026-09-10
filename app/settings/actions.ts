@@ -47,6 +47,8 @@ export async function updateNotificationPreferences(formData: FormData) {
       new_prayer_enabled: formData.get("newPrayerEnabled") === "on",
       prayer_response_enabled: formData.get("prayerResponseEnabled") === "on",
       membership_enabled: formData.get("membershipEnabled") === "on",
+      challenge_enabled: formData.get("challengeEnabled") === "on",
+      notice_enabled: formData.get("noticeEnabled") === "on",
     })
     .eq("user_id", user.id);
 

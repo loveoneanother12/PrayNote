@@ -15,6 +15,7 @@ export type SettingsBundle = {
     prayer_response_enabled?: boolean;
     membership_enabled?: boolean;
     notice_enabled?: boolean;
+    challenge_enabled?: boolean;
     push_enabled?: boolean;
     email_enabled?: boolean;
     quiet_hours_enabled?: boolean;

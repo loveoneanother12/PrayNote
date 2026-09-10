@@ -10,6 +10,7 @@ import {
   Megaphone,
   Settings,
   Smartphone,
+  Trophy,
   Users,
 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -97,6 +98,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               prayerResponse: preferences?.prayer_response_enabled ?? true,
               membership: preferences?.membership_enabled ?? true,
               notice: preferences?.notice_enabled ?? true,
+              challenge: preferences?.challenge_enabled ?? true,
             }}>
               <label className="setting-toggle master-toggle">
                 <span className="setting-copy"><strong>인앱 알림 받기</strong><small>모든 새 알림을 한 번에 켜거나 끕니다.</small></span>
@@ -104,6 +106,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 <span className="switch" aria-hidden="true" />
               </label>
               <div className="setting-toggle-group">
+                <label className="setting-toggle">
+                  <span className="setting-category-icon challenge"><Trophy size={17} /></span>
+                  <span className="setting-copy"><strong>기도 챌린지</strong><small>챌린지 시작·진행·완주 소식을 알려드려요.</small></span>
+                  <input type="checkbox" name="challengeEnabled" defaultChecked={preferences?.challenge_enabled ?? true} />
+                  <span className="switch" aria-hidden="true" />
+                </label>
                 <label className="setting-toggle">
                   <span className="setting-category-icon prayer"><BookHeart size={17} /></span>
                   <span className="setting-copy"><strong>새 기도제목</strong><small>그룹에 새 기도제목이 등록되면 알려드려요.</small></span>

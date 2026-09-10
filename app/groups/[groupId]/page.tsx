@@ -3,6 +3,7 @@ import { ArrowLeft, CalendarCheck, Settings, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { CopyInviteButton } from "@/components/copy-invite-button";
 import { GroupPrayerComposer } from "@/components/group-prayer-composer";
+import { GroupChallenges } from "@/components/group-challenges";
 import { GroupPushToggle } from "@/components/group-push-toggle";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordSections } from "@/components/prayer-record-sections";
@@ -10,6 +11,7 @@ import { SharePrayerModal } from "@/components/share-prayer-modal";
 import { SubpageNav } from "@/components/subpage-nav";
 import { formatKoreaToday } from "@/lib/dates";
 import { getGroupPageBundle } from "@/lib/group-queries";
+import { getGroupChallengesBundle } from "@/lib/challenge-queries";
 import { createClient } from "@/lib/supabase/server";
 
 type GroupPageProps = {
@@ -20,7 +22,10 @@ type GroupPageProps = {
 export default async function GroupPage({ params, searchParams }: GroupPageProps) {
   const [{ groupId }, queryParams] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const bundle = await getGroupPageBundle(supabase, groupId);
+  const [bundle, challenges] = await Promise.all([
+    getGroupPageBundle(supabase, groupId),
+    getGroupChallengesBundle(supabase, groupId),
+  ]);
   if (!bundle) redirect("/login");
   if (!bundle.overview) notFound();
   const { overview, prayers } = bundle;
@@ -60,6 +65,14 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
             <span>역할: {role === "leader" ? "리더" : role === "admin" ? "관리자" : "멤버"}</span>
             <Link className="outline-button" href={`/groups/${groupId}/manage`}><Settings size={16} />그룹 관리</Link>
           </div>
+
+          <GroupChallenges
+            groupId={group.id}
+            groupName={group.name}
+            role={role}
+            memberCount={memberCount}
+            initialBundle={challenges}
+          />
 
           <GroupPrayerComposer currentGroup={{ id: group.id, name: group.name }} groups={myGroups} />
 

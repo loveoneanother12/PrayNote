@@ -62,6 +62,15 @@ function noticeTitleFrom(data: unknown) {
   return typeof title === "string" && title.trim() ? title.trim() : null;
 }
 
+function challengeData(data: unknown) {
+  if (!data || typeof data !== "object") return { event: null, title: null };
+  const value = data as { challenge_event?: unknown; challenge_title?: unknown };
+  return {
+    event: typeof value.challenge_event === "string" ? value.challenge_event : null,
+    title: typeof value.challenge_title === "string" ? value.challenge_title : null,
+  };
+}
+
 export function notificationMessage(row: NotificationRow, actorName: string | null, groupName: string | null) {
   const actor = actorName ? `${actorName}님이` : "누군가가";
   const group = groupName ? `‘${groupName}’` : "그룹";
@@ -85,6 +94,16 @@ export function notificationMessage(row: NotificationRow, actorName: string | nu
       return `${group} 정보가 변경됐어요.`;
     case "notice_published":
       return noticeTitleFrom(row.data) ? `새 공지 ‘${noticeTitleFrom(row.data)}’가 등록됐어요.` : "새 공지사항이 등록됐어요.";
+    case "challenge_update": {
+      const challenge = challengeData(row.data);
+      if (challenge.event === "daily_reminder") return "오늘도 공동체의 기도를 이어가 볼까요?";
+      if (challenge.event === "last_day") return "기도 챌린지가 하루 남았어요.";
+      if (challenge.event === "completed") return "함께 기도를 이어 챌린지를 완주했어요.";
+      if (challenge.event === "ended") return "기도 챌린지가 종료됐어요. 함께한 기록을 확인해보세요.";
+      if (challenge.event === "stopped") return "기도 챌린지가 중단되어 지금까지의 기록을 보관했어요.";
+      if (challenge.event === "started") return "기도 챌린지가 시작됐어요.";
+      return challenge.title ? `새 기도 챌린지 ‘${challenge.title}’가 열렸어요.` : "새로운 기도 챌린지가 열렸어요.";
+    }
   }
 }
 
@@ -92,6 +111,7 @@ export function notificationHref(row: NotificationRow) {
   if (row.type === "membership_requested" && row.group_id) return `/groups/${row.group_id}/manage`;
   if (row.type === "membership_rejected" && row.group_id) return `/join/${row.group_id}`;
   if (row.type === "notice_published") return "/notices";
+  if (row.type === "challenge_update" && row.group_id) return `/groups/${row.group_id}#group-challenge-title`;
   if (row.prayer_id) return `/prayers/${row.prayer_id}`;
   if (row.group_id) return `/groups/${row.group_id}`;
   return "/notifications";

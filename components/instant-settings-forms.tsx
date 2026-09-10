@@ -143,7 +143,7 @@ export function PasswordChangeSetting() {
   </>;
 }
 
-type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean; notice: boolean };
+type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean; notice: boolean; challenge: boolean };
 
 export function InstantNotificationPreferencesForm({ initial, children }: { initial: PreferenceProps; children: ReactNode }) {
   const [pending, setPending] = useState(false);
@@ -160,6 +160,7 @@ export function InstantNotificationPreferencesForm({ initial, children }: { init
       prayer_response_enabled: form.get("prayerResponseEnabled") === "on",
       membership_enabled: form.get("membershipEnabled") === "on",
       notice_enabled: form.get("noticeEnabled") === "on",
+      challenge_enabled: form.get("challengeEnabled") === "on",
     });
     setPending(false); setMessage(error ? "저장하지 못했어요." : "저장했어요.");
   }

@@ -37,6 +37,7 @@ function pushTitle(type: NotificationRow["type"]) {
     case "role_changed": return "그룹 역할이 변경됐어요";
     case "group_updated": return "그룹 정보가 변경됐어요";
     case "notice_published": return "새 공지사항이 등록됐어요";
+    case "challenge_update": return "기도 챌린지 소식";
   }
 }
 

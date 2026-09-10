@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./challenge.css";
 
 export const metadata: Metadata = {
   title: "PrayNote — 함께 기도하는 공간",
