@@ -16,6 +16,7 @@ const profileColorSchema = readFileSync(join(root, "supabase/migrations/20260906
 const safeAnonymousBundleSchema = readFileSync(join(root, "supabase/migrations/202609060002_safe_anonymous_bundle_entry.sql"), "utf8");
 const groupsDashboardOverviewSchema = readFileSync(join(root, "supabase/migrations/202609070001_groups_dashboard_overview.sql"), "utf8");
 const authSessionHardeningSchema = readFileSync(join(root, "supabase/migrations/202609100001_auth_session_hardening.sql"), "utf8");
+const quietHoursSchema = readFileSync(join(root, "supabase/migrations/202609100002_group_push_mute_and_quiet_hours.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -61,6 +62,17 @@ describe("security guardrails", () => {
     expect(reminderSchema).toContain("user_id = auth.uid()");
     expect(reminderSchema).toContain(">= 5");
     expect(reminderSchema).toContain("pg_advisory_xact_lock");
+  });
+
+  it("keeps group push preferences user-scoped and quiet summaries server-only", () => {
+    expect(quietHoursSchema).toContain("alter table public.group_push_preferences enable row level security;");
+    expect(quietHoursSchema).toContain("user_id = auth.uid()");
+    expect(quietHoursSchema).toContain("membership.status = 'active'");
+    expect(quietHoursSchema).toContain("pg_advisory_xact_lock");
+    expect(quietHoursSchema).toContain("alter table public.deferred_push_events enable row level security;");
+    expect(quietHoursSchema).toContain("revoke all on table public.deferred_push_events from anon, authenticated;");
+    expect(quietHoursSchema).toContain("grant execute on function public.claim_due_quiet_push_summary() to service_role;");
+    expect(quietHoursSchema).toContain("praynote-quiet-hours-summaries");
   });
 
   it("dispatches daily reminders through an authenticated cron webhook", () => {

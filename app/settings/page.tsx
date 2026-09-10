@@ -22,6 +22,7 @@ import {
   InstantSignOutButton,
 } from "@/components/instant-settings-forms";
 import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
+import { QuietHoursSettings } from "@/components/quiet-hours-settings";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
 import { getSettingsBundle } from "@/lib/settings-queries";
@@ -129,6 +130,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 </label>
               </div>
             </InstantNotificationPreferencesForm>
+            <QuietHoursSettings
+              userId={bundle.userId}
+              initialEnabled={preferences?.quiet_hours_enabled ?? false}
+              initialStart={preferences?.quiet_start ?? "22:00:00"}
+              initialEnd={preferences?.quiet_end ?? "07:00:00"}
+            />
           </section>
 
           <section className="settings-panel upcoming-panel">

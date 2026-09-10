@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 import { notificationHref, notificationMessage, type NotificationRow } from "@/lib/notification-queries";
+import { quietHoursReleaseAt, type QuietHoursPreference } from "@/lib/push-quiet-hours";
 
 type PushSubscriptionRow = {
   id: string;
@@ -8,6 +9,8 @@ type PushSubscriptionRow = {
   p256dh: string;
   auth: string;
 };
+
+type PushPreferenceRow = QuietHoursPreference & { push_enabled?: boolean | null };
 
 function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -51,6 +54,23 @@ async function sendToSubscription(
   );
 }
 
+async function deferDuringQuietHours(
+  admin: ReturnType<typeof createAdminClient>,
+  userId: string,
+  eventKey: string,
+  preferences: PushPreferenceRow | null,
+) {
+  const releaseAt = quietHoursReleaseAt(preferences);
+  if (!releaseAt) return false;
+  const { error } = await admin.from("deferred_push_events").upsert({
+    user_id: userId,
+    event_key: eventKey,
+    release_at: releaseAt.toISOString(),
+  }, { onConflict: "event_key", ignoreDuplicates: true });
+  if (error) throw error;
+  return true;
+}
+
 export async function sendPushForNotification(notificationId: string) {
   configureWebPush();
   const admin = createAdminClient();
@@ -62,8 +82,8 @@ export async function sendPushForNotification(notificationId: string) {
 
   if (error || !notification) return { delivered: 0, skipped: true };
 
-  const [{ data: preferences }, { data: subscriptions }, { data: actor }, { data: group }] = await Promise.all([
-    admin.from("notification_preferences").select("push_enabled").eq("user_id", notification.recipient_id).single(),
+  const [{ data: preferences }, { data: subscriptions }, { data: actor }, { data: group }, { data: groupPreference }] = await Promise.all([
+    admin.from("notification_preferences").select("push_enabled, quiet_hours_enabled, quiet_start, quiet_end").eq("user_id", notification.recipient_id).single(),
     admin.from("push_subscriptions").select("id, endpoint, p256dh, auth").eq("user_id", notification.recipient_id),
     notification.actor_id
       ? admin.from("profiles").select("display_name").eq("id", notification.actor_id).maybeSingle()
@@ -71,9 +91,16 @@ export async function sendPushForNotification(notificationId: string) {
     notification.group_id
       ? admin.from("groups").select("name").eq("id", notification.group_id).maybeSingle()
       : Promise.resolve({ data: null }),
+    notification.group_id
+      ? admin.from("group_push_preferences").select("push_muted").eq("user_id", notification.recipient_id).eq("group_id", notification.group_id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   if (!preferences?.push_enabled || !subscriptions?.length) return { delivered: 0, skipped: true };
+  if (groupPreference?.push_muted) return { delivered: 0, skipped: true, reason: "group_muted" };
+  if (await deferDuringQuietHours(admin, notification.recipient_id, `notification:${notification.id}`, preferences)) {
+    return { delivered: 0, skipped: true, deferred: true };
+  }
 
   const row = notification as NotificationRow;
   const payload = {
@@ -147,10 +174,13 @@ export async function sendPrayerReminderPush(userId: string, reminderId: string,
   configureWebPush();
   const admin = createAdminClient();
   const [{ data: preferences }, { data: subscriptions }] = await Promise.all([
-    admin.from("notification_preferences").select("push_enabled").eq("user_id", userId).single(),
+    admin.from("notification_preferences").select("push_enabled, quiet_hours_enabled, quiet_start, quiet_end").eq("user_id", userId).single(),
     admin.from("push_subscriptions").select("id, endpoint, p256dh, auth").eq("user_id", userId),
   ]);
   if (!preferences?.push_enabled || !subscriptions?.length) return { delivered: 0, skipped: true };
+  if (await deferDuringQuietHours(admin, userId, `reminder:${reminderId}:${deliveryDate}`, preferences)) {
+    return { delivered: 0, skipped: true, deferred: true };
+  }
 
   let delivered = 0;
   for (const subscription of subscriptions as PushSubscriptionRow[]) {
@@ -172,4 +202,52 @@ export async function sendPrayerReminderPush(userId: string, reminderId: string,
     }
   }
   return { delivered, skipped: false };
+}
+
+export async function dispatchQuietHoursSummaries() {
+  configureWebPush();
+  const admin = createAdminClient();
+  let summaries = 0;
+  let delivered = 0;
+
+  for (let index = 0; index < 100; index += 1) {
+    const { data, error } = await admin.rpc("claim_due_quiet_push_summary");
+    if (error) throw error;
+    if (!data) break;
+    const summary = data as { user_id: string; release_at: string; notification_count: number };
+    summaries += 1;
+
+    const [{ data: preferences }, { data: subscriptions }] = await Promise.all([
+      admin.from("notification_preferences").select("push_enabled").eq("user_id", summary.user_id).maybeSingle(),
+      admin.from("push_subscriptions").select("id, endpoint, p256dh, auth").eq("user_id", summary.user_id),
+    ]);
+
+    if (preferences?.push_enabled && subscriptions?.length && summary.notification_count > 0) {
+      for (const subscription of subscriptions as PushSubscriptionRow[]) {
+        try {
+          await sendToSubscription(subscription, {
+            title: "방해금지 시간이 끝났어요",
+            body: `방해금지 시간동안 ${summary.notification_count}개의 알림이 발생했어요. 확인해보세요.`,
+            url: "/notifications",
+            notificationId: `quiet-summary-${summary.release_at}`,
+          });
+          delivered += 1;
+        } catch (sendError) {
+          const statusCode = typeof sendError === "object" && sendError && "statusCode" in sendError
+            ? Number(sendError.statusCode)
+            : null;
+          if (statusCode === 404 || statusCode === 410) {
+            await admin.from("push_subscriptions").delete().eq("id", subscription.id);
+          }
+        }
+      }
+    }
+
+    await admin.from("deferred_push_events").update({ released_at: new Date().toISOString() })
+      .eq("user_id", summary.user_id)
+      .eq("release_at", summary.release_at)
+      .is("released_at", null);
+  }
+
+  return { summaries, delivered };
 }

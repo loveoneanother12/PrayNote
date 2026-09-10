@@ -15,6 +15,7 @@ type GroupPageOverviewRow = {
   };
   member_count: number | string;
   my_groups?: Array<{ id: string; name: string }>;
+  push_muted?: boolean;
 };
 
 function mapGroupPageOverview(row: GroupPageOverviewRow) {
@@ -25,6 +26,7 @@ function mapGroupPageOverview(row: GroupPageOverviewRow) {
     group: row.group,
     memberCount: Number(row.member_count),
     myGroups: row.my_groups ?? [],
+    pushMuted: row.push_muted === true,
   };
 }
 

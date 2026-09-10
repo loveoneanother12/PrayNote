@@ -17,6 +17,9 @@ export type SettingsBundle = {
     notice_enabled?: boolean;
     push_enabled?: boolean;
     email_enabled?: boolean;
+    quiet_hours_enabled?: boolean;
+    quiet_start?: string;
+    quiet_end?: string;
   };
   reminderTimes: Array<{ id: string; time_local: string }>;
 };

@@ -3,6 +3,7 @@ import { ArrowLeft, CalendarCheck, Settings, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { CopyInviteButton } from "@/components/copy-invite-button";
 import { GroupPrayerComposer } from "@/components/group-prayer-composer";
+import { GroupPushToggle } from "@/components/group-push-toggle";
 import { MobileNav } from "@/components/mobile-nav";
 import { PrayerRecordSections } from "@/components/prayer-record-sections";
 import { SharePrayerModal } from "@/components/share-prayer-modal";
@@ -46,7 +47,10 @@ export default async function GroupPage({ params, searchParams }: GroupPageProps
               <span className="member-summary"><Users size={15} />멤버 {memberCount}명</span>
             </div>
             <div className="invite-code-box">
-              <span>그룹 초대코드</span>
+              <div className="invite-code-heading">
+                <span>그룹 초대코드</span>
+                <GroupPushToggle groupId={group.id} userId={bundle.userId} initialMuted={overview.pushMuted} />
+              </div>
               <strong>{group.invite_code}</strong>
               <CopyInviteButton code={group.invite_code} groupId={group.id} />
             </div>
