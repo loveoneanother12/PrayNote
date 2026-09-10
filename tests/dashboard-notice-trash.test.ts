@@ -22,8 +22,8 @@ describe("dashboard, notices, and prayer trash", () => {
     expect(invite.indexOf("supabase.auth.getUser()")).toBeLessThan(invite.indexOf('supabase.rpc("get_join_page_bundle_fast"'));
     expect(invite).toContain("/login?mode=signup&next=");
     expect(signup).toContain("redirect(onboardingDashboardPath(next))");
-    expect(proxy).toContain('request.nextUrl.pathname.startsWith("/join/")');
-    expect(proxy).toContain("return NextResponse.redirect(loginUrl)");
+    expect(proxy).toContain('pathname.startsWith("/join/")');
+    expect(proxy).toContain("return copyAuthState(response, NextResponse.redirect(loginUrl))");
   });
 
   it("adds notice preferences and creates one notification per profile", () => {

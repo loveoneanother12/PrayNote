@@ -7,7 +7,7 @@ describe("installable PrayNote PWA", () => {
   it("uses standalone display mode and install icons", () => {
     const value = manifest();
     expect(value.display).toBe("standalone");
-    expect(value.start_url).toBe("/dashboard");
+    expect(value.start_url).toBe("/");
     expect(value.icons).toEqual(expect.arrayContaining([
       expect.objectContaining({ sizes: "192x192", type: "image/png" }),
       expect.objectContaining({ sizes: "512x512", type: "image/png" }),

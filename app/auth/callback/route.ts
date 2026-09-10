@@ -7,6 +7,14 @@ function validConsentTimestamp(value: string | undefined) {
   return value && !Number.isNaN(Date.parse(value)) ? value : null;
 }
 
+function noStoreRedirect(url: URL) {
+  const response = NextResponse.redirect(url);
+  response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0");
+  response.headers.set("Expires", "0");
+  response.headers.set("Pragma", "no-cache");
+  return response;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -40,7 +48,7 @@ export async function GET(request: Request) {
         }
         cookieStore.delete("praynote_google_consent");
       }
-      return NextResponse.redirect(new URL(isSignup ? onboardingDashboardPath(next) : next, url.origin));
+      return noStoreRedirect(new URL(isSignup ? onboardingDashboardPath(next) : next, url.origin));
     }
   }
 
@@ -49,5 +57,5 @@ export async function GET(request: Request) {
     : next.startsWith("/prayers")
       ? "/prayers?error=google-link-failed"
       : "/login?error=callback-failed";
-  return NextResponse.redirect(new URL(errorPath, url.origin));
+  return noStoreRedirect(new URL(errorPath, url.origin));
 }

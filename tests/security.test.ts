@@ -15,6 +15,7 @@ const dashboardCountSchema = readFileSync(join(root, "supabase/migrations/202609
 const profileColorSchema = readFileSync(join(root, "supabase/migrations/202609060001_profile_colors_and_prayer_tools.sql"), "utf8");
 const safeAnonymousBundleSchema = readFileSync(join(root, "supabase/migrations/202609060002_safe_anonymous_bundle_entry.sql"), "utf8");
 const groupsDashboardOverviewSchema = readFileSync(join(root, "supabase/migrations/202609070001_groups_dashboard_overview.sql"), "utf8");
+const authSessionHardeningSchema = readFileSync(join(root, "supabase/migrations/202609100001_auth_session_hardening.sql"), "utf8");
 
 describe("security guardrails", () => {
   it("enables row-level security for every user-data table", () => {
@@ -106,8 +107,18 @@ describe("security guardrails", () => {
     expect(bundleSchema).toContain("where notification.recipient_id = auth.uid()");
     expect(bundleSchema).toContain("where reminder.user_id = auth.uid()");
     expect(safeAnonymousBundleSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to anon;");
+    expect(authSessionHardeningSchema).toContain("grant execute on function public.get_dashboard_bundle_fast() to anon;");
     expect(profileColorSchema).toContain("case when auth.uid() is null then null");
     expect(profileColorSchema).toContain("membership.user_id = auth.uid()");
+  });
+
+  it("refreshes and validates sessions before protected pages render", () => {
+    const proxy = readFileSync(join(root, "proxy.ts"), "utf8");
+    expect(proxy).toContain("auth.getClaims()");
+    expect(proxy).toContain("Object.entries(headersToSet)");
+    expect(proxy).toContain("isProtectedPage(pathname) && !isAuthenticated");
+    expect(proxy).toContain('loginUrl.searchParams.set("next", nextPath)');
+    expect(proxy).toContain('"/login"');
   });
 
   it("gives every membership approver a unique notification event key", () => {

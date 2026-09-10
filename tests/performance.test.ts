@@ -6,11 +6,11 @@ const root = process.cwd();
 const read = (path: string) => readFileSync(join(root, path), "utf8");
 
 describe("performance read paths", () => {
-  it("uses the local session instead of a remote user lookup on page renders", () => {
+  it("verifies claims locally instead of making a remote user lookup on page renders", () => {
     const auth = read("lib/auth.ts");
     const proxy = read("proxy.ts");
-    expect(auth).toContain("auth.getSession()");
-    expect(proxy).toContain("auth.getSession()");
+    expect(auth).toContain("auth.getClaims()");
+    expect(proxy).toContain("auth.getClaims()");
     expect(`${auth}\n${proxy}`).not.toContain("auth.getUser()");
   });
 

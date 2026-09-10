@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "PrayNote — 함께 기도하는 공간",
     short_name: "PrayNote",
     description: "신뢰하는 공동체 안에서 기도제목을 나누고 함께 기도해요.",
-    start_url: "/dashboard",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#f6f7fb",

@@ -1,5 +1,29 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { safeInternalPath } from "@/lib/navigation";
+
+const PROTECTED_PAGE_PREFIXES = [
+  "/admin",
+  "/dashboard",
+  "/groups",
+  "/notifications",
+  "/prayers",
+  "/search",
+  "/settings",
+];
+
+function isProtectedPage(pathname: string) {
+  return PROTECTED_PAGE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+function copyAuthState(source: NextResponse, target: NextResponse) {
+  source.cookies.getAll().forEach((cookie) => target.cookies.set(cookie));
+  for (const header of ["cache-control", "expires", "pragma"]) {
+    const value = source.headers.get(header);
+    if (value) target.headers.set(header, value);
+  }
+  return target;
+}
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -11,24 +35,46 @@ export async function proxy(request: NextRequest) {
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headersToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        Object.entries(headersToSet).forEach(([name, value]) => response.headers.set(name, value));
       },
     },
   });
 
-  // Reads valid sessions locally and only contacts Auth when a token needs refresh.
-  // Authorization itself is always enforced by database RLS and secured RPCs.
-  const { data: { session } } = await supabase.auth.getSession();
+  // Validates the JWT and refreshes expired tokens before Server Components run.
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const isAuthenticated = !claimsError && Boolean(claimsData?.claims?.sub);
+  const pathname = request.nextUrl.pathname;
+  const nextPath = `${pathname}${request.nextUrl.search}`;
 
-  const isJoinPage = request.nextUrl.pathname === "/join" || request.nextUrl.pathname.startsWith("/join/");
-  if (isJoinPage && !session) {
+  if (claimsError && request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token"))) {
+    console.warn("Auth session validation failed", {
+      code: claimsError.code,
+      status: claimsError.status,
+      path: pathname,
+    });
+  }
+
+  const isJoinPage = pathname === "/join" || pathname.startsWith("/join/");
+  if (isJoinPage && !isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("mode", "signup");
-    loginUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+    loginUrl.searchParams.set("next", nextPath);
+    return copyAuthState(response, NextResponse.redirect(loginUrl));
+  }
+
+  if (isProtectedPage(pathname) && !isAuthenticated) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", nextPath);
+    return copyAuthState(response, NextResponse.redirect(loginUrl));
+  }
+
+  if (pathname === "/login" && isAuthenticated) {
+    const destination = safeInternalPath(request.nextUrl.searchParams.get("next"));
+    return copyAuthState(response, NextResponse.redirect(new URL(destination, request.url)));
   }
 
   return response;
@@ -36,6 +82,8 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
+    "/login",
     "/admin/:path*",
     "/dashboard/:path*",
     "/groups/:path*",
