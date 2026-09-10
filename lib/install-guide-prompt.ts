@@ -1,6 +1,11 @@
 export const INSTALL_GUIDE_DISMISSED_DATE_KEY = "praynote_install_guide_dismissed_date";
 export const INSTALL_GUIDE_NEXT_PROMPT_KEY = "praynote_install_guide_next_prompt_at";
 export const INSTALL_GUIDE_REPEAT_MS = 4 * 60 * 60 * 1000;
+export const INSTALL_GUIDE_AUTO_PROMPT_END_AT = Date.parse("2026-09-13T00:00:00+09:00");
+
+export function isInstallGuideAutoPromptActive(date = new Date()) {
+  return date.getTime() < INSTALL_GUIDE_AUTO_PROMPT_END_AT;
+}
 
 export function getKoreaDateKey(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {

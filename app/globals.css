@@ -237,11 +237,12 @@ button { color: inherit; }
 .guide-prompt-message > div { display: grid; gap: 4px; }
 .guide-prompt-message strong { color: #3e4f91; font-size: 11px; font-weight: 650; }
 .guide-prompt-message span { color: #7480a2; font-size: 9px; line-height: 1.55; }
-.guide-platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.guide-platform-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
 .guide-platform { padding: 18px; border: 1px solid #e4e7ed; border-radius: 15px; background: #fafbfc; }
 .guide-platform-title { display: flex; align-items: center; gap: 9px; }
 .guide-platform-title > span { min-width: 36px; height: 25px; padding: 0 7px; border-radius: 7px; color: #fff; background: #5d72d2; display: grid; place-items: center; font-size: 8px; font-weight: 850; letter-spacing: .04em; }
 .guide-platform:nth-child(2) .guide-platform-title > span { background: #4c8a72; }
+.guide-platform:nth-child(3) .guide-platform-title > span { background: #6d659c; }
 .guide-platform h3 { margin: 0; font-size: 14px; }
 .guide-platform ol { margin: 16px 0 0; padding: 0; display: grid; gap: 10px; list-style: none; }
 .guide-platform li { min-height: 43px; display: flex; align-items: flex-start; gap: 9px; color: #647087; font-size: 10px; line-height: 1.55; }
@@ -252,6 +253,7 @@ button { color: inherit; }
 .guide-footer { margin-top: 15px; padding: 11px 13px; border-radius: 10px; color: #8b95a5; background: #f3f4f7; display: flex; align-items: center; gap: 8px; font-size: 9px; }
 .guide-footer > div { display: grid; gap: 3px; }
 .guide-footer strong { color: #56647b; font-size: 10px; font-weight: 650; }
+.guide-private-mode-note { margin: 8px 2px 0; color: #8993a4; font-size: 9px; line-height: 1.55; }
 .guide-reminder-actions { margin-top: 13px; display: flex; justify-content: flex-end; gap: 8px; }
 .guide-reminder-actions button { min-height: 35px; padding: 0 14px; border: 1px solid #dfe3eb; border-radius: 9px; color: #717d91; background: #fff; cursor: pointer; font-size: 9px; font-weight: 600; }
 .guide-reminder-actions button.primary { color: #fff; border-color: #5c71d1; background: #5c71d1; }

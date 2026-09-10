@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getKoreaDateKey,
+  isInstallGuideAutoPromptActive,
   INSTALL_GUIDE_REPEAT_MS,
   installGuidePromptDelay,
   millisecondsUntilNextKoreaDay,
@@ -24,5 +25,10 @@ describe("install guide prompt schedule", () => {
 
   it("opens immediately when no suppression remains", () => {
     expect(installGuidePromptDelay({ now: koreaEvening, dismissedDate: "2026-09-09", nextPromptAt: koreaEvening.getTime() - 1 })).toBe(0);
+  });
+
+  it("stops automatic prompts after September 12 in Korea", () => {
+    expect(isInstallGuideAutoPromptActive(new Date("2026-09-12T14:59:59.999Z"))).toBe(true);
+    expect(isInstallGuideAutoPromptActive(new Date("2026-09-12T15:00:00.000Z"))).toBe(false);
   });
 });

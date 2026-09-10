@@ -21,9 +21,12 @@ describe("installation guide and daily verse", () => {
   it("includes separate iOS and Android installation instructions", () => {
     const guide = read("components/install-guide-modal.tsx");
     expect(guide).toContain("iOS · iPhone");
-    expect(guide).toContain("Android");
+    expect(guide).toContain("Android · Chrome");
+    expect(guide).toContain("Android · 삼성 인터넷");
+    expect(guide).toContain("설치 및 바로가기 만들기");
+    expect(guide).toContain("현재 페이지 추가");
+    expect(guide).toContain("홈 탭");
     expect(guide).toContain("홈 화면에 추가");
-    expect(guide).toContain("세부정보 더보기");
     expect(guide).toContain("createPortal");
     expect(guide).toContain("document.body");
   });
