@@ -290,6 +290,9 @@ button { color: inherit; }
 .admin-total strong { color: #4f65c7; font-size: 21px; }
 .admin-total span { color: #7d89a1; font-size: 9px; }
 .admin-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.admin-insight-group { margin-top: 22px; }
+.admin-insight-group:first-of-type { margin-top: 0; }
+.admin-insight-group .admin-section-heading { margin-bottom: 11px; }
 .admin-metric { min-height: 120px; padding: 17px; border: 1px solid #e2e6ee; border-radius: 15px; background: #fff; display: flex; align-items: flex-start; gap: 12px; box-shadow: 0 8px 22px rgba(37,48,72,.035); }
 .admin-metric > span { width: 35px; height: 35px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; }
 .admin-metric > div { display: grid; gap: 4px; }
@@ -312,6 +315,7 @@ button { color: inherit; }
 .admin-bar-column { height: 100%; display: grid; grid-template-rows: 1fr 17px; align-items: end; justify-items: center; gap: 4px; }
 .admin-bar-column > span { width: min(18px, 75%); height: var(--bar-height); min-height: 2px; border-radius: 5px 5px 1px 1px; background: #6579d5; transition: height .2s ease; }
 .admin-chart.green .admin-bar-column > span { background: #58a17f; }
+.admin-chart.rose .admin-bar-column > span { background: #c96c88; }
 .admin-bar-column small { color: #9ca5b4; font-size: 7px; }
 .admin-log-panel { margin-top: 14px; padding: 20px; border: 1px solid #e2e6ee; border-radius: 16px; background: #fff; }
 .admin-section-heading h2 { margin: 0; font-size: 13px; font-weight: 650; }

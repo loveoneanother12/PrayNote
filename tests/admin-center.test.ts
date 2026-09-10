@@ -20,6 +20,9 @@ describe("super-admin center", () => {
     expect(insights).toContain("active_users_30d");
     expect(insights).toContain("daily_signups");
     expect(insights).toContain("daily_prayers");
+    expect(read("supabase/migrations/202609110001_expand_admin_insights.sql")).toContain("dormant_groups_30d");
+    expect(read("supabase/migrations/202609110001_expand_admin_insights.sql")).toContain("successful_challenges");
+    expect(read("supabase/migrations/202609110001_expand_admin_insights.sql")).toContain("push_failed_7d");
     expect(insights).not.toContain("prayer.content");
   });
 

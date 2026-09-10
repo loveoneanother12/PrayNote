@@ -10,16 +10,36 @@ export type AdminInsights = {
   newUsers7d: number;
   newUsers30d: number;
   activeUsers30d: number;
+  activeUsers7d: number;
   suspendedUsers: number;
   totalGroups: number;
   activeGroups30d: number;
+  dormantGroups30d: number;
+  groupsWithoutLeader: number;
+  pendingMemberships: number;
+  averageApprovalHours: number;
   totalPrayers: number;
   personalPrayers: number;
   groupPrayers: number;
   prayersCompletedToday: number;
+  prayers7d: number;
+  resolvedPrayers: number;
+  trashPrayers: number;
+  prayerResponses7d: number;
   pushEnabledUsers: number;
+  pushSubscribedUsers: number;
+  notifications7d: number;
+  unreadNotifications: number;
+  pushDelivered7d: number;
+  pushFailed7d: number;
+  totalChallenges: number;
+  activeChallenges: number;
+  completedChallenges: number;
+  successfulChallenges: number;
+  challengeParticipants: number;
   dailySignups: AdminMetricSeries;
   dailyPrayers: AdminMetricSeries;
+  dailyResponses: AdminMetricSeries;
 };
 
 export type AdminUser = {
@@ -70,16 +90,36 @@ export async function getAdminInsights(supabase: SupabaseClient): Promise<AdminI
     newUsers7d: count(row.new_users_7d),
     newUsers30d: count(row.new_users_30d),
     activeUsers30d: count(row.active_users_30d),
+    activeUsers7d: count(row.active_users_7d),
     suspendedUsers: count(row.suspended_users),
     totalGroups: count(row.total_groups),
     activeGroups30d: count(row.active_groups_30d),
+    dormantGroups30d: count(row.dormant_groups_30d),
+    groupsWithoutLeader: count(row.groups_without_leader),
+    pendingMemberships: count(row.pending_memberships),
+    averageApprovalHours: count(row.average_approval_hours),
     totalPrayers: count(row.total_prayers),
     personalPrayers: count(row.personal_prayers),
     groupPrayers: count(row.group_prayers),
     prayersCompletedToday: count(row.prayers_completed_today),
+    prayers7d: count(row.prayers_7d),
+    resolvedPrayers: count(row.resolved_prayers),
+    trashPrayers: count(row.trash_prayers),
+    prayerResponses7d: count(row.prayer_responses_7d),
     pushEnabledUsers: count(row.push_enabled_users),
+    pushSubscribedUsers: count(row.push_subscribed_users),
+    notifications7d: count(row.notifications_7d),
+    unreadNotifications: count(row.unread_notifications),
+    pushDelivered7d: count(row.push_delivered_7d),
+    pushFailed7d: count(row.push_failed_7d),
+    totalChallenges: count(row.total_challenges),
+    activeChallenges: count(row.active_challenges),
+    completedChallenges: count(row.completed_challenges),
+    successfulChallenges: count(row.successful_challenges),
+    challengeParticipants: count(row.challenge_participants),
     dailySignups: series(row.daily_signups),
     dailyPrayers: series(row.daily_prayers),
+    dailyResponses: series(row.daily_responses),
   };
 }
 
