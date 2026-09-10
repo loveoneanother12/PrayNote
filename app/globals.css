@@ -830,9 +830,9 @@ button { color: inherit; }
 .setting-category-icon.quiet { color: #667099; background: #edf0f8; }
 .quiet-hours-setting { margin-top: 8px; padding: 8px 13px 3px; border-top: 1px solid #edf0f4; }
 .quiet-hours-toggle { min-height: 70px; padding-inline: 0; }
-.quiet-hours-controls { margin: 0 0 14px 47px; padding: 11px; border: 1px solid #e2e5ed; border-radius: 11px; background: #fafbfe; display: flex; align-items: flex-end; gap: 9px; }
-.quiet-hours-controls label { min-width: 0; flex: 1; display: grid; gap: 5px; color: #7e8797; font-size: 9px; }
-.quiet-hours-controls input { width: 100%; height: 36px; padding: 0 9px; border: 1px solid #dce0e8; border-radius: 8px; color: #435069; background: #fff; font: inherit; }
+.quiet-hours-controls { width: calc(100% - 47px); box-sizing: border-box; margin: 0 0 14px 47px; padding: 11px; border: 1px solid #e2e5ed; border-radius: 11px; background: #fafbfe; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: end; gap: 9px; }
+.quiet-hours-controls label { min-width: 0; overflow: hidden; display: grid; gap: 5px; color: #7e8797; font-size: 9px; }
+.quiet-hours-controls input { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; height: 36px; padding: 0 7px; border: 1px solid #dce0e8; border-radius: 8px; color: #435069; background: #fff; font: inherit; }
 .quiet-hours-controls > span { padding-bottom: 10px; color: #a0a7b4; }
 .quiet-hours-controls button, .quiet-hours-save-off { min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; color: #fff; background: #6677ca; display: inline-flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 9px; font-weight: 700; }
 .quiet-hours-save-off { margin: 0 0 12px 47px; color: #667188; background: #eef0f5; }
@@ -1392,9 +1392,8 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .tracker-preview-frame { width: min(100%, 390px); }
   .tracker-customize-row, .tracker-camera-button, .tracker-share-actions, .tracker-share-help, .tracker-share-message { width: min(100%, 390px); }
   .tracker-share-actions button { min-height: 55px; }
-  .quiet-hours-controls { margin-left: 0; align-items: stretch; flex-wrap: wrap; }
-  .quiet-hours-controls label { min-width: calc(50% - 16px); }
-  .quiet-hours-controls button { width: 100%; }
+  .quiet-hours-controls { width: 100%; margin-left: 0; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; }
+  .quiet-hours-controls button { width: 100%; grid-column: 1 / -1; }
   .quiet-hours-save-off, .quiet-hours-message { margin-left: 0; }
   .group-push-control button span { display: none; }
   .group-push-control button { width: 30px; padding: 0; justify-content: center; }

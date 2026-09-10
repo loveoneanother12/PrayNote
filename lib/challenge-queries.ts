@@ -86,8 +86,10 @@ export function mapGroupChallengesBundleData(data: unknown): GroupChallengesBund
 export async function getGroupChallengesBundle(supabase: SupabaseClient, groupId: string): Promise<GroupChallengesBundle> {
   const { data, error } = await supabase.rpc("get_group_challenges_bundle", { target_group_id: groupId });
   if (error) {
-    if (error.code === "PGRST202" || error.code === "42883") return { active: null, history: [] };
-    throw error;
+    // Challenges are supplementary to the group page. Keep the group's core
+    // prayers available if challenge synchronization temporarily fails.
+    console.error("Failed to load group challenges", error);
+    return { active: null, history: [] };
   }
   return mapGroupChallengesBundleData(data);
 }
