@@ -3,6 +3,7 @@
 import { BellRing, Download, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { reportNetworkError } from "@/lib/network-status";
 
 type PushState = "checking" | "unsupported" | "needs-install" | "off" | "on" | "denied";
 type PushAction = "enable" | "disable" | "test" | null;
@@ -47,13 +48,18 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
         setState("denied");
         return;
       }
-      const registration = await navigator.serviceWorker.register("/sw.js");
-      await registration.update();
+      const registration = await navigator.serviceWorker.getRegistration() ?? await navigator.serviceWorker.register("/sw.js");
+      try { await registration.update(); } catch (error) { console.warn("Service worker update deferred", error); }
       const subscription = await registration.pushManager.getSubscription();
       setState(subscription && initialEnabled ? "on" : "off");
     }
 
-    inspect().catch(() => setState("unsupported"));
+    inspect().catch((error) => {
+      console.error("Failed to inspect browser push", error);
+      setState("off");
+      setMessage("푸시 상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.");
+      reportNetworkError(error);
+    });
   }, [initialEnabled, vapidPublicKey]);
 
   async function enablePush() {
@@ -69,7 +75,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
 
       const registration = await navigator.serviceWorker.register("/sw.js");
       await navigator.serviceWorker.ready;
-      await registration.update();
+      try { await registration.update(); } catch (error) { console.warn("Service worker update deferred", error); }
       const existing = await registration.pushManager.getSubscription();
       const subscription = existing ?? await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -106,6 +112,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       console.error("Failed to enable browser push", error);
       setState("off");
       setMessage("브라우저 푸시를 켜지 못했어요. 잠시 후 다시 시도해주세요.");
+      reportNetworkError(error);
     } finally {
       setWorkingAction(null);
     }
@@ -151,6 +158,7 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       console.error("Failed to disable browser push", error);
       setState("on");
       setMessage("브라우저 푸시 설정을 변경하지 못했어요.");
+      reportNetworkError(error);
     } finally {
       setWorkingAction(null);
     }
@@ -172,14 +180,14 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
   }
 
   const copy = state === "on"
-    ? { title: "브라우저 푸시 켜짐", description: "이 기기에서 새로운 기도 소식을 받을 수 있어요." }
+    ? { title: "브라우저 푸시 켜짐", description: "이 계정에 등록된 기기에서 새로운 기도 소식을 받을 수 있어요." }
     : state === "needs-install"
       ? { title: "홈 화면에 먼저 추가해주세요", description: "Safari 공유 버튼 → 홈 화면에 추가 후 PrayNote 앱에서 다시 켜주세요." }
       : state === "denied"
         ? { title: "알림 권한이 차단됐어요", description: "기기 설정에서 PrayNote의 알림 권한을 허용해주세요." }
         : state === "unsupported"
           ? { title: "이 브라우저에서는 사용할 수 없어요", description: "최신 Safari 또는 Chrome에서 홈 화면에 추가한 뒤 이용해주세요." }
-          : { title: "브라우저 푸시", description: "앱을 닫아도 새로운 기도 소식을 기기 알림으로 받아요." };
+          : { title: "브라우저 푸시", description: "이 계정의 모든 등록 기기에서 푸시 수신 여부를 함께 관리해요." };
 
   return (
     <div className="browser-push-setting">

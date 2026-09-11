@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./challenge.css";
+import { NetworkStatusDialog } from "@/components/network-status-dialog";
 
 export const metadata: Metadata = {
   title: "PrayNote — 함께 기도하는 공간",
@@ -28,7 +29,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>{children}<NetworkStatusDialog /></body>
     </html>
   );
 }

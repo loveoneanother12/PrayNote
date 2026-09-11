@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NotificationSummary, NotificationType } from "@/lib/domain";
 import { normalizeProfileColor } from "./profile-colors";
+import { retrySupabaseRead } from "./supabase/retry-read";
 
 export type NotificationRow = {
   id: string;
@@ -31,7 +32,7 @@ export function mapNotificationSummaryRow(row: NotificationSummaryRow): Notifica
 }
 
 export async function getNotificationsPageBundle(supabase: SupabaseClient, limit = 100) {
-  const { data, error } = await supabase.rpc("get_notifications_page_bundle_fast", { result_limit: limit });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_notifications_page_bundle_fast", { result_limit: limit }));
   if (error) throw error;
   if (!data) return null;
   const row = data as {

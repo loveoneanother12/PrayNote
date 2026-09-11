@@ -92,7 +92,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><Bell size={18} /></span><div><h2>인앱 알림</h2><p>PrayNote 안에서 받을 새 소식을 선택하세요.</p></div></div>
-            <InstantNotificationPreferencesForm initial={{
+            <InstantNotificationPreferencesForm userId={bundle.userId} initial={{
               inApp: preferences?.in_app_enabled ?? true,
               newPrayer: preferences?.new_prayer_enabled ?? true,
               prayerResponse: preferences?.prayer_response_enabled ?? true,

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ProfileColor } from "@/lib/domain";
 import { normalizeProfileColor } from "./profile-colors";
+import { retrySupabaseRead } from "./supabase/retry-read";
 
 export type SettingsBundle = {
   userId: string;
@@ -26,7 +27,7 @@ export type SettingsBundle = {
 };
 
 export async function getSettingsBundle(supabase: SupabaseClient): Promise<SettingsBundle | null> {
-  const { data, error } = await supabase.rpc("get_settings_bundle_fast");
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_settings_bundle_fast"));
   if (error) throw error;
   if (!data) return null;
   const row = data as {

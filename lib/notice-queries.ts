@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ProfileColor } from "@/lib/domain";
 import { normalizeProfileColor } from "@/lib/profile-colors";
+import { retrySupabaseRead } from "@/lib/supabase/retry-read";
 
 export type NoticeSummary = {
   id: string;
@@ -22,7 +23,7 @@ export type NoticesPageBundle = {
 };
 
 export async function getNoticesPageBundle(supabase: SupabaseClient): Promise<NoticesPageBundle | null> {
-  const { data, error } = await supabase.rpc("get_notices_page_bundle_fast");
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_notices_page_bundle_fast"));
   if (error) throw error;
   if (!data) return null;
   const row = data as {

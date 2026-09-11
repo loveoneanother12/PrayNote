@@ -4,7 +4,7 @@ import {
   ArrowLeft, ArrowRight, CalendarDays, Check, ChevronDown, CircleStop,
   Flame, LoaderCircle, Plus, Sparkles, Trophy, UserRoundCheck, Users, X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { CHALLENGE_KINDS, type ChallengeInviteMode, type ChallengeKind } from "@/lib/challenge-domain";
 import type { GroupRole } from "@/lib/domain";
@@ -12,6 +12,7 @@ import { mapGroupChallengesBundleData, type ChallengeWithDetails, type GroupChal
 import { ProfileDot } from "@/components/profile-dot";
 import { normalizeProfileColor } from "@/lib/profile-colors";
 import { createClient } from "@/lib/supabase/client";
+import { reportNetworkError } from "@/lib/network-status";
 
 type Props = { groupId: string; groupName: string; role: GroupRole; memberCount: number; initialBundle: GroupChallengesBundle };
 const DAY_MS = 86_400_000;
@@ -38,16 +39,22 @@ export function GroupChallenges({ groupId, groupName, role, memberCount, initial
   const isLeader = role === "leader";
   const today = koreaDateKey();
 
-  async function refreshBundle() {
+  const refreshBundle = useCallback(async () => {
     const { data, error } = await createClient().rpc("get_group_challenges_bundle", { target_group_id: groupId });
-    if (!error) setBundle(mapGroupChallengesBundleData(data));
-  }
+    if (error) {
+      setBundle((current) => ({ ...current, loadError: true }));
+      reportNetworkError(error.message);
+      return false;
+    }
+    setBundle({ ...mapGroupChallengesBundleData(data), loadError: false });
+    return true;
+  }, [groupId]);
 
   useEffect(() => {
     const refresh = () => { void refreshBundle(); };
     window.addEventListener("praynote:challenge-activity", refresh);
     return () => window.removeEventListener("praynote:challenge-activity", refresh);
-  });
+  }, [refreshBundle]);
 
   async function run(name: string, request: () => PromiseLike<{ error: { message: string } | null }>) {
     if (pending) return false;
@@ -62,6 +69,7 @@ export function GroupChallenges({ groupId, groupName, role, memberCount, initial
       return true;
     } catch (error) {
       console.error("Challenge request failed", error);
+      reportNetworkError(error);
       setMessage("연결이 불안정해 요청 결과를 확인하지 못했어요. 잠시 후 다시 시도해주세요.");
       return false;
     } finally {
@@ -83,7 +91,7 @@ export function GroupChallenges({ groupId, groupName, role, memberCount, initial
   return <section className="challenge-shell" aria-labelledby="group-challenge-title">
     <div className="challenge-section-heading"><div><span className="challenge-heading-icon"><Trophy size={18} /></span><div><p>함께 만드는 기도 습관</p><h2 id="group-challenge-title">기도 챌린지</h2></div></div></div>
     {message && <div className="challenge-inline-error" role="alert">{message}</div>}
-    {!bundle.active ? <div className="challenge-empty"><span><Sparkles size={20} /></span><div><strong>현재 진행 중인 챌린지가 없어요.</strong><p>경쟁 없이, 서로의 기도가 이어지는 시간을 만들어보세요.</p></div>{isLeader && <button type="button" onClick={() => setCreateOpen(true)}><Plus size={15} />챌린지 만들기</button>}</div> : <ChallengeCard challenge={bundle.active} today={today} groupName={groupName} memberCount={memberCount} isLeader={isLeader} pending={pending} onJoin={() => toggleJoin(bundle.active!.id)} onStop={() => stop(bundle.active!.id)} onExtend={() => extend(bundle.active!)} />}
+    {bundle.loadError ? <div className="challenge-empty challenge-load-error"><span><CircleStop size={20} /></span><div><strong>챌린지를 불러오지 못했어요.</strong><p>그룹 기도제목은 그대로 이용할 수 있어요.</p></div><button type="button" onClick={() => void refreshBundle()}>다시 시도</button></div> : !bundle.active ? <div className="challenge-empty"><span><Sparkles size={20} /></span><div><strong>현재 진행 중인 챌린지가 없어요.</strong><p>경쟁 없이, 서로의 기도가 이어지는 시간을 만들어보세요.</p></div>{isLeader && <button type="button" onClick={() => setCreateOpen(true)}><Plus size={15} />챌린지 만들기</button>}</div> : <ChallengeCard challenge={bundle.active} today={today} groupName={groupName} memberCount={memberCount} isLeader={isLeader} pending={pending} onJoin={() => toggleJoin(bundle.active!.id)} onStop={() => stop(bundle.active!.id)} onExtend={() => extend(bundle.active!)} />}
     <button className="challenge-history-toggle" type="button" onClick={() => setHistoryOpen((open) => !open)} aria-expanded={historyOpen}><span><CalendarDays size={15} />지난 챌린지 <em>{bundle.history.length}</em></span><ChevronDown className={historyOpen ? "open" : ""} size={16} /></button>
     {historyOpen && <div className="challenge-history-list">{bundle.history.length ? bundle.history.map((challenge) => <ChallengeCard key={challenge.id} challenge={challenge} today={today} groupName={groupName} memberCount={memberCount} isLeader={false} pending={pending} onJoin={() => {}} onStop={() => {}} onExtend={() => {}} compact />) : <div className="challenge-history-empty">완료한 챌린지가 이곳에 차곡차곡 쌓여요.</div>}</div>}
     {createOpen && <CreateModal groupId={groupId} groupName={groupName} today={today} pending={pending === "create"} onClose={() => setCreateOpen(false)} onSubmit={async (input) => { const success = await run("create", () => createClient().rpc("create_group_challenge", input)); if (success) setCreateOpen(false); }} />}

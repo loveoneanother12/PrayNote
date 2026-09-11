@@ -45,12 +45,24 @@ export async function proxy(request: NextRequest) {
   });
 
   // Validates the JWT and refreshes expired tokens before Server Components run.
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
-  const isAuthenticated = !claimsError && Boolean(claimsData?.claims?.sub);
+  let { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const transientAuthFailure = (error: typeof claimsError) => Boolean(error && (
+    Number(error.status ?? 0) >= 500
+    || /fetch|network|timeout|connection/i.test(error.message)
+  ));
+  if (transientAuthFailure(claimsError)) {
+    const retried = await supabase.auth.getClaims();
+    claimsData = retried.data;
+    claimsError = retried.error;
+  }
+  const hasAuthCookie = request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token"));
+  // A transient Auth outage must not erase a valid-looking local session. RLS
+  // still protects every data request made by the destination page.
+  const isAuthenticated = (!claimsError && Boolean(claimsData?.claims?.sub)) || (hasAuthCookie && transientAuthFailure(claimsError));
   const pathname = request.nextUrl.pathname;
   const nextPath = `${pathname}${request.nextUrl.search}`;
 
-  if (claimsError && request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token"))) {
+  if (claimsError && hasAuthCookie) {
     console.warn("Auth session validation failed", {
       code: claimsError.code,
       status: claimsError.status,

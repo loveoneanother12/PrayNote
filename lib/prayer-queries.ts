@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { PrayerStatus, PrayerSummary } from "@/lib/domain";
 import { normalizeProfileColor } from "./profile-colors";
+import { retrySupabaseRead } from "./supabase/retry-read";
 
 type PrayerFilters = {
   groupIds?: string[];
@@ -75,7 +76,7 @@ type PrayerPageBundleRow = {
 };
 
 export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
-  const { data, error } = await supabase.rpc("get_my_prayers_bundle_fast");
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_my_prayers_bundle_fast"));
   if (error) throw error;
   if (!data) return null;
   const row = data as PrayerPageBundleRow;
@@ -96,7 +97,7 @@ export async function getMyPrayersPageBundle(supabase: SupabaseClient) {
 }
 
 export async function getPrayerDetailPageBundle(supabase: SupabaseClient, prayerId: string) {
-  const { data, error } = await supabase.rpc("get_prayer_detail_bundle_fast", { target_prayer_id: prayerId });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_prayer_detail_bundle_fast", { target_prayer_id: prayerId }));
   if (error) throw error;
   if (!data) return null;
   const row = data as Omit<PrayerPageBundleRow, "prayers"> & { prayer?: PrayerSummaryRow | null };
@@ -104,7 +105,7 @@ export async function getPrayerDetailPageBundle(supabase: SupabaseClient, prayer
 }
 
 export async function getSearchPrayerPageBundle(supabase: SupabaseClient, search: string) {
-  const { data, error } = await supabase.rpc("search_prayers_bundle_fast", { target_search: search, target_limit: 50 });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("search_prayers_bundle_fast", { target_search: search, target_limit: 50 }));
   if (error) throw error;
   if (!data) return null;
   const row = data as PrayerPageBundleRow;
@@ -119,7 +120,7 @@ export async function getPrayerSummaries(
   if (filters.groupIds && filters.groupIds.length === 0) return [];
   if (filters.prayerIds && filters.prayerIds.length === 0) return [];
 
-  const { data, error } = await supabase.rpc("get_prayer_summaries_fast", {
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_prayer_summaries_fast", {
     target_group_ids: filters.groupIds ?? null,
     target_prayer_ids: filters.prayerIds ?? null,
     target_author_id: filters.authorId ?? null,
@@ -129,7 +130,7 @@ export async function getPrayerSummaries(
     target_personal_only: filters.personalOnly ?? false,
     expand_groups: filters.expandGroups ?? false,
     member_groups_only: filters.memberGroupsOnly ?? false,
-  });
+  }));
 
   if (error) throw error;
 

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ProfileDot } from "@/components/profile-dot";
 import type { ProfileColor } from "@/lib/domain";
 import { PROFILE_COLORS } from "@/lib/profile-colors";
+import { reportNetworkError } from "@/lib/network-status";
 
 function SaveButton({ pending, children }: { pending: boolean; children: ReactNode }) {
   return <button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending}>{pending ? <><LoaderCircle className="button-spinner" size={15} />저장 중…</> : children}</button>;
@@ -70,10 +71,13 @@ export function InstantProfileForm({ userId, displayName, email, initialColor }:
     const name = String(form.get("displayName") ?? "").trim();
     if (name.length < 2 || name.length > 30) return setMessage("이름은 2~30자로 입력해주세요.");
     setPending(true); setMessage("");
-    const supabase = createClient();
-    const { data, error } = await supabase.from("profiles").update({ display_name: name, profile_color: color }).eq("id", userId).select("id").maybeSingle();
-    setPending(false); setMessage(error || !data ? "저장하지 못했어요." : "저장했어요.");
-    if (!error && data) startTransition(() => router.refresh());
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.from("profiles").update({ display_name: name, profile_color: color }).eq("id", userId).select("id").single();
+      setMessage(error || !data ? "저장하지 못했어요." : "저장했어요.");
+      if (!error && data) startTransition(() => router.refresh());
+    } catch (error) { reportNetworkError(error); setMessage("저장하지 못했어요."); }
+    finally { setPending(false); }
   }
   return <form onSubmit={save} className="profile-settings-form">
     <label htmlFor="display-name">표시 이름</label>
@@ -102,10 +106,13 @@ export function InstantPasswordForm() {
     if (password.length < 8 || password.length > 72) return setMessage("비밀번호는 8자 이상으로 입력해주세요.");
     if (password !== form.get("passwordConfirm")) return setMessage("입력한 비밀번호가 서로 다릅니다.");
     setPending(true); setMessage("");
-    const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ password });
-    setPending(false); setMessage(error ? "저장하지 못했어요." : "비밀번호를 저장했어요.");
-    if (!error) formElement.reset();
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password });
+      setMessage(error ? "저장하지 못했어요." : "비밀번호를 저장했어요.");
+      if (!error) formElement.reset();
+    } catch (error) { reportNetworkError(error); setMessage("저장하지 못했어요."); }
+    finally { setPending(false); }
   }
   return <form onSubmit={save} className="password-settings-form"><label htmlFor="new-password">새 비밀번호 입력</label><input id="new-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="8자 이상" required /><label htmlFor="new-password-confirm">비밀번호 확인</label><input id="new-password-confirm" name="passwordConfirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} placeholder="비밀번호를 한 번 더 입력" required /><p>{message || "저장 후에는 새 비밀번호로 로그인할 수 있습니다."}</p><SaveButton pending={pending}><Check size={16} />비밀번호 저장</SaveButton></form>;
 }
@@ -145,7 +152,7 @@ export function PasswordChangeSetting() {
 
 type PreferenceProps = { inApp: boolean; newPrayer: boolean; prayerResponse: boolean; membership: boolean; notice: boolean; challenge: boolean };
 
-export function InstantNotificationPreferencesForm({ initial, children }: { initial: PreferenceProps; children: ReactNode }) {
+export function InstantNotificationPreferencesForm({ userId, initial, children }: { userId: string; initial: PreferenceProps; children: ReactNode }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -153,16 +160,19 @@ export function InstantNotificationPreferencesForm({ initial, children }: { init
     if (pending) return;
     const form = new FormData(event.currentTarget);
     setPending(true); setMessage("");
-    const supabase = createClient();
-    const { error } = await supabase.from("notification_preferences").update({
-      in_app_enabled: form.get("inAppEnabled") === "on",
-      new_prayer_enabled: form.get("newPrayerEnabled") === "on",
-      prayer_response_enabled: form.get("prayerResponseEnabled") === "on",
-      membership_enabled: form.get("membershipEnabled") === "on",
-      notice_enabled: form.get("noticeEnabled") === "on",
-      challenge_enabled: form.get("challengeEnabled") === "on",
-    });
-    setPending(false); setMessage(error ? "저장하지 못했어요." : "저장했어요.");
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.from("notification_preferences").update({
+        in_app_enabled: form.get("inAppEnabled") === "on",
+        new_prayer_enabled: form.get("newPrayerEnabled") === "on",
+        prayer_response_enabled: form.get("prayerResponseEnabled") === "on",
+        membership_enabled: form.get("membershipEnabled") === "on",
+        notice_enabled: form.get("noticeEnabled") === "on",
+        challenge_enabled: form.get("challengeEnabled") === "on",
+      }).eq("user_id", userId).select("user_id").single();
+      setMessage(error || !data ? "저장하지 못했어요." : "저장했어요.");
+    } catch (error) { reportNetworkError(error); setMessage("저장하지 못했어요."); }
+    finally { setPending(false); }
   }
   return <form onSubmit={save} className="notification-settings-form" data-initial={JSON.stringify(initial)}>{children}<div className="settings-save-row"><span>{message || "기존 알림은 유지되고 새로 발생하는 알림부터 적용됩니다."}</span><SaveButton pending={pending}>알림 설정 저장</SaveButton></div></form>;
 }

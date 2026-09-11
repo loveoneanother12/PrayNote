@@ -3,6 +3,7 @@ import type { GroupRole, GroupSummary, NotificationSummary, PrayerSummary, Profi
 import { mapNotificationSummaryRow, type NotificationSummaryRow } from "@/lib/notification-queries";
 import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
 import { normalizeProfileColor } from "./profile-colors";
+import { retrySupabaseRead } from "./supabase/retry-read";
 
 type DashboardOverviewRow = {
   display_name?: string | null;
@@ -38,7 +39,7 @@ export type DashboardBundle = DashboardOverview & {
 };
 
 export async function getDashboardOverview(supabase: SupabaseClient): Promise<DashboardOverview | null> {
-  const { data, error } = await supabase.rpc("get_dashboard_overview");
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_dashboard_overview"));
   if (error) throw error;
   if (!data) return null;
 
@@ -60,7 +61,7 @@ export async function getDashboardOverview(supabase: SupabaseClient): Promise<Da
 }
 
 export async function getDashboardBundle(supabase: SupabaseClient): Promise<DashboardBundle | null> {
-  const { data, error } = await supabase.rpc("get_dashboard_bundle_fast");
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_dashboard_bundle_fast"));
   if (error) throw error;
   if (!data) return null;
   const bundle = data as {

@@ -42,6 +42,7 @@ export type ChallengeWithDetails = PrayerChallenge & {
 export type GroupChallengesBundle = {
   active: ChallengeWithDetails | null;
   history: ChallengeWithDetails[];
+  loadError?: boolean;
 };
 
 function mapChallenge(row: RawChallenge): ChallengeWithDetails {
@@ -89,7 +90,7 @@ export async function getGroupChallengesBundle(supabase: SupabaseClient, groupId
     // Challenges are supplementary to the group page. Keep the group's core
     // prayers available if challenge synchronization temporarily fails.
     console.error("Failed to load group challenges", error);
-    return { active: null, history: [] };
+    return { active: null, history: [], loadError: true };
   }
   return mapGroupChallengesBundleData(data);
 }

@@ -58,5 +58,14 @@ describe("installable PrayNote PWA", () => {
     expect(disableFlow).toContain("update({ push_enabled: false })");
     expect(disableFlow).not.toContain("if (!count)");
     expect(disableFlow.indexOf("update({ push_enabled: false })")).toBeLessThan(disableFlow.indexOf("subscription.unsubscribe()"));
+    expect(settings).toContain("이 계정의 모든 등록 기기");
+  });
+
+  it("shows a global dialog when the device loses its network", () => {
+    const layout = readFileSync(join(process.cwd(), "app/layout.tsx"), "utf8");
+    const dialog = readFileSync(join(process.cwd(), "components/network-status-dialog.tsx"), "utf8");
+    expect(layout).toContain("<NetworkStatusDialog />");
+    expect(dialog).toContain('window.addEventListener("offline"');
+    expect(dialog).toContain("네트워크 연결이 원활하지 않습니다.");
   });
 });

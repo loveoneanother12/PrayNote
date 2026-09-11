@@ -3,6 +3,7 @@
 import { LoaderCircle, MoonStar } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { reportNetworkError } from "@/lib/network-status";
 
 export function QuietHoursSettings({ userId, initialEnabled, initialStart, initialEnd }: { userId: string; initialEnabled: boolean; initialStart: string; initialEnd: string }) {
   const [enabled, setEnabled] = useState(initialEnabled);
@@ -16,14 +17,16 @@ export function QuietHoursSettings({ userId, initialEnabled, initialStart, initi
     if (enabled && start === end) return setMessage("시작 시간과 종료 시간을 다르게 설정해주세요.");
     setPending(true);
     setMessage("");
-    const supabase = createClient();
-    const { error } = await supabase.from("notification_preferences").update({
-      quiet_hours_enabled: enabled,
-      quiet_start: `${start}:00`,
-      quiet_end: `${end}:00`,
-    }).eq("user_id", userId);
-    setMessage(error ? "방해금지 시간을 저장하지 못했어요." : enabled ? "방해금지 시간을 저장했어요." : "방해금지를 껐어요.");
-    setPending(false);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.from("notification_preferences").update({
+        quiet_hours_enabled: enabled,
+        quiet_start: `${start}:00`,
+        quiet_end: `${end}:00`,
+      }).eq("user_id", userId).select("user_id").single();
+      setMessage(error || !data ? "방해금지 시간을 저장하지 못했어요." : enabled ? "방해금지 시간을 저장했어요." : "방해금지를 껐어요.");
+    } catch (error) { reportNetworkError(error); setMessage("방해금지 시간을 저장하지 못했어요."); }
+    finally { setPending(false); }
   }
 
   return <div className="quiet-hours-setting">

@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { GroupRole, MembershipStatus } from "@/lib/domain";
 import { mapPrayerSummaryRow, type PrayerSummaryRow } from "@/lib/prayer-queries";
 import { normalizeProfileColor } from "./profile-colors";
+import { retrySupabaseRead } from "./supabase/retry-read";
 
 type GroupPageOverviewRow = {
   display_name?: string | null;
@@ -31,7 +32,7 @@ function mapGroupPageOverview(row: GroupPageOverviewRow) {
 }
 
 export async function getGroupPageOverview(supabase: SupabaseClient, groupId: string) {
-  const { data, error } = await supabase.rpc("get_group_page_overview", { target_group_id: groupId });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_group_page_overview", { target_group_id: groupId }));
   if (error) throw error;
   if (!data) return null;
 
@@ -40,7 +41,7 @@ export async function getGroupPageOverview(supabase: SupabaseClient, groupId: st
 }
 
 export async function getGroupPageBundle(supabase: SupabaseClient, groupId: string) {
-  const { data, error } = await supabase.rpc("get_group_page_bundle_fast", { target_group_id: groupId });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_group_page_bundle_fast", { target_group_id: groupId }));
   if (error) throw error;
   if (!data) return null;
   const row = data as {
@@ -69,7 +70,7 @@ type GroupManageOverviewRow = {
 };
 
 export async function getGroupManageOverview(supabase: SupabaseClient, groupId: string) {
-  const { data, error } = await supabase.rpc("get_group_manage_overview", { target_group_id: groupId });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_group_manage_overview", { target_group_id: groupId }));
   if (error) throw error;
   if (!data) return null;
 
@@ -84,7 +85,7 @@ export async function getGroupManageOverview(supabase: SupabaseClient, groupId: 
 }
 
 export async function getGroupManageBundle(supabase: SupabaseClient, groupId: string) {
-  const { data, error } = await supabase.rpc("get_group_manage_bundle_fast", { target_group_id: groupId });
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_group_manage_bundle_fast", { target_group_id: groupId }));
   if (error) throw error;
   if (!data) return null;
   const row = data as { user_id: string; email?: string | null; overview?: GroupManageOverviewRow | null };
