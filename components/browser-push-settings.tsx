@@ -94,7 +94,9 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
 
       const { error: preferenceError } = await supabase.from("notification_preferences")
         .update({ push_enabled: true })
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select("push_enabled")
+        .single();
       if (preferenceError) throw preferenceError;
 
       setState("on");
@@ -121,13 +123,26 @@ export function BrowserPushSettings({ initialEnabled, vapidPublicKey }: BrowserP
       const userId = sessionData.session?.user.id;
       if (!userId) throw new Error("session_missing");
 
+      // OFF is an account-level preference. Persist it regardless of stale or
+      // additional device subscriptions so a later app launch cannot restore ON.
+      const { error: preferenceError } = await supabase.from("notification_preferences")
+        .update({ push_enabled: false })
+        .eq("user_id", userId)
+        .select("push_enabled")
+        .single();
+      if (preferenceError) throw preferenceError;
+
       if (subscription) {
-        await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
-        await subscription.unsubscribe();
-      }
-      const { count } = await supabase.from("push_subscriptions").select("id", { count: "exact", head: true });
-      if (!count) {
-        await supabase.from("notification_preferences").update({ push_enabled: false }).eq("user_id", userId);
+        const { error: subscriptionError } = await supabase.from("push_subscriptions")
+          .delete()
+          .eq("user_id", userId)
+          .eq("endpoint", subscription.endpoint);
+        if (subscriptionError) console.warn("Push preference saved, but subscription cleanup failed", subscriptionError);
+        try {
+          await subscription.unsubscribe();
+        } catch (unsubscribeError) {
+          console.warn("Push preference saved, but browser unsubscribe failed", unsubscribeError);
+        }
       }
       setState("off");
       window.dispatchEvent(new CustomEvent("praynote:push-status", { detail: { enabled: false } }));

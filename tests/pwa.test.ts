@@ -51,4 +51,12 @@ describe("installable PrayNote PWA", () => {
     expect(pendingButton).toContain("disabled={disabled || pending}");
     expect(pendingButton).toContain('aria-busy={pending}');
   });
+
+  it("persists browser push OFF independently of other device subscriptions", () => {
+    const settings = readFileSync(join(process.cwd(), "components/browser-push-settings.tsx"), "utf8");
+    const disableFlow = settings.slice(settings.indexOf("async function disablePush"), settings.indexOf("async function sendTest"));
+    expect(disableFlow).toContain("update({ push_enabled: false })");
+    expect(disableFlow).not.toContain("if (!count)");
+    expect(disableFlow.indexOf("update({ push_enabled: false })")).toBeLessThan(disableFlow.indexOf("subscription.unsubscribe()"));
+  });
 });
