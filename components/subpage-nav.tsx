@@ -18,13 +18,13 @@ export function SubpageNav({ displayName, profileColor = "indigo", active, unrea
         <span>PrayNote</span>
       </Link>
       <nav className="side-nav">
-        <Link className="nav-item" href="/dashboard"><Home size={19} />홈</Link>
-        <Link className={`nav-item ${active === "groups" ? "active" : ""}`} href="/groups"><Users size={19} />내 그룹</Link>
-        <Link className={`nav-item ${active === "prayers" ? "active" : ""}`} href="/prayers"><BookHeart size={19} />마이</Link>
-        <Link className={`nav-item ${active === "notifications" ? "active" : ""}`} href="/notifications"><Bell size={19} />알림{unreadNotificationCount > 0 && <span className="nav-count">{unreadNotificationCount}</span>}</Link>
+        <Link className="nav-item" href="/dashboard" prefetch><Home size={19} />홈</Link>
+        <Link className={`nav-item ${active === "groups" ? "active" : ""}`} href="/groups" prefetch><Users size={19} />내 그룹</Link>
+        <Link className={`nav-item ${active === "prayers" ? "active" : ""}`} href="/prayers" prefetch><BookHeart size={19} />마이</Link>
+        <Link className={`nav-item ${active === "notifications" ? "active" : ""}`} href="/notifications" prefetch><Bell size={19} />알림{unreadNotificationCount > 0 && <span className="nav-count">{unreadNotificationCount}</span>}</Link>
       </nav>
       <div className="side-spacer" />
-      <Link className={`nav-item ${active === "settings" ? "active" : ""}`} href="/settings"><Settings size={19} />설정</Link>
+      <Link className={`nav-item ${active === "settings" ? "active" : ""}`} href="/settings" prefetch><Settings size={19} />설정</Link>
       <div className="profile-mini simple-profile">
         <ProfileDot color={profileColor} label={displayName} />
         <div><strong>{displayName}</strong><span>함께 기도해요</span></div>

@@ -1284,6 +1284,15 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
 .group-order-actions { margin-top: 18px; display: flex; justify-content: flex-end; gap: 8px; }
 .groups-loading-page { padding-top: 73px; }
 .skeleton-block { border-radius: 16px; background: linear-gradient(90deg, #eff1f5 25%, #f7f8fa 50%, #eff1f5 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.35s infinite linear; }
+.tab-page-loading .detail-content { padding-top: 34px; }
+.tab-loading-back { width: 112px; height: 18px; border-radius: 7px; }
+.tab-loading-pill { width: 98px; height: 32px; border-radius: 16px; }
+.tab-loading-hero { height: 172px; border-radius: 18px; }
+.tab-loading-panel { height: 260px; margin-top: 24px; border-radius: 18px; }
+.tab-loading-panel.short { height: 150px; }
+.challenge-shell-loading { display: grid; gap: 12px; }
+.challenge-shell-loading .skeleton-block:first-child { width: 190px; height: 36px; }
+.challenge-shell-loading .skeleton-block:last-child { height: 150px; }
 .groups-hero-skeleton { height: 180px; }
 .groups-loading-grid { margin-top: 72px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
 .groups-loading-grid .skeleton-block { height: 205px; }

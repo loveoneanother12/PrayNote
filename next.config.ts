@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   agentRules: false,
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    // Keep recently visited authenticated screens in the client router so
+    // switching between the fixed tabs does not repeat the same server read.
+    staleTimes: {
+      dynamic: 30,
+      static: 30,
+    },
   },
   async headers() {
     return [{

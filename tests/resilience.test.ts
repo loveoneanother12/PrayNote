@@ -15,6 +15,7 @@ describe("network and partial-failure resilience", () => {
   it("retries transient auth validation without treating it as a logout", () => {
     const proxy = read("proxy.ts");
     expect(proxy.match(/supabase\.auth\.getClaims\(\)/g)).toHaveLength(2);
+    expect(proxy).toContain("hasSessionHint");
     expect(proxy).toContain("hasAuthCookie && transientAuthFailure");
   });
 

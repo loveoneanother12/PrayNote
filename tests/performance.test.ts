@@ -6,12 +6,49 @@ const root = process.cwd();
 const read = (path: string) => readFileSync(join(root, path), "utf8");
 
 describe("performance read paths", () => {
-  it("verifies claims locally instead of making a remote user lookup on page renders", () => {
+  it("uses the local session as a routing hint and retains verified claims on auth entry points", () => {
     const auth = read("lib/auth.ts");
     const proxy = read("proxy.ts");
     expect(auth).toContain("auth.getClaims()");
+    expect(proxy).toContain("auth.getSession()");
     expect(proxy).toContain("auth.getClaims()");
+    expect(proxy).toContain("mustVerifyClaims");
     expect(`${auth}\n${proxy}`).not.toContain("auth.getUser()");
+  });
+
+  it("prefetches the fixed tabs and briefly reuses their server payloads", () => {
+    const mobileNav = read("components/mobile-nav.tsx");
+    const desktopNav = read("components/subpage-nav.tsx");
+    const config = read("next.config.ts");
+    expect(mobileNav).toContain('href="/groups" prefetch');
+    expect(mobileNav).toContain('href="/prayers" prefetch');
+    expect(desktopNav).toContain('href="/settings" prefetch');
+    expect(config).toContain("staleTimes");
+    expect(config).toContain("dynamic: 30");
+  });
+
+  it("keeps tab navigation visible while an uncached screen is loading", () => {
+    const loading = read("components/tab-page-loading.tsx");
+    expect(loading).toContain("<MobileNav active={active}");
+    for (const route of ["dashboard", "prayers", "settings", "notifications"]) {
+      expect(read(`app/${route}/loading.tsx`)).toContain("<TabPageLoading");
+    }
+  });
+
+  it("streams supplementary challenge data without blocking the group prayer screen", () => {
+    const groupPage = read("app/groups/[groupId]/page.tsx");
+    const section = read("components/group-challenges-section.tsx");
+    expect(groupPage).toContain("<Suspense fallback=");
+    expect(groupPage).toContain("<GroupChallengesSection");
+    expect(groupPage).not.toContain("getGroupChallengesBundle(supabase");
+    expect(section).toContain("getGroupChallengesBundle(supabase, groupId)");
+  });
+
+  it("scopes challenge progress to prayers shared with that challenge group", () => {
+    const challengeSchema = read("supabase/migrations/202609100003_group_prayer_challenges.sql");
+    expect(challengeSchema).toContain("where share.prayer_id = response_row.prayer_id");
+    expect(challengeSchema).toContain("challenge.group_id = share.group_id");
+    expect(challengeSchema).toContain("other_share.group_id = candidate.group_id");
   });
 
   it("loads each prayer and notification list in one RPC", () => {
