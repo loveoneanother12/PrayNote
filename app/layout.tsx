@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "PrayNote — 함께 기도하는 공간",
   description: "신뢰하는 공동체 안에서 기도제목을 나누고 함께 기도해요.",
   applicationName: "PrayNote",
-  manifest: "/manifest.webmanifest",
+  manifest: "/manifest-20260912.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/icon-192-20260912.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512-20260912.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/icons/apple-touch-icon-20260912.png", sizes: "180x180", type: "image/png" }],
   },
 };
 

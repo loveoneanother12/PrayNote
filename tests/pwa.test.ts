@@ -1,11 +1,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import manifest from "../app/manifest";
 
 describe("installable PrayNote PWA", () => {
   it("uses standalone display mode and install icons", () => {
-    const value = manifest();
+    const value = JSON.parse(readFileSync(join(process.cwd(), "public/manifest-20260912.webmanifest"), "utf8"));
     expect(value.display).toBe("standalone");
     expect(value.start_url).toBe("/");
     expect(value.icons).toEqual(expect.arrayContaining([

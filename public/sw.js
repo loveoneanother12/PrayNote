@@ -1,5 +1,5 @@
-const CACHE_NAME = "praynote-static-v3";
-const APP_SHELL = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/apple-touch-icon.png"];
+const CACHE_NAME = "praynote-static-v4";
+const APP_SHELL = ["/manifest-20260912.webmanifest", "/icons/icon-192-20260912.png", "/icons/apple-touch-icon-20260912.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -59,7 +59,7 @@ self.addEventListener("push", (event) => {
 
   event.waitUntil(self.registration.showNotification(payload.title, {
     body: payload.body,
-    icon: "/icons/icon-192.png",
+    icon: "/icons/icon-192-20260912.png",
     badge: "/icons/badge-96.png",
     tag: payload.notificationId,
     data: { url: payload.url },
