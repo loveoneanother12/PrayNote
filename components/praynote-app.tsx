@@ -29,6 +29,7 @@ import { NotificationRealtime } from "@/components/notification-realtime";
 import { MobileNav } from "@/components/mobile-nav";
 import { MobilePrayerSearch } from "@/components/mobile-prayer-search";
 import { InstallGuideModal } from "@/components/install-guide-modal";
+import { InstallCampaignModal } from "@/components/install-campaign-modal";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
@@ -153,7 +154,8 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
         <header className="topbar">
           <a className="mobile-brand" href="#top"><span className="brand-mark"><BookHeart size={19} /></span>PrayNote</a>
           <form className="search-box" action="/search" method="get"><Search size={18} /><input name="q" aria-label="기도제목 검색" placeholder="기도제목 검색" /><kbd>⌘ K</kbd></form>
-          <InstallGuideModal initialOpen={initialGuideOpen} onCompleteHref={guideNextPath} autoPrompt />
+          <InstallGuideModal initialOpen={initialGuideOpen} onCompleteHref={guideNextPath} />
+          <InstallCampaignModal disabled={initialGuideOpen} />
           <MobilePrayerSearch />
           <Link className="icon-button notification-button" href="/notifications" aria-label={`읽지 않은 알림 ${unreadNotificationCount}개`}><Bell size={20} />{unreadNotificationCount > 0 && <span />}</Link>
           <ProfileDot color={profileColor} label={displayName} className="top-avatar" />

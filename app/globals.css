@@ -258,6 +258,24 @@ button { color: inherit; }
 .guide-reminder-actions button { min-height: 35px; padding: 0 14px; border: 1px solid #dfe3eb; border-radius: 9px; color: #717d91; background: #fff; cursor: pointer; font-size: 9px; font-weight: 600; }
 .guide-reminder-actions button.primary { color: #fff; border-color: #5c71d1; background: #5c71d1; }
 
+.install-campaign-backdrop { position: fixed; inset: 0; z-index: 86; padding: 18px; background: rgba(27, 34, 52, .52); backdrop-filter: blur(5px); display: grid; place-items: center; animation: fade-in .15s ease-out; }
+.install-campaign-modal { position: relative; width: min(520px, 100%); max-height: calc(100dvh - 36px); box-sizing: border-box; padding: 25px; border-radius: 23px; background: #fff; box-shadow: 0 24px 80px rgba(24, 33, 58, .25); overflow-y: auto; overscroll-behavior: contain; text-align: center; }
+.install-campaign-close { position: absolute; top: 15px; right: 15px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; color: #7d8799; background: #f2f4f7; display: grid; place-items: center; cursor: pointer; }
+.install-campaign-icon { width: 47px; height: 47px; margin: 0 auto 10px; border-radius: 15px; color: #fff; background: linear-gradient(145deg, #7185df, #5368ca); box-shadow: 0 9px 22px rgba(78, 99, 194, .2); display: grid; place-items: center; }
+.install-campaign-eyebrow { margin: 0 0 7px; color: #6175d2; font-size: 10px; font-weight: 750; }
+.install-campaign-modal h2 { margin: 0; color: #2e3a50; font-size: 20px; font-weight: 680; line-height: 1.42; letter-spacing: -.035em; word-break: keep-all; }
+.install-campaign-description { max-width: 410px; margin: 10px auto 16px; color: #778297; font-size: 11px; line-height: 1.6; word-break: keep-all; }
+.install-campaign-tabs { width: 100%; padding: 4px; border-radius: 12px; background: #eff1f6; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.install-campaign-tabs button { min-height: 34px; border: 0; border-radius: 9px; color: #7b8596; background: transparent; cursor: pointer; font-size: 10px; font-weight: 650; }
+.install-campaign-tabs button.active { color: #4e64c4; background: #fff; box-shadow: 0 3px 10px rgba(40, 52, 91, .08); }
+.install-campaign-guide { margin-top: 12px; padding: 10px; border: 1px solid #e2e6ef; border-radius: 16px; background: #fafbfe; }
+.install-campaign-guide img { width: 100%; height: auto; border-radius: 12px; display: block; }
+.install-campaign-steps { padding: 10px 3px 1px; display: grid; gap: 7px; text-align: left; }
+.install-campaign-steps span { color: #5d697e; display: flex; align-items: center; gap: 7px; font-size: 10px; line-height: 1.45; }
+.install-campaign-steps svg { flex: 0 0 auto; color: #5c71d0; }
+.install-campaign-confirm { width: 100%; min-height: 43px; margin-top: 13px; border: 0; border-radius: 11px; color: #fff; background: #5b70d2; cursor: pointer; font-size: 11px; font-weight: 700; }
+.install-campaign-expiry { margin-top: 9px; color: #a0a8b5; display: block; font-size: 8px; }
+
 /* Super-admin center */
 .settings-admin-link { margin-bottom: 12px; padding: 16px 18px; border: 1px solid #dce2fb; border-radius: 16px; color: #34415b; background: linear-gradient(120deg, #f4f6ff, #fff); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; text-decoration: none; box-shadow: 0 8px 24px rgba(67,84,160,.06); }
 .settings-admin-icon { width: 40px; height: 40px; border-radius: 12px; color: #fff; background: linear-gradient(145deg, #687dde, #4e63c6); display: grid; place-items: center; }
