@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { BookHeart, Check, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { Check, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { signInWithPassword, signUpWithPassword } from "./actions";
 import { GoogleAuthButton } from "@/components/google-auth-button";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { BrandMark } from "@/components/brand-mark";
 
 type LoginPageProps = {
   searchParams: Promise<{ error?: string; next?: string; mode?: string; notice?: string }>;
@@ -36,7 +37,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="auth-page">
       <section className="auth-story">
         <Link className="brand auth-brand" href="/">
-          <span className="brand-mark"><BookHeart size={22} /></span>
+          <BrandMark />
           <span>PrayNote</span>
         </Link>
         <div className="auth-story-copy">

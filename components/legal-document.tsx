@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, BookHeart, FileText, ShieldCheck } from "lucide-react";
+import { ArrowLeft, FileText, ShieldCheck } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 type LegalDocumentProps = {
   kind: "privacy" | "terms";
@@ -14,7 +15,7 @@ export function LegalDocument({ kind, eyebrow, title, effectiveDate, children }:
     <main className="legal-page">
       <header className="legal-topbar">
         <Link className="brand legal-brand" href="/">
-          <span className="brand-mark"><BookHeart size={21} /></span>
+          <BrandMark />
           <span>PrayNote</span>
         </Link>
         <Link className="legal-back-link" href="/login">

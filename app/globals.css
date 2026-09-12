@@ -26,7 +26,8 @@ button { color: inherit; }
 .sidebar { position: fixed; inset: 0 auto 0 0; width: 246px; padding: 28px 20px 22px; background: #fff; border-right: 1px solid var(--line); display: flex; flex-direction: column; z-index: 20; }
 .brand, .mobile-brand { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.04em; }
 .brand { padding: 0 10px 31px; }
-.brand-mark { width: 39px; height: 39px; display: inline-flex; align-items: center; justify-content: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #7386e4, #4e63c5); box-shadow: 0 8px 20px rgba(78, 99, 197, .24); }
+.brand-mark { width: 39px; height: 39px; display: inline-flex; align-items: center; justify-content: center; border-radius: 13px; color: #fff; background: transparent; box-shadow: 0 8px 20px rgba(78, 99, 197, .24); overflow: hidden; }
+.brand-mark img { width: 100%; height: 100%; border-radius: inherit; display: block; }
 .side-nav { display: grid; gap: 6px; }
 .nav-item { min-height: 45px; display: flex; align-items: center; gap: 13px; padding: 0 13px; border-radius: 11px; text-decoration: none; color: #69758a; font-weight: 650; font-size: 14px; }
 .nav-item:hover { background: #f5f6fa; color: var(--ink); }
@@ -286,7 +287,7 @@ button { color: inherit; }
 .admin-shell { min-height: 100dvh; color: #273248; background: #f4f6fa; display: grid; grid-template-columns: 238px minmax(0, 1fr); }
 .admin-sidebar { position: sticky; top: 0; height: 100dvh; padding: 24px 18px; border-right: 1px solid #e2e6ee; background: #fff; display: flex; flex-direction: column; }
 .admin-brand { padding: 4px 7px 22px; color: #252f43; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.admin-brand > span { width: 38px; height: 38px; border-radius: 11px; color: #fff; background: #5b70d3; display: grid; place-items: center; }
+.admin-brand > span { width: 38px; height: 38px; border-radius: 11px; color: #fff; background: transparent; display: grid; place-items: center; }
 .admin-brand > div { display: grid; gap: 2px; }
 .admin-brand strong { font-size: 17px; font-weight: 700; }
 .admin-brand small { color: #8791a3; font-size: 8px; font-weight: 700; letter-spacing: .12em; }
@@ -970,6 +971,7 @@ button { color: inherit; }
 .state-page { min-height: 100vh; padding: 24px; background: radial-gradient(circle at 18% 15%, #eef1ff, transparent 27%), var(--canvas); display: grid; place-items: center; }
 .state-card { width: min(470px, 100%); padding: 42px 35px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 22px 65px rgba(39,50,78,.1); text-align: center; }
 .state-icon { width: 58px; height: 58px; margin: 0 auto 19px; border-radius: 18px; color: #5b70cf; background: #edf0ff; display: grid; place-items: center; }
+.state-brand-mark { width: 42px; height: 42px; border-radius: 13px; box-shadow: 0 6px 15px rgba(78, 99, 197, .2); }
 .state-icon.error { color: #ad5365; background: #fff0f3; }
 .state-icon.pulse { animation: state-pulse 1.35s ease-in-out infinite; }
 .state-kicker { margin: 0 0 8px !important; color: var(--blue) !important; font-size: 10px !important; font-weight: 800; letter-spacing: .06em; }
@@ -1197,7 +1199,7 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
 .auth-page { min-height: 100vh; display: grid; grid-template-columns: minmax(390px, .9fr) minmax(480px, 1.1fr); background: #fff; }
 .auth-story { min-height: 100vh; padding: 42px clamp(35px, 5vw, 80px); color: #fff; background: radial-gradient(circle at 18% 17%, rgba(255,255,255,.13), transparent 24%), radial-gradient(circle at 80% 82%, rgba(255,255,255,.1), transparent 25%), linear-gradient(145deg, #5f73d4, #3f54b7); display: flex; flex-direction: column; }
 .auth-brand { color: #fff; padding: 0; }
-.auth-brand .brand-mark { color: #596fd0; background: #fff; box-shadow: 0 9px 24px rgba(27, 38, 91, .24); }
+.auth-brand .brand-mark { color: #596fd0; background: transparent; box-shadow: 0 9px 24px rgba(27, 38, 91, .24); }
 .auth-story-copy { max-width: 530px; margin: auto 0; padding: 60px 0; }
 .auth-kicker { font-size: 12px; font-weight: 750; letter-spacing: .04em; opacity: .74; }
 .auth-story h1 { margin: 20px 0; font-size: clamp(36px, 4.7vw, 61px); line-height: 1.19; letter-spacing: -.055em; }

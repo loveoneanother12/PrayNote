@@ -30,6 +30,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { MobilePrayerSearch } from "@/components/mobile-prayer-search";
 import { InstallGuideModal } from "@/components/install-guide-modal";
 import { InstallCampaignModal } from "@/components/install-campaign-modal";
+import { BrandMark } from "@/components/brand-mark";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
@@ -130,7 +131,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
     <div className="app-shell">
       <aside className="sidebar" aria-label="주요 메뉴">
         <a className="brand" href="#top" aria-label="PrayNote 홈">
-          <span className="brand-mark"><BookHeart size={22} strokeWidth={2.2} /></span>
+          <BrandMark />
           <span>PrayNote</span>
         </a>
 
@@ -152,7 +153,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
 
       <main id="top" className="main-content">
         <header className="topbar">
-          <a className="mobile-brand" href="#top"><span className="brand-mark"><BookHeart size={19} /></span>PrayNote</a>
+          <a className="mobile-brand" href="#top"><BrandMark />PrayNote</a>
           <form className="search-box" action="/search" method="get"><Search size={18} /><input name="q" aria-label="기도제목 검색" placeholder="기도제목 검색" /><kbd>⌘ K</kbd></form>
           <InstallGuideModal initialOpen={initialGuideOpen} onCompleteHref={guideNextPath} />
           <InstallCampaignModal disabled={initialGuideOpen} />

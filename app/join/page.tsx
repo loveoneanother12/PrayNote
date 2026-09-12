@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { BookHeart, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { InstantJoinForm } from "@/components/instant-group-actions";
 import { getAuthIdentity } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { BrandMark } from "@/components/brand-mark";
 
 type JoinPageProps = {
   searchParams: Promise<{ requested?: string; error?: string }>;
@@ -17,7 +18,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
 
   return (
     <main className="join-page">
-      <Link className="brand join-brand" href="/dashboard"><span className="brand-mark"><BookHeart size={21} /></span><span>PrayNote</span></Link>
+      <Link className="brand join-brand" href="/dashboard"><BrandMark /><span>PrayNote</span></Link>
       <section className="join-card-panel">
         <span className="join-hero-icon"><Users size={28} /></span>
         <p className="eyebrow">새 공동체에 참여하기</p>

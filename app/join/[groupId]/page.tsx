@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { BookHeart, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { InstantJoinForm } from "@/components/instant-group-actions";
 import { createClient } from "@/lib/supabase/server";
+import { BrandMark } from "@/components/brand-mark";
 
 type InvitePageProps = {
   params: Promise<{ groupId: string }>;
@@ -23,7 +24,7 @@ export default async function InvitePage({ params, searchParams }: InvitePagePro
 
   return (
     <main className="join-page">
-      <Link className="brand join-brand" href="/dashboard"><span className="brand-mark"><BookHeart size={21} /></span><span>PrayNote</span></Link>
+      <Link className="brand join-brand" href="/dashboard"><BrandMark /><span>PrayNote</span></Link>
       <section className="join-card-panel">
         <span className="join-hero-icon"><Users size={28} /></span>
         <p className="eyebrow">그룹 초대</p>

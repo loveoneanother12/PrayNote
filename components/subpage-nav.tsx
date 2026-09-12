@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bell, BookHeart, Home, Settings, Users } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { ProfileDot } from "@/components/profile-dot";
 import type { ProfileColor } from "@/lib/domain";
 
@@ -14,7 +15,7 @@ export function SubpageNav({ displayName, profileColor = "indigo", active, unrea
   return (
     <aside className="sidebar" aria-label="주요 메뉴">
       <Link className="brand" href="/dashboard" aria-label="PrayNote 홈">
-        <span className="brand-mark"><BookHeart size={22} /></span>
+        <BrandMark />
         <span>PrayNote</span>
       </Link>
       <nav className="side-nav">
