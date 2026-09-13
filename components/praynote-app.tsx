@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import {
   Bell,
   BookHeart,
@@ -34,6 +34,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
+import { restoreDashboardPreview, restoreGroupOrder, saveDashboardPreview, saveGroupOrder } from "@/lib/client-group-preferences";
 import type { GroupSummary, NotificationSummary, PrayerSummary, ProfileColor } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
 
@@ -94,9 +95,24 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
   const previewGroups = showAllPreviews ? groups : groups.filter((group) => selectedPreviewKeys.includes(group.id));
   const showPersonalPreview = showAllPreviews || selectedPreviewKeys.includes("personal");
 
+  useEffect(() => {
+    const availableIds = initialGroups.map((group) => group.id);
+    const fallbackPreview = ["personal", initialGroups[0]?.id].filter(Boolean) as string[];
+    const savedOrder = restoreGroupOrder(userId, availableIds);
+    const savedPreview = restoreDashboardPreview(userId, availableIds, fallbackPreview);
+    queueMicrotask(() => {
+      setGroupOrder(savedOrder);
+      setSelectedPreviewKeys(savedPreview);
+    });
+  }, [initialGroups, userId]);
+
   function togglePreviewKey(key: string) {
     setShowAllPreviews(false);
-    setSelectedPreviewKeys((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]);
+    setSelectedPreviewKeys((current) => {
+      const next = current.includes(key) ? current.filter((item) => item !== key) : [...current, key];
+      saveDashboardPreview(userId, next);
+      return next;
+    });
   }
 
   async function submitGroup(event: FormEvent<HTMLFormElement>) {
@@ -243,7 +259,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
             )}
           </section>
 
-          {orderModalOpen && <GroupOrderModal groups={groups} onClose={() => setOrderModalOpen(false)} onSaved={(orderedIds) => { setGroupOrder(orderedIds); setLocalToast("그룹 순서를 저장했어요"); }} />}
+          {orderModalOpen && <GroupOrderModal groups={groups} onClose={() => setOrderModalOpen(false)} onSaved={(orderedIds) => { setGroupOrder(orderedIds); saveGroupOrder(userId, orderedIds); setLocalToast("그룹 순서를 저장했어요"); }} />}
 
           <section className="groups-section" id="groups">
             <div className="section-heading">

@@ -8,11 +8,22 @@ const read = (path: string) => readFileSync(join(root, path), "utf8");
 describe("dashboard, notices, and prayer trash", () => {
   it("keeps dashboard previews to three prayers and supports scoped/all views", () => {
     const dashboard = read("components/praynote-app.tsx");
+    const preferences = read("lib/client-group-preferences.ts");
     expect(dashboard).toContain("groupPrayers = allGroupPrayers.slice(0, 3)");
     expect(dashboard).toContain("personalPrayers.slice(0, 3)");
     expect(dashboard).toContain("대시보드 미리보기에 띄울 그룹 선택");
     expect(dashboard).toContain("모든 기도제목/그룹 보기");
     expect(dashboard).toContain('"personal"');
+    expect(dashboard).toContain("saveDashboardPreview");
+    expect(dashboard).toContain("saveGroupOrder");
+    expect(preferences).toContain("window.localStorage.setItem");
+  });
+
+  it("offers persistent group ordering from the groups tab", () => {
+    const groups = read("components/groups-dashboard.tsx");
+    expect(groups).toContain("순서 바꾸기");
+    expect(groups).toContain("restoreGroupOrder");
+    expect(groups).toContain("saveGroupOrder");
   });
 
   it("returns new invitees to the invite after opening signup first", () => {

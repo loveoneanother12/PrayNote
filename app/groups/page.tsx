@@ -23,7 +23,7 @@ export default async function GroupsPage() {
           <span className="today-pill"><Users size={15} />내 그룹</span>
         </header>
         <div className="content-wrap detail-content groups-dashboard-content">
-          <GroupsDashboard initialGroups={overview.groups} />
+          <GroupsDashboard initialGroups={overview.groups} accountKey={overview.accountKey} />
         </div>
       </main>
       <MobileNav active="groups" />

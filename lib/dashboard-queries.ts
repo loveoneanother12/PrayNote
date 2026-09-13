@@ -21,6 +21,7 @@ type DashboardOverviewRow = {
 };
 
 export type DashboardOverview = {
+  accountKey: string;
   displayName: string | null;
   profileColor: ProfileColor;
   groups: GroupSummary[];
@@ -39,12 +40,16 @@ export type DashboardBundle = DashboardOverview & {
 };
 
 export async function getDashboardOverview(supabase: SupabaseClient): Promise<DashboardOverview | null> {
-  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_dashboard_overview"));
+  const [{ data, error }, { data: authData }] = await Promise.all([
+    retrySupabaseRead(() => supabase.rpc("get_dashboard_overview")),
+    supabase.auth.getUser(),
+  ]);
   if (error) throw error;
   if (!data) return null;
 
   const row = data as DashboardOverviewRow;
   return {
+    accountKey: authData.user?.id ?? "current-account",
     displayName: row.display_name ?? null,
     profileColor: normalizeProfileColor(row.profile_color),
     unreadCount: Number(row.unread_count ?? 0),
@@ -77,6 +82,7 @@ export async function getDashboardBundle(supabase: SupabaseClient): Promise<Dash
   const groupPrayers = (bundle.group_prayers ?? []).map(mapPrayerSummaryRow);
   const personalPrayers = (bundle.personal_prayers ?? []).map(mapPrayerSummaryRow);
   return {
+    accountKey: bundle.user_id,
     userId: bundle.user_id,
     email: bundle.email ?? "",
     displayName: overview.display_name ?? null,

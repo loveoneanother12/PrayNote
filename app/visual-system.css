@@ -53,6 +53,7 @@ button, input, textarea, select { font: inherit; }
 .groups-dashboard-title > div > span { font-size: var(--type-body); }
 .groups-dashboard-card { min-height: 166px; }
 .groups-dashboard-meta { font-size: var(--type-caption); }
+.groups-dashboard-actions { flex-wrap: wrap; justify-content: flex-end; }
 
 .group-hero { min-height: 104px; padding: 17px 22px; border-radius: 18px; box-shadow: 0 12px 28px rgba(66,86,182,.14); }
 .group-hero h1 { font-size: var(--type-page); font-weight: var(--weight-semibold); }
@@ -116,6 +117,8 @@ button, input, textarea, select { font: inherit; }
   .group-card, .groups-dashboard-card { min-height: 132px; }
   .groups-dashboard-content, .detail-content { padding-inline: 14px; }
   .groups-dashboard-hero { min-height: 0; padding: 20px; }
+  .groups-dashboard-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .groups-dashboard-actions .primary-button { grid-column: 1 / -1; }
   .group-hero { padding: 16px; }
   .inline-composer { width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr); padding: 15px; }
   .inline-composer-icon { display: none; }

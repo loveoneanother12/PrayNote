@@ -1,26 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Check, ChevronRight, CircleAlert, KeyRound, ListOrdered, LoaderCircle, Plus, Users, X } from "lucide-react";
 import { GroupOrderModal } from "@/components/group-order-modal";
+import { restoreGroupOrder, saveGroupOrder } from "@/lib/client-group-preferences";
 import type { GroupSummary } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
 
 type GroupsDashboardProps = {
   initialGroups: GroupSummary[];
+  accountKey: string;
 };
 
 const roleLabels = { leader: "리더", admin: "관리자", member: "멤버" } as const;
 const groupTones = ["blue", "sage", "lavender"];
 
-export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
+export function GroupsDashboard({ initialGroups, accountKey }: GroupsDashboardProps) {
   const [groups, setGroups] = useState<GroupSummary[]>(initialGroups);
   const [modalOpen, setModalOpen] = useState(false);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const orderedIds = restoreGroupOrder(accountKey, initialGroups.map((group) => group.id));
+    const byId = new Map(initialGroups.map((group) => [group.id, group]));
+    queueMicrotask(() => setGroups(orderedIds.map((id) => byId.get(id)).filter((group): group is GroupSummary => Boolean(group))));
+  }, [accountKey, initialGroups]);
 
   async function submitGroup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,6 +76,7 @@ export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
           <div><p>함께 기도하는 공동체</p><h1>내 그룹</h1><span>가입한 그룹을 선택해 기도제목과 멤버 소식을 확인하세요.</span></div>
         </div>
         <div className="groups-dashboard-actions">
+          {groups.length > 1 && <button className="outline-button" type="button" onClick={() => setOrderModalOpen(true)}><ListOrdered size={17} />순서 바꾸기</button>}
           <Link className="outline-button" href="/join"><KeyRound size={17} />초대코드로 참여</Link>
           <button className="primary-button" type="button" onClick={() => setModalOpen(true)}><Plus size={18} />그룹 만들기</button>
         </div>
@@ -110,6 +119,7 @@ export function GroupsDashboard({ initialGroups }: GroupsDashboardProps) {
         onClose={() => setOrderModalOpen(false)}
         onSaved={(orderedIds) => {
           setGroups((current) => orderedIds.map((id) => current.find((group) => group.id === id)).filter((group): group is GroupSummary => Boolean(group)));
+          saveGroupOrder(accountKey, orderedIds);
           setMessage("그룹 순서를 저장했어요.");
         }}
       />}
