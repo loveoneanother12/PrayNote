@@ -134,7 +134,7 @@ begin
   if webhook_secret is null then raise exception 'push_webhook_secret_missing'; end if;
 
   perform net.http_post(
-    url := 'https://ourpraynote.vercel.app/api/push/quiet-summary',
+    url := 'https://praynote.app/api/push/quiet-summary',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'x-praynote-push-secret', webhook_secret

@@ -98,7 +98,7 @@ begin
     join public.prayer_reminder_times reminder on reminder.id = claimed.reminder_id
   loop
     perform net.http_post(
-      url := 'https://ourpraynote.vercel.app/api/push/reminder',
+      url := 'https://praynote.app/api/push/reminder',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
         'x-praynote-push-secret', webhook_secret
