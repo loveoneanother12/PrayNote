@@ -85,11 +85,13 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <span className="settings-notice-action">보러 가기</span>
           </Link>
 
+          <div className="settings-section-label"><span>계정</span><p>로그인과 계정 보안을 관리합니다.</p></div>
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><LockKeyhole size={18} /></span><div><h2>비밀번호</h2><p>로그인에 사용할 비밀번호를 안전하게 변경할 수 있습니다.</p></div></div>
             <PasswordChangeSetting />
           </section>
 
+          <div className="settings-section-label"><span>알림과 기기</span><p>이 기기에서 받을 소식과 시간을 설정합니다.</p></div>
           <section className="settings-panel">
             <div className="settings-panel-heading"><span><Bell size={18} /></span><div><h2>인앱 알림</h2><p>PrayNote 안에서 받을 새 소식을 선택하세요.</p></div></div>
             <InstantNotificationPreferencesForm userId={bundle.userId} initial={{
@@ -157,6 +159,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <div className="upcoming-setting"><span className="setting-category-icon email"><Mail size={17} /></span><div><strong>이메일 알림</strong><small>중요 소식을 이메일로 요약해 받는 기능입니다.</small></div><em>준비 중</em></div>
           </section>
 
+          <div className="settings-section-label"><span>계정 관리</span><p>로그아웃하거나 계정을 정리할 수 있습니다.</p></div>
           <section className="settings-panel account-panel">
             <div><strong>로그아웃</strong><span>이 기기에서 PrayNote 사용을 종료합니다.</span></div>
             <InstantSignOutButton />

@@ -44,6 +44,7 @@ export function GroupPrayerComposer({ currentGroup, groups, onCreated }: { curre
       <section className="inline-composer">
         <div className="inline-composer-icon"><BookHeart size={22} /></div>
         <form onSubmit={submit}>
+          <div className="inline-composer-heading"><strong>이 그룹에 기도 나누기</strong><span>마음을 편안하게 기록해보세요.</span></div>
           <label className="sr-only" htmlFor="group-prayer-content">기도제목</label>
           <textarea id="group-prayer-content" name="content" maxLength={2000} required value={content} onChange={(event) => setContent(event.target.value)} placeholder="함께 기도받고 싶은 내용을 적어주세요." />
           <div><span>{error || "등록 날짜는 한국시간 기준으로 자동 저장돼요."}</span><button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending || !content.trim()}>{pending ? <><LoaderCircle className="button-spinner" size={15} />등록 중…</> : <><Plus size={17} />기도제목 등록</>}</button></div>

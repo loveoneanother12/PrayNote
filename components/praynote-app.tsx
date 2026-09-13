@@ -163,13 +163,13 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
         </header>
 
         <div className="content-wrap">
-          <section className="welcome-row">
+          <section className="welcome-row today-prayer-hero">
             <div>
               <p className="eyebrow"><Sparkles size={15} />{todayLabel} · 오늘도 함께하는 기도</p>
               <h1>{greeting}, {displayName}님.</h1>
               <p>서로의 마음을 기억하고, 작은 기도로 오늘을 이어가요.</p>
             </div>
-            <button className="primary-button" onClick={() => setComposerOpen(true)}><Plus size={19} />기도제목 나누기</button>
+            <button className="primary-button today-prayer-button" onClick={() => setComposerOpen(true)}><Plus size={19} />오늘 기도하기</button>
           </section>
 
           <section className="prayer-overview" id="prayers">

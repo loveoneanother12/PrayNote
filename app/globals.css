@@ -579,6 +579,148 @@ button { color: inherit; }
   .toast { bottom: 84px; width: max-content; max-width: calc(100% - 32px); }
 }
 
+/* Moved to visual-system.css so it loads after all legacy responsive rules.
+:root {
+  --type-hero: clamp(28px, 3.5vw, 38px);
+  --type-page: clamp(23px, 2.5vw, 29px);
+  --type-section: 18px;
+  --type-body: 14px;
+  --type-label: 12px;
+  --type-caption: 11px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --radius-panel: 18px;
+  --soft-shadow: 0 10px 30px rgba(40, 52, 83, .045);
+}
+
+body { font-weight: var(--weight-regular); letter-spacing: -.012em; }
+button, input, textarea, select { font: inherit; }
+.primary-button, .outline-button, .text-button, .nav-item, .role-label,
+.prayer-meta strong, .group-copy strong, .settings-panel-heading h2,
+.prayer-calendar-heading h2, .notifications-hero h1, .settings-hero h1 {
+  font-weight: var(--weight-semibold);
+}
+
+.content-wrap { width: min(1040px, calc(100% - 56px)); padding-top: 38px; }
+.today-prayer-hero {
+  min-height: 178px;
+  margin-bottom: 22px;
+  padding: 30px 32px;
+  border: 1px solid #e1e6f5;
+  border-radius: 22px;
+  background: radial-gradient(circle at 92% 0, rgba(102,123,218,.14), transparent 34%), linear-gradient(132deg, #fff 10%, #f5f7ff 100%);
+  box-shadow: var(--soft-shadow);
+  align-items: center;
+}
+.welcome-row h1 { margin: 9px 0 7px; font-size: var(--type-hero); font-weight: var(--weight-semibold); line-height: 1.16; }
+.welcome-row > div > p:last-child { font-size: var(--type-body); line-height: 1.6; }
+.today-prayer-button { min-height: 48px; padding-inline: 20px; border-radius: 14px; box-shadow: 0 11px 24px rgba(78, 99, 197, .18); }
+
+.prayer-overview { border-radius: var(--radius-panel); box-shadow: none; }
+.overview-trigger { min-height: 80px; }
+.overview-title strong { font-size: var(--type-section); font-weight: var(--weight-semibold); }
+.overview-title small { font-size: var(--type-caption); }
+.overview-body { padding-top: 8px; }
+.dashboard-group-prayers + .dashboard-group-prayers { margin-top: 22px; }
+.section-heading { margin-top: 34px; }
+.section-heading h2 { font-size: var(--type-section); font-weight: var(--weight-semibold); }
+.section-heading span { font-size: var(--type-caption); line-height: 1.5; }
+.prayer-card { min-height: 104px; padding: 17px 4px; gap: 13px; }
+.prayer-copy { gap: 7px; }
+.prayer-copy > p, .dashboard-prayer-link { font-size: var(--type-body); line-height: 1.65; }
+.prayer-meta { font-size: var(--type-caption); }
+.pray-button { font-weight: var(--weight-medium); }
+
+.groups-section { margin-top: 30px; }
+.group-grid { gap: 11px; }
+.group-card { min-height: 148px; padding: 17px; border-radius: 16px; box-shadow: none; }
+.group-card:hover { transform: translateY(-1px); box-shadow: var(--soft-shadow); }
+.group-copy strong { font-size: 16px; }
+.group-copy span { font-size: var(--type-caption); line-height: 1.45; }
+.activity-panel { border-radius: var(--radius-panel); box-shadow: none; }
+
+.groups-dashboard-hero { min-height: 142px; padding: 24px 27px; border-radius: 20px; box-shadow: var(--soft-shadow); }
+.groups-dashboard-title h1 { font-size: var(--type-page); font-weight: var(--weight-semibold); }
+.groups-dashboard-title > div > span { font-size: var(--type-body); }
+.groups-dashboard-card { min-height: 166px; }
+.groups-dashboard-meta { font-size: var(--type-caption); }
+
+.group-hero { min-height: 104px; padding: 17px 22px; border-radius: 18px; box-shadow: 0 12px 28px rgba(66, 86, 182, .14); }
+.group-hero h1 { font-size: var(--type-page); font-weight: var(--weight-semibold); }
+.group-hero p { font-size: var(--type-label); line-height: 1.55; }
+.group-toolbar { margin-top: 10px; }
+.inline-composer { margin-top: 17px; padding: 18px; border-radius: var(--radius-panel); box-shadow: none; }
+.inline-composer-heading { padding: 0 4px 11px !important; display: grid !important; justify-content: initial !important; gap: 3px !important; }
+.inline-composer-heading strong { color: #36435a; font-size: 15px; font-weight: var(--weight-semibold); }
+.inline-composer-heading span { color: var(--muted) !important; font-size: var(--type-caption) !important; }
+.inline-composer textarea { min-height: 70px; font-size: var(--type-body); }
+
+.composer-modal { border-radius: 22px; }
+.composer-heading h2, .modal-head h2 { font-weight: var(--weight-semibold); }
+.composer-modal label { font-size: var(--type-label); font-weight: var(--weight-medium); }
+.composer-modal textarea { font-size: 15px; line-height: 1.65; }
+.composer-footer { position: sticky; bottom: -25px; z-index: 2; margin: 20px -25px -25px; padding: 14px 25px 25px; background: linear-gradient(to bottom, rgba(255,255,255,.9), #fff 28%); }
+
+.my-profile-card { border-radius: 20px; box-shadow: var(--soft-shadow); }
+.my-profile-summary { min-height: 112px; padding: 21px 25px 16px; }
+.my-profile-identity > span { font-size: var(--type-caption); font-weight: var(--weight-medium); }
+.my-profile-identity h1 { font-size: var(--type-page); font-weight: var(--weight-semibold); }
+.my-profile-identity p { font-size: var(--type-label); }
+.my-prayer-mini-stats { font-size: var(--type-label); }
+.prayer-streak-copy strong { font-size: 15px; font-weight: var(--weight-semibold); }
+.prayer-streak-copy > span, .prayer-streak-meta, .prayer-streak-footer { font-size: var(--type-caption); }
+.prayer-calendar-panel { padding: 21px; border-radius: var(--radius-panel); box-shadow: none; }
+.prayer-calendar-heading h2 { font-size: var(--type-section); }
+.prayer-calendar-heading p { font-size: var(--type-caption); }
+.prayer-calendar-controls strong, .prayer-calendar-selected-heading strong { font-size: var(--type-label); font-weight: var(--weight-semibold); }
+.prayer-calendar-grid > button { font-size: var(--type-caption); }
+.calendar-prayer-copy strong { font-size: 13px; font-weight: var(--weight-medium); }
+.calendar-prayer-copy small { font-size: var(--type-caption); }
+
+.notifications-hero, .settings-hero { padding: 23px 26px; border-radius: var(--radius-panel); box-shadow: none; }
+.notifications-hero h1, .settings-hero h1 { font-size: var(--type-page); }
+.notifications-hero p, .settings-hero p { font-size: var(--type-caption); font-weight: var(--weight-semibold); }
+.notifications-hero > div > span, .settings-hero > div > span { font-size: var(--type-label); line-height: 1.55; }
+.notification-stat { min-width: 94px; padding: 11px 13px; }
+.notification-stat strong { font-size: 19px; font-weight: var(--weight-semibold); }
+.notification-stat span { font-size: 10px; }
+.prayer-filter-tabs :is(a, button) { font-size: var(--type-label); font-weight: var(--weight-medium); }
+.notification-item { box-shadow: none; }
+
+.settings-section-label { margin: 30px 3px 10px; display: flex; align-items: baseline; gap: 10px; }
+.settings-section-label span { color: #36435a; font-size: var(--type-section); font-weight: var(--weight-semibold); }
+.settings-section-label p { margin: 0; color: var(--muted); font-size: var(--type-caption); }
+.settings-panel { margin-top: 10px; padding: 21px; border-radius: var(--radius-panel); box-shadow: none; }
+.settings-panel-heading h2 { font-size: 16px; }
+.settings-panel-heading p { font-size: var(--type-caption); }
+.setting-copy strong, .upcoming-setting strong { font-weight: var(--weight-medium); }
+
+@media (max-width: 760px) {
+  .content-wrap { width: 100%; padding-top: 18px; }
+  .today-prayer-hero { min-height: 0; margin: 0 14px 16px; padding: 22px 19px; border-radius: 20px; align-items: stretch; flex-direction: column; gap: 18px; }
+  .welcome-row h1 { font-size: 27px; }
+  .today-prayer-button { width: 100%; justify-content: center; }
+  .prayer-overview, .groups-section, .bottom-grid { margin-inline: 14px; }
+  .overview-trigger { min-height: 72px; }
+  .overview-title strong { font-size: 16px; }
+  .group-grid { grid-template-columns: 1fr; }
+  .group-card, .groups-dashboard-card { min-height: 132px; }
+  .groups-dashboard-content, .detail-content { padding-inline: 14px; }
+  .groups-dashboard-hero { min-height: 0; padding: 20px; }
+  .group-hero { padding: 16px; }
+  .inline-composer { grid-template-columns: 36px 1fr; padding: 15px; }
+  .inline-composer-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .composer-modal { border-radius: 24px 24px 0 0; }
+  .composer-footer { bottom: calc(-25px - env(safe-area-inset-bottom)); padding-bottom: calc(25px + env(safe-area-inset-bottom)); }
+  .my-profile-summary { padding: 19px 18px 15px; }
+  .prayer-calendar-panel { padding: 17px 13px; }
+  .notifications-hero, .settings-hero { padding: 20px 18px; }
+  .settings-section-label { margin-top: 25px; align-items: flex-start; flex-direction: column; gap: 3px; }
+  .settings-panel { padding: 18px 16px; }
+}
+*/
+
 @media (max-width: 460px) {
   .group-grid { grid-template-columns: 1fr; }
   .group-card { min-height: 125px; }

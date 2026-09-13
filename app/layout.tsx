@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./visual-system.css";
 import "./challenge.css";
 import { NetworkStatusDialog } from "@/components/network-status-dialog";
 
