@@ -117,8 +117,11 @@ button, input, textarea, select { font: inherit; }
   .groups-dashboard-content, .detail-content { padding-inline: 14px; }
   .groups-dashboard-hero { min-height: 0; padding: 20px; }
   .group-hero { padding: 16px; }
-  .inline-composer { grid-template-columns: 36px 1fr; padding: 15px; }
-  .inline-composer-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .inline-composer { width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr); padding: 15px; }
+  .inline-composer-icon { display: none; }
+  .inline-composer form, .inline-composer textarea, .inline-composer form > div { width: 100%; min-width: 0; }
+  .inline-composer form > div:not(.inline-composer-heading) { align-items: center; }
+  .inline-composer form > div:not(.inline-composer-heading) > span { max-width: min(52%, 180px); overflow-wrap: anywhere; }
   .composer-modal { border-radius: 24px 24px 0 0; }
   .composer-footer { bottom: calc(-25px - env(safe-area-inset-bottom)); padding-bottom: calc(25px + env(safe-area-inset-bottom)); }
   .my-profile-summary { padding: 19px 18px 15px; }
