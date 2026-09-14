@@ -3,7 +3,8 @@ import { ArrowLeft, Crown, ShieldCheck, Trash2, UserMinus, Users } from "lucide-
 import { notFound, redirect } from "next/navigation";
 import { deleteGroup, leaveGroup } from "@/app/group-actions";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
-import { InstantAdminRoleButton, InstantGroupSettingsForm, InstantMembershipReview } from "@/components/instant-group-actions";
+import { InstantGroupSettingsForm, InstantMembershipReview } from "@/components/instant-group-actions";
+import { MemberManagementMenu } from "@/components/member-management-menu";
 import { MobileNav } from "@/components/mobile-nav";
 import { SubpageNav } from "@/components/subpage-nav";
 import { ProfileDot } from "@/components/profile-dot";
@@ -68,7 +69,12 @@ export default async function ManageGroupPage({ params, searchParams }: ManageGr
                   <div><strong>{membership.user_id === bundle.userId ? `${nameFor(membership.user_id)} (나)` : nameFor(membership.user_id)}</strong><span>{membership.role === "leader" ? "Leader" : membership.role === "admin" ? "Admin · 가입 승인 가능" : "Member"}</span></div>
                   <span className={`member-role-badge ${membership.role}`}>{membership.role === "leader" ? <Crown size={13} /> : membership.role === "admin" ? <ShieldCheck size={13} /> : null}{membership.role.toUpperCase()}</span>
                   {isLeader && membership.user_id !== bundle.userId && membership.role !== "leader" && (
-                    <InstantAdminRoleButton groupId={groupId} userId={membership.user_id} initialIsAdmin={membership.role === "admin"} />
+                    <MemberManagementMenu
+                      groupId={groupId}
+                      userId={membership.user_id}
+                      displayName={nameFor(membership.user_id)}
+                      initialIsAdmin={membership.role === "admin"}
+                    />
                   )}
                 </div>
               ))}

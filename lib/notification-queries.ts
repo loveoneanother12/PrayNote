@@ -54,7 +54,7 @@ export async function getNotificationsPageBundle(supabase: SupabaseClient, limit
 function roleFrom(data: unknown) {
   if (!data || typeof data !== "object" || !("role" in data)) return null;
   const role = (data as { role?: unknown }).role;
-  return role === "admin" || role === "member" ? role : null;
+  return role === "leader" || role === "admin" || role === "member" ? role : null;
 }
 
 function noticeTitleFrom(data: unknown) {
@@ -88,7 +88,9 @@ export function notificationMessage(row: NotificationRow, actorName: string | nu
     case "membership_rejected":
       return `${group} 가입 신청이 승인되지 않았어요.`;
     case "role_changed":
-      return roleFrom(row.data) === "admin"
+      return roleFrom(row.data) === "leader"
+        ? `${group}의 새 리더가 되었어요.`
+        : roleFrom(row.data) === "admin"
         ? `${group}의 Admin 권한이 부여됐어요.`
         : `${group}의 역할이 Member로 변경됐어요.`;
     case "group_updated":

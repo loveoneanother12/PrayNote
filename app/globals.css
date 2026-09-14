@@ -1222,6 +1222,21 @@ button, input, textarea, select { font: inherit; }
 .member-role-badge.leader { color: #8a692f; background: #fff6df; }
 .member-role-badge.admin { color: #5266c2; background: #edf0ff; }
 .role-action-button { color: #5266c2; background: #edf0ff; }
+.member-management { position: relative; flex: 0 0 auto; }
+.member-menu-trigger { width: 34px; height: 34px; padding: 0; border: 1px solid #e1e5ed; border-radius: 9px; color: #68748a; background: #fff; cursor: pointer; display: grid; place-items: center; }
+.member-menu-trigger:hover { color: #5266c2; background: #f5f6fc; }
+.member-action-popover { position: absolute; z-index: 45; top: calc(100% + 7px); right: 0; width: 230px; padding: 8px; border: 1px solid #dde2eb; border-radius: 13px; background: #fff; box-shadow: 0 16px 38px rgba(40, 52, 78, .17); display: grid; gap: 3px; }
+.member-action-title { padding: 8px 9px 9px; border-bottom: 1px solid #eef0f4; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.member-action-title strong { min-width: 0; overflow: hidden; color: #354158; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.member-action-title span { flex: 0 0 auto; color: #9aa3b2; font-size: 9px; }
+.member-action-popover > button { min-height: 39px; padding: 0 9px; border: 0; border-radius: 8px; color: #4d5a70; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 9px; text-align: left; font-size: 10px; font-weight: 650; }
+.member-action-popover > button:hover { background: #f4f6fb; }
+.member-action-popover > button > span { flex: 1; }
+.member-action-popover > button > em { min-width: 35px; padding: 4px 6px; border-radius: 20px; color: #8d96a7; background: #eceff3; font-size: 8px; font-style: normal; font-weight: 800; text-align: center; }
+.member-action-popover > button > em.on { color: #fff; background: #6176d7; }
+.member-action-popover > .member-remove-action { color: #a54c5d; }
+.member-action-popover > .member-remove-action:hover { background: #fff0f3; }
+.member-action-error { margin: 4px 8px 6px; color: #a54c5d; font-size: 9px; line-height: 1.45; }
 .review-result { min-height: 33px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 750; }
 .review-result.approved { color: #39725b; background: #e7f4ed; }
 .review-result.rejected { color: #a25161; background: #fff0f3; }
@@ -1292,6 +1307,9 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .membership-actions form, .membership-actions button { flex: 1; }
   .member-role-badge { margin-left: auto; }
   .role-action-button { width: 100%; }
+  .member-action-popover { position: fixed; z-index: 120; top: auto; right: 16px; bottom: calc(82px + env(safe-area-inset-bottom)); left: 16px; width: auto; padding: 10px; border-radius: 16px; box-shadow: 0 20px 60px rgba(28, 38, 60, .25); }
+  .member-action-popover > button { min-height: 46px; font-size: 12px; }
+  .member-action-title strong { font-size: 12px; }
   .notifications-hero { padding: 22px; align-items: flex-start; }
   .notification-stat { min-width: 75px; padding: 11px 8px; }
   .notifications-hero > div > span { display: none; }

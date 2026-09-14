@@ -33,26 +33,6 @@ export function InstantMembershipReview({ membershipId }: { membershipId: string
   );
 }
 
-export function InstantAdminRoleButton({ groupId, userId, initialIsAdmin }: { groupId: string; userId: string; initialIsAdmin: boolean }) {
-  const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(initialIsAdmin);
-  const [pending, setPending] = useState(false);
-
-  async function changeRole() {
-    if (pending) return;
-    const next = !isAdmin;
-    setIsAdmin(next);
-    setPending(true);
-    const supabase = createClient();
-    const { error } = await supabase.rpc("set_group_admin", { target_group_id: groupId, target_user_id: userId, make_admin: next });
-    if (error) setIsAdmin(!next);
-    else startTransition(() => router.refresh());
-    setPending(false);
-  }
-
-  return <button className={`role-action-button ${pending ? "button-pending" : ""}`} type="button" onClick={changeRole} disabled={pending}>{pending && <LoaderCircle className="button-spinner" size={14} />}{isAdmin ? "Admin 해제" : "Admin 지정"}</button>;
-}
-
 export function InstantGroupSettingsForm({ groupId, initialName, initialDescription }: { groupId: string; initialName: string; initialDescription: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
