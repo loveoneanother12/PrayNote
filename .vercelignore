@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+mobile
+.env*
+!.env.example
+coverage
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store
