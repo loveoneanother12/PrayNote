@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { signInWithPassword, signUpWithPassword } from "./actions";
 import { GoogleAuthButton } from "@/components/google-auth-button";
+import { AppleAuthButton } from "@/components/apple-auth-button";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { BrandMark } from "@/components/brand-mark";
 
@@ -22,6 +23,7 @@ const errors: Record<string, string> = {
   "age-required": "만 14세 이상만 가입할 수 있습니다.",
   "sensitive-consent-required": "기도제목에 포함될 수 있는 민감정보 처리에 동의해주세요.",
   "google-unavailable": "Google 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.",
+  "apple-unavailable": "Apple 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.",
 };
 
 function modeHref(mode: "login" | "signup", next?: string) {
@@ -70,7 +72,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               {params.notice === "account-deleted" && <p className="auth-notice">회원 탈퇴가 완료되었습니다.</p>}
               {params.error && <p className="auth-error" role="alert">{errors[params.error] ?? "문제가 발생했습니다."}</p>}
 
-              <GoogleAuthButton mode={mode} next={next} />
+              <div className="social-auth-stack">
+                <GoogleAuthButton mode={mode} next={next} />
+                {process.env.NEXT_PUBLIC_APPLE_SIGN_IN_ENABLED === "true" && <AppleAuthButton mode={mode} next={next} />}
+              </div>
+              <div className="auth-divider"><span>또는 이메일로</span></div>
 
               {mode === "signup" ? (
                 <form action={signUpWithPassword} className="auth-form">

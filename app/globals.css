@@ -864,7 +864,7 @@ button, input, textarea, select { font: inherit; }
 .profile-edit-modal { width: min(620px, 100%); }
 .profile-edit-intro { margin: 9px 0 0; color: #7e899c; font-size: 12px; line-height: 1.6; }
 .profile-edit-modal .profile-settings-form { margin-top: 9px; padding-top: 15px; }
-.profile-edit-modal .google-identity-setting { margin-top: 17px; }
+.profile-edit-modal .identity-settings { margin-top: 17px; }
 .streak-goals-backdrop { z-index: 88; }
 .streak-goals-modal { width: min(520px, 100%); }
 .streak-goals-intro { margin: 12px 0 18px; color: #778397; font-size: 12px; line-height: 1.65; }
@@ -1460,11 +1460,15 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
 .groups-loading-grid .skeleton-block { height: 205px; }
 @keyframes skeleton-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-/* Google authentication and identity linking */
+/* Social authentication and identity linking */
+.social-auth-stack { display: grid; gap: 9px; }
 .google-auth-button { width: 100%; min-height: 49px; padding: 0 16px; border: 1px solid #dfe3eb; border-radius: 11px; color: #3c475c; background: #fff; box-shadow: 0 5px 16px rgba(39,50,78,.04); display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 750; }
 .google-auth-button:hover { border-color: #cfd5e2; background: #fafbfe; }
 .google-mark { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid #e3e6ec; border-radius: 50%; color: #4285f4; background: #fff; display: inline-grid; place-items: center; font-family: Arial, sans-serif; font-size: 14px; font-weight: 800; }
 .google-mark.inverse { width: 21px; height: 21px; border: 0; font-size: 12px; }
+.apple-auth-button { width: 100%; min-height: 49px; padding: 0 16px; border: 1px solid #111; border-radius: 11px; color: #fff; background: #111; box-shadow: 0 5px 16px rgba(17,17,17,.08); display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+.apple-auth-button:hover { border-color: #262626; background: #262626; }
+.apple-mark { width: 24px; height: 24px; flex: 0 0 auto; display: inline-grid; place-items: center; color: currentColor; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 20px; line-height: 1; }
 .auth-divider { margin: 18px 0; color: #9ba4b3; display: flex; align-items: center; gap: 11px; font-size: 10px; }
 .auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: #e7e9ee; }
 .google-consent-modal { width: min(510px, 100%); }
@@ -1474,14 +1478,18 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
 .google-consent-form .auth-consent-list input { margin-top: 2px; }
 .google-consent-help { margin: 13px 2px 17px; color: #8892a4; font-size: 10px; line-height: 1.6; }
 .google-consent-submit { width: 100%; }
-.google-identity-setting { margin-top: 20px; padding-top: 19px; border-top: 1px solid #edf0f4; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 18px; }
-.google-identity-copy { display: flex; align-items: center; gap: 12px; }
-.google-identity-copy strong, .google-identity-copy small { display: block; }
-.google-identity-copy strong { color: #4a566c; font-size: 12px; }
-.google-identity-copy small { margin-top: 4px; color: #8c95a5; font-size: 10px; line-height: 1.5; }
+.identity-settings { margin-top: 20px; padding-top: 19px; border-top: 1px solid #edf0f4; display: grid; gap: 12px; }
+.identity-setting-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 18px; }
+.identity-setting-copy { display: flex; align-items: center; gap: 12px; }
+.identity-setting-copy strong, .identity-setting-copy small { display: block; }
+.identity-setting-copy strong { color: #4a566c; font-size: 12px; }
+.identity-setting-copy small { margin-top: 4px; color: #8c95a5; font-size: 10px; line-height: 1.5; }
+.identity-provider-mark { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid #e3e6ec; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
+.identity-provider-mark.google { color: #4285f4; background: #fff; font-family: Arial, sans-serif; }
+.identity-provider-mark.apple { color: #fff; background: #111; border-color: #111; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 18px; }
 .google-link-button { min-width: 150px; font-size: 11px; }
 .google-link-button.linked { color: #438069; border-color: #d7e9df; background: #f4fbf7; }
-.google-identity-message { grid-column: 1 / -1; margin: 0; color: #a8495a; font-size: 10px; }
+.identity-setting-message { margin: 0; color: #a8495a; font-size: 10px; }
 
 /* Prayer history calendar */
 .prayer-calendar-panel { margin-top: 20px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 9px 28px rgba(39,50,78,.04); }
@@ -1535,7 +1543,7 @@ button:disabled, button[aria-busy="true"] { cursor: wait !important; filter: sat
   .groups-dashboard-card { min-height: 185px; }
   .groups-loading-page { padding-top: 0; }
   .groups-loading-grid { grid-template-columns: repeat(2, 1fr); }
-  .google-identity-setting { grid-template-columns: 1fr; }
+  .identity-setting-row { grid-template-columns: 1fr; }
   .google-link-button { width: 100%; }
   .prayer-calendar-panel { padding: 18px 15px; }
   .prayer-calendar-heading { align-items: flex-start; flex-direction: column; }

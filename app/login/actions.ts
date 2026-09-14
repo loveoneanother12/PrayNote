@@ -15,7 +15,7 @@ function loginPath(mode: "login" | "signup", error: string, next: string) {
   return `/login?mode=${mode}&error=${error}&next=${encodeURIComponent(next)}`;
 }
 
-export async function signInWithGoogle(formData: FormData) {
+async function signInWithOAuthProvider(formData: FormData, provider: "google" | "apple") {
   const mode = formData.get("mode") === "signup" ? "signup" : "login";
   const next = safeInternalPath(formData.get("next"));
   const termsAgreed = formData.get("termsAgreed") === "yes";
@@ -28,7 +28,7 @@ export async function signInWithGoogle(formData: FormData) {
 
   const acceptedAt = new Date().toISOString();
   const cookieStore = await cookies();
-  cookieStore.set("praynote_google_consent", acceptedAt, {
+  cookieStore.set(`praynote_${provider}_consent`, acceptedAt, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -37,19 +37,27 @@ export async function signInWithGoogle(formData: FormData) {
   });
 
   const supabase = await createClient();
-  const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}&intent=${mode}`;
+  const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}&intent=${mode}&provider=${provider}`;
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
+    provider,
     options: { redirectTo: callbackUrl, skipBrowserRedirect: true },
   });
 
   if (error || !data.url) {
-    cookieStore.delete("praynote_google_consent");
-    console.error("Google OAuth start failed", { code: error?.code, status: error?.status });
-    redirect(loginPath(mode, "google-unavailable", next));
+    cookieStore.delete(`praynote_${provider}_consent`);
+    console.error(`${provider} OAuth start failed`, { code: error?.code, status: error?.status });
+    redirect(loginPath(mode, `${provider}-unavailable`, next));
   }
 
   redirect(data.url);
+}
+
+export async function signInWithGoogle(formData: FormData) {
+  return signInWithOAuthProvider(formData, "google");
+}
+
+export async function signInWithApple(formData: FormData) {
+  return signInWithOAuthProvider(formData, "apple");
 }
 
 export async function signInWithPassword(formData: FormData) {
@@ -101,7 +109,7 @@ export async function signUpWithPassword(formData: FormData) {
         privacy_accepted_at: acceptedAt,
         sensitive_info_accepted_at: acceptedAt,
         age_14_confirmed_at: acceptedAt,
-        policy_version: "2026-09-06",
+        policy_version: "2026-09-14",
       },
     },
   });

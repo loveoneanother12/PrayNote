@@ -46,6 +46,6 @@ describe("notice board authorization", () => {
   it("links the board directly below the profile panel", () => {
     const settings = read("app/settings/page.tsx");
     expect(settings).toContain('className="settings-notice-link" href="/notices"');
-    expect(settings.indexOf("<GoogleIdentitySettings")).toBeLessThan(settings.indexOf("settings-notice-link"));
+    expect(settings).not.toContain("<OAuthIdentitySettings");
   });
 });

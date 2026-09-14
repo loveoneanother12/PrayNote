@@ -3,7 +3,7 @@
 import { Check, Flame, LockKeyhole, Pencil, Sparkles, Target, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { GoogleIdentitySettings } from "@/components/google-identity-settings";
+import { OAuthIdentitySettings } from "@/components/oauth-identity-settings";
 import { InstantProfileForm } from "@/components/instant-settings-forms";
 import { PrayerTrackerShare } from "@/components/prayer-tracker-share";
 import { ProfileDot } from "@/components/profile-dot";
@@ -123,7 +123,7 @@ export function MyProfileCard({
             </div>
             <p className="profile-edit-intro">그룹 멤버들에게 보이는 이름과 색, 로그인 수단을 관리할 수 있어요.</p>
             <InstantProfileForm userId={userId} displayName={displayName} email={email} initialColor={profileColor} />
-            <GoogleIdentitySettings returnTo="/prayers" />
+            <OAuthIdentitySettings returnTo="/prayers" />
           </section>
         </div>,
         document.body,

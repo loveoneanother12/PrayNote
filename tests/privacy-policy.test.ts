@@ -5,6 +5,7 @@ const loginPage = readFileSync("app/login/page.tsx", "utf8");
 const loginActions = readFileSync("app/login/actions.ts", "utf8");
 const privacyPage = readFileSync("app/privacy/page.tsx", "utf8");
 const termsPage = readFileSync("app/terms/page.tsx", "utf8");
+const supportPage = readFileSync("app/support/page.tsx", "utf8");
 
 describe("legal documents and signup consent", () => {
   it("links both public legal documents from login", () => {
@@ -15,11 +16,13 @@ describe("legal documents and signup consent", () => {
   });
 
   it("publishes the revised privacy policy with sensitive-data and vendor disclosures", () => {
-    expect(privacyPage).toContain('effectiveDate="2026년 9월 6일"');
+    expect(privacyPage).toContain('effectiveDate="2026년 9월 14일"');
     expect(privacyPage).toContain("hyunjae.lee.edu@gmail.com");
     expect(privacyPage).toContain("개인정보 보호법 제23조");
     expect(privacyPage).toContain("Supabase, Inc.");
     expect(privacyPage).toContain("Vercel Inc.");
+    expect(privacyPage).toContain("Apple Inc., Google LLC");
+    expect(privacyPage).toContain("Apple·Google 로그인 제공자 및 제공자 고유 식별자");
     expect(privacyPage).toContain("ap-northeast-2");
     expect(privacyPage).toContain("icn1");
     expect(privacyPage).toContain("서버 응답으로부터 1시간");
@@ -40,7 +43,7 @@ describe("legal documents and signup consent", () => {
     expect(loginPage).toContain('name="termsAgreed"');
     expect(loginPage).toContain('name="ageConfirmed"');
     expect(loginPage).toContain('name="sensitiveInfoAgreed"');
-    expect(loginActions).toContain('policy_version: "2026-09-06"');
+    expect(loginActions).toContain('policy_version: "2026-09-14"');
     expect(loginActions).toContain("sensitive_info_accepted_at");
   });
 
@@ -49,5 +52,11 @@ describe("legal documents and signup consent", () => {
     expect(loginPage).not.toContain("mode=magic");
     expect(loginActions).not.toContain("requestMagicLink");
     expect(loginActions).not.toContain("signInWithOtp");
+  });
+
+  it("publishes a public App Store support destination", () => {
+    expect(supportPage).toContain("PrayNote 고객지원");
+    expect(supportPage).toContain("hyunjae.lee.edu@gmail.com");
+    expect(supportPage).toContain('href="/privacy"');
   });
 });

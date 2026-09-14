@@ -20,13 +20,15 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const next = safeInternalPath(url.searchParams.get("next"));
   const isSignup = url.searchParams.get("intent") === "signup";
+  const provider = url.searchParams.get("provider") === "apple" ? "apple" : "google";
 
   if (code) {
     const cookieStore = await cookies();
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const acceptedAt = validConsentTimestamp(cookieStore.get("praynote_google_consent")?.value);
+      const consentCookie = `praynote_${provider}_consent`;
+      const acceptedAt = validConsentTimestamp(cookieStore.get(consentCookie)?.value);
       if (acceptedAt) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -39,23 +41,23 @@ export async function GET(request: Request) {
               privacy_accepted_at: metadata.privacy_accepted_at || acceptedAt,
               sensitive_info_accepted_at: metadata.sensitive_info_accepted_at || acceptedAt,
               age_14_confirmed_at: metadata.age_14_confirmed_at || acceptedAt,
-              policy_version: metadata.policy_version || "2026-09-06",
+              policy_version: metadata.policy_version || "2026-09-14",
             },
           });
-          if (metadataError) console.error("Google consent metadata update failed", { code: metadataError.code, status: metadataError.status });
+          if (metadataError) console.error(`${provider} consent metadata update failed`, { code: metadataError.code, status: metadataError.status });
           const { error: profileError } = await supabase.from("profiles").update({ display_name: displayName }).eq("id", user.id);
-          if (profileError) console.error("Google profile name update failed", { code: profileError.code, message: profileError.message });
+          if (profileError) console.error(`${provider} profile name update failed`, { code: profileError.code, message: profileError.message });
         }
-        cookieStore.delete("praynote_google_consent");
+        cookieStore.delete(consentCookie);
       }
       return noStoreRedirect(new URL(isSignup ? onboardingDashboardPath(next) : next, url.origin));
     }
   }
 
   const errorPath = next.startsWith("/settings")
-    ? "/settings?error=google-link-failed"
+    ? `/settings?error=${provider}-link-failed`
     : next.startsWith("/prayers")
-      ? "/prayers?error=google-link-failed"
+      ? `/prayers?error=${provider}-link-failed`
       : "/login?error=callback-failed";
   return noStoreRedirect(new URL(errorPath, url.origin));
 }

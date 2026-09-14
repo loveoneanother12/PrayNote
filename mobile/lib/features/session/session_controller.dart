@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/config.dart';
@@ -139,7 +143,81 @@ class SessionController extends Notifier<SessionState> {
 
   Future<bool> signInWithGoogle() => _signInWithOAuth(OAuthProvider.google);
 
-  Future<bool> signInWithApple() => _signInWithOAuth(OAuthProvider.apple);
+  Future<bool> signInWithApple() async {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      return _signInWithOAuth(OAuthProvider.apple);
+    }
+    if (!AppConfig.hasSupabase) {
+      state = state.copyWith(error: '서버가 연결된 빌드에서 사용할 수 있어요.');
+      return false;
+    }
+
+    state = state.copyWith(isBusy: true, clearError: true);
+    try {
+      final supabase = Supabase.instance.client;
+      final rawNonce = supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: const [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException('Apple identity token is missing.');
+      }
+
+      final response = await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+      final displayName = [credential.givenName, credential.familyName]
+          .whereType<String>()
+          .map((part) => part.trim())
+          .where((part) => part.isNotEmpty)
+          .join(' ');
+      final existingName = response.user?.userMetadata?['display_name']
+          ?.toString()
+          .trim();
+      if (displayName.isNotEmpty &&
+          response.user != null &&
+          (existingName == null || existingName.isEmpty)) {
+        await supabase.auth.updateUser(
+          UserAttributes(data: {'display_name': displayName}),
+        );
+        await supabase
+            .from('profiles')
+            .update({'display_name': displayName})
+            .eq('id', response.user!.id);
+      }
+      state = state.copyWith(
+        isBusy: false,
+        isAuthenticated: response.session != null,
+        isDemo: false,
+        clearError: true,
+      );
+      return response.session != null;
+    } on SignInWithAppleAuthorizationException catch (error) {
+      state = state.copyWith(
+        isBusy: false,
+        error: error.code == AuthorizationErrorCode.canceled
+            ? null
+            : 'Apple 로그인을 완료하지 못했어요. 잠시 후 다시 시도해주세요.',
+        clearError: error.code == AuthorizationErrorCode.canceled,
+      );
+      return false;
+    } on AuthException catch (error) {
+      state = state.copyWith(isBusy: false, error: _authMessage(error));
+      return false;
+    } catch (_) {
+      state = state.copyWith(isBusy: false, error: '네트워크 연결이 원활하지 않습니다.');
+      return false;
+    }
+  }
 
   Future<bool> _signInWithOAuth(OAuthProvider provider) async {
     if (!AppConfig.hasSupabase) {

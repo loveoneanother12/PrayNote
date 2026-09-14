@@ -16,9 +16,9 @@ describe("My profile and prayer streak", () => {
     expect(page).toContain("<MyProfileCard");
     expect(card).toContain('aria-labelledby="profile-edit-title"');
     expect(card).toContain("<InstantProfileForm");
-    expect(card).toContain("<GoogleIdentitySettings");
+    expect(card).toContain("<OAuthIdentitySettings");
     expect(settings).not.toContain("<InstantProfileForm");
-    expect(settings).not.toContain("<GoogleIdentitySettings");
+    expect(settings).not.toContain("<OAuthIdentitySettings");
   });
 
   it("counts distinct Korea-time response days and resets after a missed day", () => {

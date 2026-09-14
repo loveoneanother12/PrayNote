@@ -39,16 +39,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const { preferences, reminderTimes } = bundle;
 
   const displayName = (bundle.displayName ?? bundle.email.split("@")[0]) || "기도하는 이";
-  const notice = query.linked === "google"
-    ? "Google 계정을 연결했어요. 이제 Google로도 로그인할 수 있습니다."
+  const notice = query.linked === "google" || query.linked === "apple"
+    ? `${query.linked === "apple" ? "Apple" : "Google"} 계정을 연결했어요. 이제 해당 계정으로도 로그인할 수 있습니다.`
     : query.saved === "notifications"
       ? "알림 설정을 저장했어요. 앞으로 도착하는 알림부터 적용됩니다."
       : query.saved === "password"
         ? "비밀번호를 저장했어요. 다음 로그인부터 사용할 수 있습니다."
       : "";
 
-  const errorMessage = query.error === "google-link-failed"
-    ? "Google 계정을 연결하지 못했습니다. 다시 시도해주세요."
+  const errorMessage = query.error === "google-link-failed" || query.error === "apple-link-failed"
+    ? `${query.error.startsWith("apple") ? "Apple" : "Google"} 계정을 연결하지 못했습니다. 다시 시도해주세요.`
     : query.error === "invalid-name"
     ? "이름은 2~30자로 입력해주세요."
     : query.error === "weak-password"

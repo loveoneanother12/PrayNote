@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalDocument kind="privacy" eyebrow="PRIVACY POLICY" title="PrayNote 개인정보처리방침" effectiveDate="2026년 9월 6일">
+    <LegalDocument kind="privacy" eyebrow="PRIVACY POLICY" title="PrayNote 개인정보처리방침" effectiveDate="2026년 9월 14일">
       <section className="legal-section">
         <h2>제1조 (개인정보처리방침의 목적)</h2>
         <p>PrayNote(이하 “서비스”)는 이용자의 개인정보를 중요하게 생각하며, 「개인정보 보호법」 등 관련 법령을 준수합니다. 본 방침은 서비스가 어떤 개인정보를 어떠한 목적으로 처리하고, 이용자의 권리를 어떻게 보호하는지 안내하기 위해 마련되었습니다.</p>
@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
       <section className="legal-section">
         <h2>제2조 (처리하는 개인정보의 항목)</h2>
         <ol>
-          <li><strong>회원가입 및 인증:</strong> 이메일 주소, 이름, 비밀번호 인증정보, 만 14세 이상 확인 여부, 약관·개인정보 및 민감정보 처리 동의 기록</li>
+          <li><strong>회원가입 및 인증:</strong> 이메일 주소, 이름, 비밀번호 인증정보, Apple·Google 로그인 제공자 및 제공자 고유 식별자, 제공자가 전달하는 이메일·이름, 만 14세 이상 확인 여부, 약관·개인정보 및 민감정보 처리 동의 기록</li>
           <li><strong>프로필:</strong> 표시 이름, 프로필 색상</li>
           <li><strong>기도 기록:</strong> 기도제목 내용, 개인기도 여부, 공유 그룹, 작성·수정·완료 일시 및 상태</li>
           <li><strong>그룹 이용:</strong> 개설·가입 그룹, 가입 신청 및 승인 상태, 그룹 내 역할, 초대코드 이용 기록</li>
@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
       <section className="legal-section">
         <h2>제3조 (개인정보의 처리 목적)</h2>
         <ol>
-          <li>회원가입, 본인확인, 로그인 및 계정 관리</li>
+          <li>회원가입, 본인확인, Apple·Google 간편 로그인 및 계정 관리</li>
           <li>개인 기도 기록의 저장·동기화 및 완료 이력 제공</li>
           <li>비공개 그룹 개설·가입·권한 관리 및 선택한 그룹에 기도제목 공유</li>
           <li>기도완료 반응, 인앱 알림 및 이용자가 설정한 브라우저 푸시 알림 제공</li>
@@ -102,7 +102,8 @@ export default function PrivacyPolicyPage() {
             <thead><tr><th>이전받는 자</th><th>국가·위치</th><th>항목·목적</th><th>시기·방법 및 기간</th></tr></thead>
             <tbody>
               <tr><td>Supabase, Inc.</td><td>주 데이터: 대한민국 서울<br />운영·지원: 미국 및 재수탁자 소재 국가</td><td>제2조의 정보 / 인증·DB 운영·지원</td><td>서비스 이용 시 암호화된 네트워크 전송 / 회원 탈퇴·삭제 또는 계약 종료 시까지</td></tr>
-              <tr><td>Vercel Inc.</td><td>서버 실행: 대한민국 서울<br />플랫폼 운영: 미국 및 재수탁자 소재 국가</td><td>웹 요청, IP, 접속·오류 정보 / 호스팅·보안·장애 대응</td><td>서비스 이용 시 암호화된 네트워크 전송 / 런타임 로그는 현재 1시간, 그 외 계약 종료 또는 삭제 시까지</td></tr>
+              <tr><td>Vercel Inc.</td><td>서버 실행: 대한민국 서울<br />플랫폼 운영: 미국 및 재수탁자 소재 국가</td><td>웹 요청, IP, 접속·오류 정보 / 호스팅·보안·장애 대응</td><td>서비스 이용 시 암호화된 네트워크 전송 / 런타임 로그는 서버 응답으로부터 1시간, 그 외 계약 종료 또는 삭제 시까지</td></tr>
+              <tr><td>Apple Inc., Google LLC</td><td>미국 등 각 제공자의 처리 국가</td><td>로그인 요청, 제공자 식별자, 이메일·이름(제공 시) / 이용자가 선택한 간편 로그인 인증</td><td>간편 로그인 이용 시 암호화 전송 / 각 제공자의 계정·개인정보 정책에 따른 기간</td></tr>
               <tr><td>Apple, Google 등 이용 브라우저의 푸시 서비스 제공자</td><td>미국 등 각 제공자의 처리 국가</td><td>푸시 구독 식별자와 민감 내용을 제외한 알림 문구 / 알림 전달</td><td>알림 발송 시 암호화 전송 / 알림 전달 또는 구독 해제 시까지</td></tr>
             </tbody>
           </table>
@@ -152,8 +153,8 @@ export default function PrivacyPolicyPage() {
       </section>
 
       <footer className="legal-document-footer">
-        <p><strong>공고일자:</strong> 2026년 9월 6일</p>
-        <p><strong>시행일자:</strong> 2026년 9월 6일</p>
+        <p><strong>공고일자:</strong> 2026년 9월 14일</p>
+        <p><strong>시행일자:</strong> 2026년 9월 14일</p>
         <Link href="/terms">PrayNote 서비스 이용약관 보기</Link>
       </footer>
     </LegalDocument>
