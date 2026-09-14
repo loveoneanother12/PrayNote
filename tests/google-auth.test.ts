@@ -10,6 +10,7 @@ const settingsIdentity = readFileSync(join(root, "components/oauth-identity-sett
 const confirmLinkPage = readFileSync(join(root, "app/auth/confirm-link/page.tsx"), "utf8");
 const confirmLinkActions = readFileSync(join(root, "app/auth/confirm-link/actions.ts"), "utf8");
 const authConfig = readFileSync(join(root, "supabase/config.toml"), "utf8");
+const proxy = readFileSync(join(root, "proxy.ts"), "utf8");
 
 describe("social authentication", () => {
   it("requires legal, age, and sensitive-information consent before OAuth signup", () => {
@@ -45,6 +46,7 @@ describe("social authentication", () => {
     expect(confirmLinkPage).toContain("본인이신가요?");
     expect(confirmLinkActions).toContain("unlinkIdentity");
     expect(confirmLinkActions).toContain("confirmSocialLink");
+    expect(proxy).toContain('pathname === "/auth/confirm-link" && (!isAuthenticated || !hasPendingSocialLink)');
   });
 
   it("requires email verification for new password accounts", () => {

@@ -84,6 +84,12 @@ export async function proxy(request: NextRequest) {
     return copyAuthState(response, NextResponse.redirect(new URL("/auth/confirm-link", request.url)));
   }
 
+  if (pathname === "/auth/confirm-link" && (!isAuthenticated || !hasPendingSocialLink)) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("error", "link-confirmation-expired");
+    return copyAuthState(response, NextResponse.redirect(loginUrl));
+  }
+
   if (claimsError && hasAuthCookie) {
     console.warn("Auth session validation failed", {
       code: claimsError.code,
