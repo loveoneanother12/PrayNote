@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="164" y1="104" x2="860" y2="920" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7488E2"/>
+      <stop offset="1" stop-color="#586DCE"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="260" y1="196" x2="708" y2="798" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F7F8FE"/>
+    </linearGradient>
+    <filter id="shadow" x="188" y="152" width="660" height="738" filterUnits="userSpaceOnUse">
+      <feDropShadow dy="22" stdDeviation="26" flood-color="#31417E" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <rect x="296" y="222" width="476" height="612" rx="90" fill="#D5DCFA"/>
+    <rect x="252" y="190" width="476" height="612" rx="90" fill="url(#paper)"/>
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35Z" fill="#6074D5" transform="translate(358 256) scale(10.8)"/>
+    <path d="M348 570h284M348 638h284M348 706h168" stroke="#6074D5" stroke-width="22" stroke-linecap="round" opacity=".9"/>
+  </g>
+</svg>

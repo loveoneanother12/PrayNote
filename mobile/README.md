@@ -34,6 +34,7 @@
 ## 네이티브 로그인과 푸시 준비
 
 - 앱 식별자: iOS·Android 모두 `com.praynote.app`
+- Apple 개발팀: `Hyunjae Lee` (`6RKKJW52GK`), Xcode 자동 서명 사용
 - OAuth 복귀 주소: `com.praynote.app://login-callback/`
 - Google 로그인은 Supabase Provider와 위 Redirect URL을 등록하면 동작합니다.
 - iOS Apple 로그인은 네이티브 인증과 nonce 검증을 사용하며 기본 활성화됩니다. 긴급 비활성화가 필요한 빌드에만 `ENABLE_APPLE_SIGN_IN=false`를 지정합니다.
