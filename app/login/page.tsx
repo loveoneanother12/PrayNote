@@ -24,6 +24,8 @@ const errors: Record<string, string> = {
   "sensitive-consent-required": "기도제목에 포함될 수 있는 민감정보 처리에 동의해주세요.",
   "google-unavailable": "Google 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.",
   "apple-unavailable": "Apple 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.",
+  "link-confirmation-expired": "계정 통합 확인 시간이 만료되었습니다. 다시 로그인해주세요.",
+  "link-cancel-failed": "계정 연결을 안전하게 취소하지 못했습니다. 다시 로그인하거나 고객지원으로 문의해주세요.",
 };
 
 function modeHref(mode: "login" | "signup", next?: string) {
@@ -70,6 +72,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
               {params.notice === "confirm-email" && <p className="auth-notice">가입 확인 메일을 확인한 뒤 로그인해주세요.</p>}
               {params.notice === "account-deleted" && <p className="auth-notice">회원 탈퇴가 완료되었습니다.</p>}
+              {params.notice === "link-cancelled" && <p className="auth-notice">계정 통합을 취소하고 소셜 로그인 연결을 해제했습니다.</p>}
               {params.error && <p className="auth-error" role="alert">{errors[params.error] ?? "문제가 발생했습니다."}</p>}
 
               <div className="social-auth-stack">

@@ -36,7 +36,7 @@ export function AppleAuthButton({ mode, next }: AppleAuthButtonProps) {
                 <label><input name="ageConfirmed" type="checkbox" value="yes" required /><span>[필수] 만 14세 이상입니다.</span></label>
                 <label><input name="sensitiveInfoAgreed" type="checkbox" value="yes" required /><span>[필수] 기도제목에 종교적 신념·건강 등 민감정보가 포함될 수 있으며, 서비스 제공을 위한 처리에 동의합니다.</span></label>
               </div>
-              <p className="google-consent-help">기존 회원은 먼저 로그인한 뒤 ‘마이 → 프로필 수정’에서 Apple 계정을 연결하면 기존 기도 기록을 유지할 수 있어요.</p>
+              <p className="google-consent-help">동일한 이메일의 기존 계정이 확인되면 본인 여부를 먼저 묻습니다. 이메일 가리기를 사용했다면 기존 계정에 로그인한 뒤 ‘마이 → 프로필 수정’에서 연결해주세요.</p>
               <PendingSubmitButton className="apple-auth-button google-consent-submit" pendingText="Apple로 이동 중…"><AppleIcon className="apple-mark" size={18} aria-hidden="true" />{actionLabel}</PendingSubmitButton>
             </form>
           </div>

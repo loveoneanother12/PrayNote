@@ -22,6 +22,8 @@ describe("legal documents and signup consent", () => {
     expect(privacyPage).toContain("Supabase, Inc.");
     expect(privacyPage).toContain("Vercel Inc.");
     expect(privacyPage).toContain("Apple Inc., Google LLC");
+    expect(privacyPage).toContain("Plus Five Five, Inc. (Resend)");
+    expect(privacyPage).toContain("발송일로부터 30일");
     expect(privacyPage).toContain("Apple·Google 로그인 제공자 및 제공자 고유 식별자");
     expect(privacyPage).toContain("ap-northeast-2");
     expect(privacyPage).toContain("icn1");

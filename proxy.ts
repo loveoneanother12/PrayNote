@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { safeInternalPath } from "@/lib/navigation";
+import { PENDING_SOCIAL_LINK_COOKIE } from "@/lib/social-link-confirmation";
 
 const PROTECTED_PAGE_PREFIXES = [
   "/admin",
@@ -47,6 +48,7 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const nextPath = `${pathname}${request.nextUrl.search}`;
   const isJoinPage = pathname === "/join" || pathname.startsWith("/join/");
+  const hasPendingSocialLink = Boolean(request.cookies.get(PENDING_SOCIAL_LINK_COOKIE)?.value);
 
   // Reading a healthy cookie session is local and avoids putting a second
   // Supabase round trip in front of every authenticated page request. This is
@@ -77,6 +79,10 @@ export async function proxy(request: NextRequest) {
   // still protects every data request made by the destination page.
   const hasVerifiedClaims = mustVerifyClaims && !claimsError && Boolean(claimsData?.claims?.sub);
   const isAuthenticated = hasSessionHint || hasVerifiedClaims || (hasAuthCookie && transientAuthFailure(claimsError));
+
+  if (isAuthenticated && hasPendingSocialLink && pathname !== "/auth/confirm-link" && pathname !== "/auth/callback") {
+    return copyAuthState(response, NextResponse.redirect(new URL("/auth/confirm-link", request.url)));
+  }
 
   if (claimsError && hasAuthCookie) {
     console.warn("Auth session validation failed", {
@@ -120,5 +126,6 @@ export const config = {
     "/search/:path*",
     "/settings/:path*",
     "/api/push/test",
+    "/auth/:path*",
   ],
 };

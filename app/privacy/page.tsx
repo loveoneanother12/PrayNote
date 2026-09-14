@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
           <li><strong>그룹 이용:</strong> 개설·가입 그룹, 가입 신청 및 승인 상태, 그룹 내 역할, 초대코드 이용 기록</li>
           <li><strong>서비스 활동:</strong> 기도완료 반응과 날짜, 기도제목 열람 기록, 알림 기록·설정, 기도 알림 시간</li>
           <li><strong>브라우저 푸시:</strong> 푸시 구독 주소, 암호화 공개키 및 인증값, 브라우저·기기 정보</li>
-          <li><strong>자동 생성 정보:</strong> IP 주소, 쿠키 및 로그인 세션 정보, 접속·오류 기록, 브라우저·운영체제 정보, 접속 일시</li>
+          <li><strong>자동 생성 정보:</strong> IP 주소, 쿠키 및 로그인 세션 정보, 접속·오류 기록, 이메일 인증·전달 기록, 브라우저·운영체제 정보, 접속 일시</li>
         </ol>
         <p className="legal-note">서비스는 주민등록번호와 결제정보를 수집하지 않습니다.</p>
       </section>
@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
       <section className="legal-section">
         <h2>제3조 (개인정보의 처리 목적)</h2>
         <ol>
-          <li>회원가입, 본인확인, Apple·Google 간편 로그인 및 계정 관리</li>
+          <li>회원가입, 이메일 인증, Apple·Google 간편 로그인 및 계정 관리</li>
           <li>개인 기도 기록의 저장·동기화 및 완료 이력 제공</li>
           <li>비공개 그룹 개설·가입·권한 관리 및 선택한 그룹에 기도제목 공유</li>
           <li>기도완료 반응, 인앱 알림 및 이용자가 설정한 브라우저 푸시 알림 제공</li>
@@ -60,6 +60,7 @@ export default function PrivacyPolicyPage() {
               <tr><td>브라우저 푸시 구독 정보</td><td>푸시 알림 해제 또는 회원 탈퇴 시까지</td></tr>
               <tr><td>Vercel 런타임 로그</td><td>서버 응답으로부터 1시간</td></tr>
               <tr><td>Supabase 서비스 로그</td><td>서버 응답으로부터 1일</td></tr>
+              <tr><td>Resend 인증 이메일 및 전달 로그</td><td>발송일로부터 30일</td></tr>
             </tbody>
           </table>
         </div>
@@ -87,6 +88,7 @@ export default function PrivacyPolicyPage() {
             <tbody>
               <tr><td>Supabase, Inc.</td><td>회원 인증, 데이터베이스 저장·동기화, 실시간 처리 및 서비스 로그 관리</td><td>회원 탈퇴, 정보 삭제 또는 위탁계약 종료 시까지</td></tr>
               <tr><td>Vercel Inc.</td><td>웹서비스 호스팅·전송, 서버 기능 실행, 보안 및 오류 로그 처리</td><td>회원 탈퇴, 정보 삭제 또는 위탁계약 종료 시까지. 런타임 로그는 현재 1시간</td></tr>
+              <tr><td>Plus Five Five, Inc. (Resend)</td><td>회원가입 확인, 비밀번호 재설정 및 계정 보안 이메일 발송</td><td>인증 이메일과 전달 로그는 발송일로부터 30일, 계약 종료 시 잔여 고객 데이터는 90일 이내 삭제</td></tr>
               <tr><td>이용 브라우저의 푸시 서비스 제공자</td><td>이용자가 신청한 브라우저 푸시 알림 전달</td><td>알림 전달 또는 푸시 구독 해제 시까지</td></tr>
             </tbody>
           </table>
@@ -103,6 +105,7 @@ export default function PrivacyPolicyPage() {
             <tbody>
               <tr><td>Supabase, Inc.</td><td>주 데이터: 대한민국 서울<br />운영·지원: 미국 및 재수탁자 소재 국가</td><td>제2조의 정보 / 인증·DB 운영·지원</td><td>서비스 이용 시 암호화된 네트워크 전송 / 회원 탈퇴·삭제 또는 계약 종료 시까지</td></tr>
               <tr><td>Vercel Inc.</td><td>서버 실행: 대한민국 서울<br />플랫폼 운영: 미국 및 재수탁자 소재 국가</td><td>웹 요청, IP, 접속·오류 정보 / 호스팅·보안·장애 대응</td><td>서비스 이용 시 암호화된 네트워크 전송 / 런타임 로그는 서버 응답으로부터 1시간, 그 외 계약 종료 또는 삭제 시까지</td></tr>
+              <tr><td>Plus Five Five, Inc. (Resend)</td><td>미국<br />이메일 발송 리전: 일본 도쿄</td><td>이메일 주소, 발신·수신 메타데이터, 인증 이메일 내용, 전달 로그 / 인증·보안 이메일 발송</td><td>인증 이메일 발송 시 암호화 전송 / 이메일과 로그는 발송일로부터 30일</td></tr>
               <tr><td>Apple Inc., Google LLC</td><td>미국 등 각 제공자의 처리 국가</td><td>로그인 요청, 제공자 식별자, 이메일·이름(제공 시) / 이용자가 선택한 간편 로그인 인증</td><td>간편 로그인 이용 시 암호화 전송 / 각 제공자의 계정·개인정보 정책에 따른 기간</td></tr>
               <tr><td>Apple, Google 등 이용 브라우저의 푸시 서비스 제공자</td><td>미국 등 각 제공자의 처리 국가</td><td>푸시 구독 식별자와 민감 내용을 제외한 알림 문구 / 알림 전달</td><td>알림 발송 시 암호화 전송 / 알림 전달 또는 구독 해제 시까지</td></tr>
             </tbody>

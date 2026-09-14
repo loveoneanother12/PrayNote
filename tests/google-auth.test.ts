@@ -7,6 +7,9 @@ const loginActions = readFileSync(join(root, "app/login/actions.ts"), "utf8");
 const callback = readFileSync(join(root, "app/auth/callback/route.ts"), "utf8");
 const loginPage = readFileSync(join(root, "app/login/page.tsx"), "utf8");
 const settingsIdentity = readFileSync(join(root, "components/oauth-identity-settings.tsx"), "utf8");
+const confirmLinkPage = readFileSync(join(root, "app/auth/confirm-link/page.tsx"), "utf8");
+const confirmLinkActions = readFileSync(join(root, "app/auth/confirm-link/actions.ts"), "utf8");
+const authConfig = readFileSync(join(root, "supabase/config.toml"), "utf8");
 
 describe("social authentication", () => {
   it("requires legal, age, and sensitive-information consent before OAuth signup", () => {
@@ -33,5 +36,20 @@ describe("social authentication", () => {
     expect(settingsIdentity).toContain('`${returnTo}${separator}linked=${provider}`');
     expect(loginPage).toContain('NEXT_PUBLIC_APPLE_SIGN_IN_ENABLED');
     expect(loginPage).toContain('<AppleAuthButton mode={mode} next={next} />');
+  });
+
+  it("requires explicit confirmation when OAuth automatically matches an existing email", () => {
+    expect(callback).toContain("newlyAutoLinkedIdentity");
+    expect(callback).toContain('new URL("/auth/confirm-link"');
+    expect(confirmLinkPage).toContain("동일한 이메일로 가입된 계정이 있습니다.");
+    expect(confirmLinkPage).toContain("본인이신가요?");
+    expect(confirmLinkActions).toContain("unlinkIdentity");
+    expect(confirmLinkActions).toContain("confirmSocialLink");
+  });
+
+  it("requires email verification for new password accounts", () => {
+    expect(authConfig).toContain("enable_confirmations = true");
+    expect(loginActions).toContain("emailRedirectTo:");
+    expect(loginActions).toContain("provider=email");
   });
 });

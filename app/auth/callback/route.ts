@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { onboardingDashboardPath, safeInternalPath } from "@/lib/navigation";
+import { encodePendingSocialLink, newlyAutoLinkedIdentity, PENDING_SOCIAL_LINK_COOKIE, type SocialProvider } from "@/lib/social-link-confirmation";
 
 function validConsentTimestamp(value: string | undefined) {
   return value && !Number.isNaN(Date.parse(value)) ? value : null;
@@ -20,7 +21,8 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const next = safeInternalPath(url.searchParams.get("next"));
   const isSignup = url.searchParams.get("intent") === "signup";
-  const provider = url.searchParams.get("provider") === "apple" ? "apple" : "google";
+  const providerParam = url.searchParams.get("provider");
+  const provider = providerParam === "apple" ? "apple" : providerParam === "email" ? "email" : "google";
 
   if (code) {
     const cookieStore = await cookies();
@@ -50,13 +52,36 @@ export async function GET(request: Request) {
         }
         cookieStore.delete(consentCookie);
       }
+      if (provider !== "email") {
+        const startedCookie = `praynote_${provider}_started_at`;
+        const oauthStartedAt = Number(cookieStore.get(startedCookie)?.value) || null;
+        const { data: { user } } = await supabase.auth.getUser();
+        const linkedIdentity = user ? newlyAutoLinkedIdentity(user, provider as SocialProvider, oauthStartedAt) : null;
+        cookieStore.delete(startedCookie);
+        if (user && linkedIdentity) {
+          const destination = isSignup ? onboardingDashboardPath(next) : next;
+          cookieStore.set(PENDING_SOCIAL_LINK_COOKIE, encodePendingSocialLink({
+            provider: provider as SocialProvider,
+            identityId: linkedIdentity.id,
+            userId: user.id,
+            next: destination,
+          }), {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 10 * 60,
+            path: "/",
+          });
+          return noStoreRedirect(new URL("/auth/confirm-link", url.origin));
+        }
+      }
       return noStoreRedirect(new URL(isSignup ? onboardingDashboardPath(next) : next, url.origin));
     }
   }
 
-  const errorPath = next.startsWith("/settings")
+  const errorPath = provider !== "email" && next.startsWith("/settings")
     ? `/settings?error=${provider}-link-failed`
-    : next.startsWith("/prayers")
+    : provider !== "email" && next.startsWith("/prayers")
       ? `/prayers?error=${provider}-link-failed`
       : "/login?error=callback-failed";
   return noStoreRedirect(new URL(errorPath, url.origin));

@@ -35,6 +35,13 @@ async function signInWithOAuthProvider(formData: FormData, provider: "google" | 
     maxAge: 10 * 60,
     path: "/",
   });
+  cookieStore.set(`praynote_${provider}_started_at`, String(Date.now()), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 10 * 60,
+    path: "/",
+  });
 
   const supabase = await createClient();
   const callbackUrl = `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}&intent=${mode}&provider=${provider}`;
@@ -45,6 +52,7 @@ async function signInWithOAuthProvider(formData: FormData, provider: "google" | 
 
   if (error || !data.url) {
     cookieStore.delete(`praynote_${provider}_consent`);
+    cookieStore.delete(`praynote_${provider}_started_at`);
     console.error(`${provider} OAuth start failed`, { code: error?.code, status: error?.status });
     redirect(loginPath(mode, `${provider}-unavailable`, next));
   }
@@ -103,6 +111,7 @@ export async function signUpWithPassword(formData: FormData) {
     email: email.data,
     password: password.data,
     options: {
+      emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}&intent=signup&provider=email`,
       data: {
         display_name: displayName.data,
         terms_accepted_at: acceptedAt,

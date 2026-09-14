@@ -35,7 +35,7 @@ export function GoogleAuthButton({ mode, next }: GoogleAuthButtonProps) {
                 <label><input name="ageConfirmed" type="checkbox" value="yes" required /><span>[필수] 만 14세 이상입니다.</span></label>
                 <label><input name="sensitiveInfoAgreed" type="checkbox" value="yes" required /><span>[필수] 기도제목에 종교적 신념·건강 등 민감정보가 포함될 수 있으며, 서비스 제공을 위한 처리에 동의합니다.</span></label>
               </div>
-              <p className="google-consent-help">이미 가입한 회원은 같은 Google 이메일을 선택하면 기존 계정으로 이어서 사용할 수 있어요.</p>
+              <p className="google-consent-help">동일한 이메일의 기존 계정이 확인되면 본인 여부를 먼저 묻고, 동의한 경우에만 기존 기도 기록과 Google 로그인을 통합합니다.</p>
               <PendingSubmitButton className="primary-button google-consent-submit" pendingText="Google로 이동 중…"><span className="google-mark inverse" aria-hidden="true">G</span>{actionLabel}</PendingSubmitButton>
             </form>
           </div>
