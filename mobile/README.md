@@ -36,7 +36,7 @@
 - 앱 식별자: iOS·Android 모두 `com.praynote.app`
 - OAuth 복귀 주소: `com.praynote.app://login-callback/`
 - Google 로그인은 Supabase Provider와 위 Redirect URL을 등록하면 동작합니다.
-- iOS Apple 로그인은 네이티브 인증과 nonce 검증을 사용합니다. Apple Developer의 App ID·Services ID·Key와 Supabase Apple Provider 연결 후 `ENABLE_APPLE_SIGN_IN=true`로 활성화합니다.
+- iOS Apple 로그인은 네이티브 인증과 nonce 검증을 사용하며 기본 활성화됩니다. 긴급 비활성화가 필요한 빌드에만 `ENABLE_APPLE_SIGN_IN=false`를 지정합니다.
 - 공식 서비스 URL은 `https://praynote.app`, 개인정보처리방침은 `https://praynote.app/privacy`, 고객지원은 `https://praynote.app/support`입니다.
 - 기기 토큰 테이블은 `supabase/migrations/202609130001_native_mobile_foundation.sql`에 있습니다.
 - 실제 알림 전송은 Firebase 프로젝트 생성, Android/iOS 앱 등록, APNs 키 연결 후 활성화됩니다.
@@ -65,7 +65,7 @@ flutter run \
 ```
 
 Apple 로그인 설정이 완료된 배포 빌드에는
-`--dart-define=ENABLE_APPLE_SIGN_IN=true`를 추가합니다.
+Apple 로그인은 별도 플래그 없이 활성화됩니다.
 
 ## 검사
 

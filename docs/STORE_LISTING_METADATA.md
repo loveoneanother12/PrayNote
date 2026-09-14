@@ -49,6 +49,8 @@
 
 - Primary App ID / Bundle ID: `com.praynote.app`
 - Services ID 권장값: `com.praynote.app.web`
+- Apple Developer Team ID: `6RKKJW52GK`
+- Sign in with Apple Key ID: `PMH95P44WX`
 - Apple Services ID 등록 Domain: `yldbthzepaenrmrccnem.supabase.co`
 - Apple Return URL: `https://yldbthzepaenrmrccnem.supabase.co/auth/v1/callback`
 - Supabase Redirect Allow List:
@@ -56,6 +58,8 @@
   - `com.praynote.app://login-callback/`
 
 Supabase Apple Client IDs에는 웹 OAuth용 Services ID를 첫 번째로, 네이티브 앱 Bundle ID를 두 번째로 등록한다.
+
+Apple 웹 OAuth 클라이언트 보안 토큰은 2026년 9월 14일에 180일 유효기간으로 발급했다. 로그인 중단을 방지하기 위해 2027년 3월 10일까지 같은 키로 새 토큰을 생성해 Supabase에 교체한다. `.p8` 원본은 저장소나 배포 환경에 업로드하지 않는다.
 
 ## 출시 전 URL 확인
 

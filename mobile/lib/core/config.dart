@@ -15,7 +15,10 @@ class AppConfig {
   static const firebaseAndroidAppId = String.fromEnvironment(
     'FIREBASE_ANDROID_APP_ID',
   );
-  static const enableAppleSignIn = bool.fromEnvironment('ENABLE_APPLE_SIGN_IN');
+  static const enableAppleSignIn = bool.fromEnvironment(
+    'ENABLE_APPLE_SIGN_IN',
+    defaultValue: true,
+  );
 
   static const authCallbackUrl = 'com.praynote.app://login-callback/';
 
