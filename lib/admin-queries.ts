@@ -63,11 +63,15 @@ export type AdminActionLog = {
   id: string;
   targetUserId: string | null;
   targetEmail: string | null;
-  action: "user.suspended" | "user.unsuspended" | "user.signed_out" | "user.deleted";
+  action: "user.suspended" | "user.unsuspended" | "user.signed_out" | "user.deleted" | "report.dismissed" | "report.hidden" | "report.deleted" | "detection.dismissed" | "detection.hidden" | "detection.deleted";
   metadata: Record<string, unknown>;
   createdAt: string;
   actorName: string;
 };
+
+export type ModerationStatus = "pending" | "dismissed" | "hidden" | "deleted";
+export type AdminContentReport = { id: string; prayerId: string | null; reportedUserId: string | null; groupId: string | null; reason: string; details: string | null; content: string; authorName: string; groupName: string | null; status: ModerationStatus; createdAt: string; reportCount: number };
+export type AdminKeywordDetection = { id: string; prayerId: string | null; authorId: string | null; groupId: string | null; matchedTerms: string[]; content: string; authorName: string; groupName: string | null; status: ModerationStatus; createdAt: string };
 
 const count = (value: unknown) => Number(value ?? 0);
 const series = (value: unknown): AdminMetricSeries => Array.isArray(value)
@@ -163,4 +167,23 @@ export async function getAdminActionLogs(supabase: SupabaseClient, limit = 30): 
     createdAt: String(row.created_at),
     actorName: String(row.actor_name ?? "관리자"),
   }));
+}
+
+export async function getAdminModerationCenter(supabase: SupabaseClient) {
+  const { data, error } = await supabase.rpc("get_admin_moderation_center");
+  if (error) throw error;
+  const row = (data ?? {}) as Record<string, unknown>;
+  const reports: AdminContentReport[] = (Array.isArray(row.reports) ? row.reports : []).map((item: Record<string, unknown>) => ({
+    id: String(item.id), prayerId: item.prayer_id ? String(item.prayer_id) : null, reportedUserId: item.reported_user_id ? String(item.reported_user_id) : null,
+    groupId: item.group_id ? String(item.group_id) : null, reason: String(item.reason), details: item.details ? String(item.details) : null,
+    content: String(item.content_snapshot ?? ""), authorName: String(item.author_name_snapshot ?? "사용자"), groupName: item.group_name_snapshot ? String(item.group_name_snapshot) : null,
+    status: item.status as ModerationStatus, createdAt: String(item.created_at), reportCount: count(item.report_count),
+  }));
+  const detections: AdminKeywordDetection[] = (Array.isArray(row.detections) ? row.detections : []).map((item: Record<string, unknown>) => ({
+    id: String(item.id), prayerId: item.prayer_id ? String(item.prayer_id) : null, authorId: item.author_id ? String(item.author_id) : null,
+    groupId: item.group_id ? String(item.group_id) : null, matchedTerms: Array.isArray(item.matched_terms) ? item.matched_terms.map(String) : [],
+    content: String(item.content_snapshot ?? ""), authorName: String(item.author_name_snapshot ?? "사용자"), groupName: item.group_name_snapshot ? String(item.group_name_snapshot) : null,
+    status: item.status as ModerationStatus, createdAt: String(item.created_at),
+  }));
+  return { pendingReportCount: count(row.pending_report_count), pendingDetectionCount: count(row.pending_detection_count), reports, detections };
 }

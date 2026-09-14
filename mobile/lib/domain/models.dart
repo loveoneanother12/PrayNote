@@ -18,6 +18,7 @@ class PrayerItem {
     required this.id,
     required this.content,
     required this.authorName,
+    required this.authorId,
     required this.createdAt,
     required this.groupIds,
     required this.groupNames,
@@ -30,6 +31,7 @@ class PrayerItem {
   final String id;
   final String content;
   final String authorName;
+  final String? authorId;
   final DateTime createdAt;
   final List<String> groupIds;
   final List<String> groupNames;
@@ -48,6 +50,7 @@ class PrayerItem {
       id: id,
       content: content,
       authorName: authorName,
+      authorId: authorId,
       createdAt: createdAt,
       groupIds: groupIds,
       groupNames: groupNames,

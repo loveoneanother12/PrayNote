@@ -16,6 +16,7 @@ import {
 import { redirect } from "next/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { BrowserPushSettings } from "@/components/browser-push-settings";
+import { BlockedUsersSettings } from "@/components/blocked-users-settings";
 import { AccountDeletion } from "@/components/account-deletion";
 import {
   InstantNotificationPreferencesForm,
@@ -26,7 +27,7 @@ import { PrayerReminderSettings } from "@/components/prayer-reminder-settings";
 import { QuietHoursSettings } from "@/components/quiet-hours-settings";
 import { SubpageNav } from "@/components/subpage-nav";
 import { createClient } from "@/lib/supabase/server";
-import { getSettingsBundle } from "@/lib/settings-queries";
+import { getBlockedUsers, getSettingsBundle } from "@/lib/settings-queries";
 
 type SettingsPageProps = {
   searchParams: Promise<{ saved?: string; error?: string; linked?: string }>;
@@ -34,7 +35,7 @@ type SettingsPageProps = {
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const supabase = await createClient();
-  const [bundle, query] = await Promise.all([getSettingsBundle(supabase), searchParams]);
+  const [bundle, query, blockedUsers] = await Promise.all([getSettingsBundle(supabase), searchParams, getBlockedUsers(supabase)]);
   if (!bundle) redirect("/login?next=/settings");
   const { preferences, reminderTimes } = bundle;
 
@@ -164,6 +165,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <div><strong>로그아웃</strong><span>이 기기에서 PrayNote 사용을 종료합니다.</span></div>
             <InstantSignOutButton />
           </section>
+
+          <BlockedUsersSettings initialUsers={blockedUsers} />
 
           <section className="settings-panel account-panel withdrawal-panel">
             <div><strong>회원 탈퇴</strong><span>계정과 개인 데이터를 영구적으로 정리합니다.</span></div>

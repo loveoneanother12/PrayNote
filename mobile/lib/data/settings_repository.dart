@@ -13,6 +13,7 @@ abstract class SettingsRepository {
   Future<void> removeReminder(String id);
   Future<bool> loadGroupMuted(String groupId);
   Future<void> setGroupMuted(String groupId, bool muted);
+  Future<void> unblockUser(String userId);
 }
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
@@ -91,6 +92,15 @@ class DemoSettingsRepository implements SettingsRepository {
       _mutedGroups.remove(groupId);
     }
   }
+
+  @override
+  Future<void> unblockUser(String userId) async {
+    _settings = _settings.copyWith(
+      blockedUsers: _settings.blockedUsers
+          .where((user) => user.id != userId)
+          .toList(),
+    );
+  }
 }
 
 class SupabaseSettingsRepository implements SettingsRepository {
@@ -113,6 +123,16 @@ class SupabaseSettingsRepository implements SettingsRepository {
         time: _trimTime(item['time_local'] as String?),
       );
     }).toList();
+    final blockedUsers = ((bundle['blocked_users'] as List?) ?? const []).map((
+      rawItem,
+    ) {
+      final item = Map<String, dynamic>.from(rawItem as Map);
+      return BlockedUser(
+        id: item['user_id'] as String,
+        displayName: item['display_name'] as String? ?? '사용자',
+        profileColor: item['profile_color'] as String? ?? 'indigo',
+      );
+    }).toList();
     return AccountSettings(
       userId: bundle['user_id'] as String,
       email: bundle['email'] as String? ?? '',
@@ -132,6 +152,7 @@ class SupabaseSettingsRepository implements SettingsRepository {
         quietEnd: _trimTime(preferences['quiet_end'] as String?),
       ),
       reminders: reminders,
+      blockedUsers: blockedUsers,
     );
   }
 
@@ -191,6 +212,11 @@ class SupabaseSettingsRepository implements SettingsRepository {
       'group_id': groupId,
       'push_muted': muted,
     });
+  }
+
+  @override
+  Future<void> unblockUser(String userId) async {
+    await _client.rpc('unblock_user', params: {'target_user_id': userId});
   }
 }
 

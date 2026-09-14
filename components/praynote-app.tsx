@@ -32,6 +32,7 @@ import { InstallGuideModal } from "@/components/install-guide-modal";
 import { InstallCampaignModal } from "@/components/install-campaign-modal";
 import { BrandMark } from "@/components/brand-mark";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
+import { PrayerSafetyMenu } from "@/components/prayer-safety-menu";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
 import { restoreDashboardPreview, restoreGroupOrder, saveDashboardPreview, saveGroupOrder } from "@/lib/client-group-preferences";
@@ -246,6 +247,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
                               <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="pray-button" />
                             </div>
                             {prayer.authorId === userId && <PrayerOwnerActions prayerId={prayer.id} initialContent={contentOverrides[prayer.id] ?? prayer.content} initialSharedGroups={prayer.groupIds.map((id, index) => ({ id, name: prayer.groupNames[index] ?? "공유 그룹" }))} groups={groups} onContentChange={(content) => setContentOverrides((current) => ({ ...current, [prayer.id]: content }))} compact />}
+                            {prayer.authorId && prayer.authorId !== userId && <PrayerSafetyMenu prayerId={prayer.id} authorId={prayer.authorId} authorName={prayer.authorName} />}
                             <Link className="more-button" href={`/prayers/${prayer.id}`} aria-label={`${prayer.authorName}님의 기도제목 자세히 보기`}><ChevronRight size={19} /></Link>
                           </article>
                         ))}

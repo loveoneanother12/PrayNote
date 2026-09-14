@@ -72,6 +72,46 @@ class DashboardController extends AsyncNotifier<DashboardData> {
     }
   }
 
+  Future<bool> reportPrayer(
+    PrayerItem prayer,
+    String reason,
+    String? details,
+  ) async {
+    final current = state.value;
+    if (current == null) return false;
+    try {
+      await _repository.reportPrayer(prayer.id, reason, details);
+      state = AsyncData(
+        current.copyWith(
+          prayers: current.prayers
+              .where((item) => item.id != prayer.id)
+              .toList(),
+        ),
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> blockUser(PrayerItem prayer) async {
+    final current = state.value;
+    if (current == null || prayer.authorId == null) return false;
+    try {
+      await _repository.blockUser(prayer.authorId!);
+      state = AsyncData(
+        current.copyWith(
+          prayers: current.prayers
+              .where((item) => item.authorId != prayer.authorId)
+              .toList(),
+        ),
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   void _replacePrayer(PrayerItem replacement) {
     final current = state.value;
     if (current == null) return;

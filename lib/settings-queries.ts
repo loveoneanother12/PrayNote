@@ -3,6 +3,8 @@ import type { ProfileColor } from "@/lib/domain";
 import { normalizeProfileColor } from "./profile-colors";
 import { retrySupabaseRead } from "./supabase/retry-read";
 
+type BlockedUser = { userId: string; displayName: string; profileColor: ProfileColor; blockedAt: string };
+
 export type SettingsBundle = {
   userId: string;
   email: string;
@@ -50,4 +52,15 @@ export async function getSettingsBundle(supabase: SupabaseClient): Promise<Setti
     preferences: row.preferences ?? {},
     reminderTimes: row.reminder_times ?? [],
   };
+}
+
+export async function getBlockedUsers(supabase: SupabaseClient): Promise<BlockedUser[]> {
+  const { data, error } = await retrySupabaseRead(() => supabase.rpc("get_blocked_users"));
+  if (error) throw error;
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    userId: String(row.user_id),
+    displayName: String(row.display_name ?? "사용자"),
+    profileColor: normalizeProfileColor(String(row.profile_color ?? "indigo")),
+    blockedAt: String(row.blocked_at),
+  }));
 }

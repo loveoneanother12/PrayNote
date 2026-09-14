@@ -40,7 +40,7 @@ export default async function PrayerDetailPage({ params, searchParams }: PrayerD
           <article className="prayer-detail-card">
             <div className="prayer-detail-author"><ProfileDot color={prayer.authorColor} label={prayer.authorName} size="large" /><div><strong>{mine ? "나" : prayer.authorName}</strong><span>{prayer.groupName}</span></div></div>
             <div className="detail-dates"><span><CalendarDays size={14} />{formatKoreaDate(prayer.createdAt)} 등록</span>{completed && prayer.completedAt && <span className="resolved"><Check size={14} />{formatKoreaDate(prayer.completedAt)} 해결</span>}</div>
-            {mine ? <PrayerDetailContent prayer={prayer} groups={bundle.myGroups} /> : <p className="prayer-full-content">{prayer.content}</p>}
+            <PrayerDetailContent prayer={prayer} groups={bundle.myGroups} currentUserId={bundle.userId} />
             <div className="detail-actions">
               {!completed && <InstantPrayerButton prayerId={prayer.id} initialHasPrayed={prayer.hasPrayed} initialResponseCount={prayer.responseCount} className="daily-prayer-button detail-pray" countPrefix="누적 " iconSize={17} />}
               {mine && <InstantPrayerStatusButton prayerId={prayer.id} initialStatus={prayer.status} initialCompletedAt={prayer.completedAt} className="resolve-button detail-resolve" refreshAfterSuccess />}

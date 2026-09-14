@@ -77,6 +77,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             const SizedBox(height: 14),
             _PrayerReminders(state: state),
             const SizedBox(height: 14),
+            _BlockedUsers(state: state),
+            const SizedBox(height: 14),
             Card(
               child: Column(
                 children: [
@@ -124,6 +126,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       ),
     );
   }
+}
+
+class _BlockedUsers extends ConsumerWidget {
+  const _BlockedUsers({required this.state});
+  final SettingsState state;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => Card(
+    child: ExpansionTile(
+      leading: const Icon(Icons.person_off_outlined),
+      title: const Text('차단한 사용자'),
+      subtitle: Text('${state.account.blockedUsers.length}명'),
+      children: state.account.blockedUsers.isEmpty
+          ? const [
+              Padding(
+                padding: EdgeInsets.all(18),
+                child: Text('차단한 사용자가 없습니다.'),
+              ),
+            ]
+          : state.account.blockedUsers
+                .map(
+                  (user) => ListTile(
+                    title: Text(user.displayName),
+                    trailing: TextButton(
+                      onPressed: () =>
+                          ref.read(settingsProvider.notifier).unblockUser(user),
+                      child: const Text('차단 해제'),
+                    ),
+                  ),
+                )
+                .toList(),
+    ),
+  );
 }
 
 class _SyncStatus extends StatelessWidget {

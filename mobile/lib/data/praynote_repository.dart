@@ -14,6 +14,8 @@ abstract class PrayNoteRepository {
   });
   Future<bool> togglePrayed(String prayerId);
   Future<void> setPrayerCompleted(String prayerId, bool completed);
+  Future<void> reportPrayer(String prayerId, String reason, String? details);
+  Future<void> blockUser(String userId);
 }
 
 final repositoryProvider = Provider<PrayNoteRepository>((ref) {
@@ -47,6 +49,7 @@ class DemoPrayNoteRepository implements PrayNoteRepository {
       id: 'prayer-1',
       content: '이번 주 중요한 선택 앞에서 지혜롭게 결정할 수 있도록 기도해주세요.',
       authorName: '이현재',
+      authorId: 'demo-user',
       createdAt: DateTime.now().subtract(const Duration(hours: 2)),
       groupIds: const ['group-1'],
       groupNames: const ['우리 교회 청년부'],
@@ -58,6 +61,7 @@ class DemoPrayNoteRepository implements PrayNoteRepository {
       id: 'prayer-2',
       content: '가족 모두 건강하고 서로를 더 따뜻하게 이해할 수 있기를 기도해요.',
       authorName: '서진',
+      authorId: 'demo-other',
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
       groupIds: const ['group-2'],
       groupNames: const ['가족 기도방'],
@@ -70,6 +74,7 @@ class DemoPrayNoteRepository implements PrayNoteRepository {
       id: 'prayer-3',
       content: '오늘 하루 조급해하지 않고 감사하는 마음을 지킬 수 있도록.',
       authorName: '이현재',
+      authorId: 'demo-user',
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
       groupIds: const [],
       groupNames: const [],
@@ -101,6 +106,7 @@ class DemoPrayNoteRepository implements PrayNoteRepository {
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       content: content.trim(),
       authorName: '이현재',
+      authorId: 'demo-user',
       createdAt: DateTime.now(),
       groupIds: groups.map((group) => group.id).toList(),
       groupNames: groups.map((group) => group.name).toList(),
@@ -132,6 +138,20 @@ class DemoPrayNoteRepository implements PrayNoteRepository {
       ),
     );
     return next;
+  }
+
+  @override
+  Future<void> reportPrayer(
+    String prayerId,
+    String reason,
+    String? details,
+  ) async {
+    _prayers.removeWhere((prayer) => prayer.id == prayerId);
+  }
+
+  @override
+  Future<void> blockUser(String userId) async {
+    _prayers.removeWhere((prayer) => prayer.authorId == userId);
   }
 }
 
@@ -210,6 +230,7 @@ class SupabasePrayNoteRepository implements PrayNoteRepository {
       id: id,
       content: content.trim(),
       authorName: user.userMetadata?['display_name'] as String? ?? '나',
+      authorId: user.id,
       createdAt: DateTime.now(),
       groupIds: groups.map((group) => group.id).toList(),
       groupNames: groups.map((group) => group.name).toList(),
@@ -240,11 +261,35 @@ class SupabasePrayNoteRepository implements PrayNoteRepository {
     return result == true;
   }
 
+  @override
+  Future<void> reportPrayer(
+    String prayerId,
+    String reason,
+    String? details,
+  ) async {
+    await _client.rpc(
+      'report_prayer',
+      params: {
+        'target_prayer_id': prayerId,
+        'report_reason': reason,
+        'report_details': details?.trim().isEmpty == true
+            ? null
+            : details?.trim(),
+      },
+    );
+  }
+
+  @override
+  Future<void> blockUser(String userId) async {
+    await _client.rpc('block_user', params: {'target_user_id': userId});
+  }
+
   static PrayerItem _mapPrayer(Map<String, dynamic> item, String userId) {
     return PrayerItem(
       id: item['id'] as String,
       content: item['content'] as String? ?? '',
       authorName: item['author_name'] as String? ?? '탈퇴한 사용자',
+      authorId: item['author_id'] as String?,
       createdAt:
           DateTime.tryParse(item['created_at'] as String? ?? '') ??
           DateTime.now(),

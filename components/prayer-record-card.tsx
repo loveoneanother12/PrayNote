@@ -5,6 +5,7 @@ import { CalendarDays, Check } from "lucide-react";
 import { useState } from "react";
 import { InstantPrayerButton, InstantPrayerStatusButton } from "@/components/instant-prayer-actions";
 import { PrayerOwnerActions } from "@/components/prayer-owner-actions";
+import { PrayerSafetyMenu } from "@/components/prayer-safety-menu";
 import { ProfileDot } from "@/components/profile-dot";
 import { formatKoreaDate } from "@/lib/dates";
 import type { PrayerStatus, PrayerSummary } from "@/lib/domain";
@@ -25,10 +26,12 @@ export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, gro
   const [localStatus, setLocalStatus] = useState<PrayerStatus>(prayer.status);
   const [localCompletedAt, setLocalCompletedAt] = useState(prayer.completedAt);
   const [content, setContent] = useState(prayer.content);
+  const [hidden, setHidden] = useState(false);
   const status = controlledStatus ?? localStatus;
   const completedAt = controlledCompletedAt === undefined ? localCompletedAt : controlledCompletedAt;
   const completed = status === "completed";
 
+  if (hidden) return null;
   return (
     <article className={`record-card ${completed ? "resolved" : ""}`}>
       <div className="record-card-head">
@@ -38,6 +41,7 @@ export function PrayerRecordCard({ prayer, currentUserId, showGroup = false, gro
           <span><CalendarDays size={13} />{formatKoreaDate(prayer.createdAt)} 등록{showGroup ? ` · ${prayer.groupName}` : ""}</span>
         </div>
         {mine && <PrayerOwnerActions prayerId={prayer.id} initialContent={content} initialSharedGroups={prayer.groupIds.map((id, index) => ({ id, name: prayer.groupNames[index] ?? "공유 그룹" }))} groups={groups} onContentChange={setContent} compact />}
+        {!mine && prayer.authorId && <PrayerSafetyMenu prayerId={prayer.id} authorId={prayer.authorId} authorName={prayer.authorName} onHidden={() => setHidden(true)} />}
         {completed && <em><Check size={14} />해결됨</em>}
       </div>
       <Link className="record-content-link" href={`/prayers/${prayer.id}`}>

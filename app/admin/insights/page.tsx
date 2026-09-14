@@ -6,7 +6,7 @@ import { getAdminActionLogs, getAdminInsights, isSuperAdmin, type AdminActionLog
 import { createClient } from "@/lib/supabase/server";
 
 const number = new Intl.NumberFormat("ko-KR");
-const actionLabels: Record<AdminActionLog["action"], string> = { "user.suspended": "계정 정지", "user.unsuspended": "정지 해제", "user.signed_out": "강제 로그아웃", "user.deleted": "계정 영구 삭제" };
+const actionLabels: Record<AdminActionLog["action"], string> = { "user.suspended": "계정 정지", "user.unsuspended": "정지 해제", "user.signed_out": "강제 로그아웃", "user.deleted": "계정 영구 삭제", "report.dismissed": "신고 문제없음", "report.hidden": "신고 게시물 숨김", "report.deleted": "신고 게시물 삭제", "detection.dismissed": "감지 문제없음", "detection.hidden": "감지 게시물 숨김", "detection.deleted": "감지 게시물 삭제" };
 type Metric = { label: string; value: number; helper: string; icon: ElementType; tone: string; suffix?: string };
 
 function formatDate(value: string) { return new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value)); }

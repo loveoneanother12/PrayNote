@@ -198,6 +198,24 @@ class SettingsController extends AsyncNotifier<SettingsState> {
     }
   }
 
+  Future<void> unblockUser(BlockedUser user) async {
+    final current = state.value;
+    if (current == null) return;
+    final nextUsers = current.account.blockedUsers
+        .where((item) => item.id != user.id)
+        .toList();
+    state = AsyncData(
+      current.copyWith(
+        account: current.account.copyWith(blockedUsers: nextUsers),
+      ),
+    );
+    try {
+      await _repository.unblockUser(user.id);
+    } catch (_) {
+      state = AsyncData(current.copyWith(message: '차단을 해제하지 못했어요.'));
+    }
+  }
+
   void _optimistic(SettingsState next, String key) {
     state = AsyncData(
       next.copyWith(

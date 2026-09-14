@@ -57,6 +57,17 @@ class ReminderTime {
   final String time;
 }
 
+class BlockedUser {
+  const BlockedUser({
+    required this.id,
+    required this.displayName,
+    required this.profileColor,
+  });
+  final String id;
+  final String displayName;
+  final String profileColor;
+}
+
 class AccountSettings {
   const AccountSettings({
     required this.userId,
@@ -65,6 +76,7 @@ class AccountSettings {
     required this.profileColor,
     required this.notifications,
     required this.reminders,
+    this.blockedUsers = const [],
   });
 
   final String userId;
@@ -73,12 +85,14 @@ class AccountSettings {
   final String profileColor;
   final NotificationSettings notifications;
   final List<ReminderTime> reminders;
+  final List<BlockedUser> blockedUsers;
 
   AccountSettings copyWith({
     String? displayName,
     String? profileColor,
     NotificationSettings? notifications,
     List<ReminderTime>? reminders,
+    List<BlockedUser>? blockedUsers,
   }) {
     return AccountSettings(
       userId: userId,
@@ -87,6 +101,7 @@ class AccountSettings {
       profileColor: profileColor ?? this.profileColor,
       notifications: notifications ?? this.notifications,
       reminders: reminders ?? this.reminders,
+      blockedUsers: blockedUsers ?? this.blockedUsers,
     );
   }
 }

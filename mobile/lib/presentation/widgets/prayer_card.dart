@@ -84,6 +84,66 @@ class PrayerCard extends ConsumerWidget {
                       ),
                     ],
                   ),
+                if (!prayer.isMine && prayer.authorId != null)
+                  PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.more_horiz_rounded, size: 20),
+                    tooltip: '신고 및 차단',
+                    onSelected: (value) async {
+                      if (value == 'report') {
+                        final reason = await _showReportDialog(context);
+                        if (reason != null && context.mounted) {
+                          final ok = await ref
+                              .read(dashboardProvider.notifier)
+                              .reportPrayer(prayer, reason, null);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  ok
+                                      ? '신고를 접수하고 이 기도제목을 숨겼어요.'
+                                      : '신고를 접수하지 못했어요.',
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      } else if (value == 'block') {
+                        final ok = await ref
+                            .read(dashboardProvider.notifier)
+                            .blockUser(prayer);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                ok
+                                    ? '${prayer.authorName}님을 차단했어요.'
+                                    : '사용자를 차단하지 못했어요.',
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: 'report',
+                        child: ListTile(
+                          leading: Icon(Icons.flag_outlined),
+                          title: Text('신고하기'),
+                          dense: true,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'block',
+                        child: ListTile(
+                          leading: Icon(Icons.block_rounded),
+                          title: Text('이 사용자 차단'),
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -133,3 +193,25 @@ class PrayerCard extends ConsumerWidget {
     );
   }
 }
+
+Future<String?> _showReportDialog(BuildContext context) => showDialog<String>(
+  context: context,
+  builder: (context) => SimpleDialog(
+    title: const Text('신고 사유를 선택해주세요'),
+    children:
+        const [
+              ('spam', '스팸·광고'),
+              ('harassment', '비방·명예훼손'),
+              ('inappropriate', '부적절한 내용'),
+              ('personal_info', '개인정보 노출'),
+              ('other', '기타'),
+            ]
+            .map(
+              (item) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, item.$1),
+                child: Text(item.$2),
+              ),
+            )
+            .toList(),
+  ),
+);

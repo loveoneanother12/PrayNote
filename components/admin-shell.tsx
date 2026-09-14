@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, BarChart3, ShieldCheck, Users } from "lucide-react";
+import { ArrowLeft, BarChart3, Flag, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { BrandMark } from "@/components/brand-mark";
 
-export function AdminShell({ active, children }: { active: "insights" | "users"; children: ReactNode }) {
+export function AdminShell({ active, children }: { active: "insights" | "users" | "reports"; children: ReactNode }) {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
@@ -12,6 +12,7 @@ export function AdminShell({ active, children }: { active: "insights" | "users";
         <nav aria-label="관리자 메뉴">
           <Link className={active === "insights" ? "active" : ""} href="/admin/insights"><BarChart3 size={18} />인사이트</Link>
           <Link className={active === "users" ? "active" : ""} href="/admin/users"><Users size={18} />회원 관리</Link>
+          <Link className={active === "reports" ? "active" : ""} href="/admin/reports"><Flag size={18} />신고 관리</Link>
         </nav>
         <Link className="admin-back" href="/settings"><ArrowLeft size={16} />PrayNote 설정으로</Link>
       </aside>
