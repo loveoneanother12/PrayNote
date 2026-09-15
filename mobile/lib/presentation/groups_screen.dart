@@ -16,7 +16,11 @@ class GroupsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboard = ref.watch(dashboardProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('내 그룹')),
+      appBar: AppBar(
+        toolbarHeight: 52,
+        title: const Text('내 그룹'),
+        titleTextStyle: PrayNoteType.pageTitle.copyWith(fontSize: 22),
+      ),
       body: dashboard.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _GroupError(
@@ -38,13 +42,13 @@ class GroupsScreen extends ConsumerWidget {
                   ],
                 )
               : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+                  padding: const EdgeInsets.fromLTRB(18, 2, 18, 28),
                   itemCount: data.groups.length + 1,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 2),
                         child: SectionHeader(
                           title: '함께하는 공동체',
                           description:
@@ -55,25 +59,28 @@ class GroupsScreen extends ConsumerWidget {
                     final group = data.groups[index - 1];
                     return Card(
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(18),
                         onTap: () => context.go('/groups/${group.id}'),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 13,
+                          ),
                           child: Row(
                             children: [
                               Container(
-                                width: 44,
-                                height: 44,
+                                width: 40,
+                                height: 40,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFEEF1FF),
-                                  borderRadius: BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(13),
                                 ),
                                 child: const Icon(
                                   Icons.groups_rounded,
                                   color: brandColor,
                                 ),
                               ),
-                              const SizedBox(width: 13),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +98,7 @@ class GroupsScreen extends ConsumerWidget {
                                         style: PrayNoteType.caption,
                                       ),
                                     ],
-                                    const SizedBox(height: 7),
+                                    const SizedBox(height: 4),
                                     Text(
                                       '멤버 ${group.memberCount}명 · 기도 ${group.prayerCount}개',
                                       style: PrayNoteType.label,
@@ -154,34 +161,37 @@ class GroupDetailScreen extends ConsumerWidget {
           return RefreshIndicator(
             onRefresh: () => ref.read(dashboardProvider.notifier).refresh(),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 30),
               children: [
                 SoftPanel(
                   color: const Color(0xFFF0F3FF),
                   borderColor: const Color(0xFFDDE3FA),
-                  padding: const EdgeInsets.all(17),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 13,
+                  ),
                   child: Row(
                     children: [
                       const CircleAvatar(
-                        radius: 22,
+                        radius: 19,
                         backgroundColor: Colors.white,
                         foregroundColor: brandColor,
                         child: Icon(Icons.groups_rounded),
                       ),
-                      const SizedBox(width: 13),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(group.name, style: PrayNoteType.pageTitle),
-                            const SizedBox(height: 3),
+                            Text(group.name, style: PrayNoteType.sectionTitle),
+                            const SizedBox(height: 2),
                             Text(
                               group.description ?? '함께 기도하는 공동체',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: PrayNoteType.caption,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Row(
                               children: [
                                 CountPill(label: '멤버 ${group.memberCount}'),
@@ -195,14 +205,14 @@ class GroupDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 FilledButton.icon(
                   onPressed: () =>
                       showPrayerComposer(context, initialGroup: group),
                   icon: const Icon(Icons.edit_rounded, size: 19),
                   label: Text('${group.name}에 기도제목 나누기'),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 SectionHeader(
                   title: '함께 기도 중',
                   description: '${active.length}개의 기도제목이 기다리고 있어요.',

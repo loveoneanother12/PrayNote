@@ -70,7 +70,7 @@ class _NotificationGroups extends ConsumerWidget {
       children: [
         SectionHeader(title: title, description: '${values.length}개의 소식'),
         ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
           child: ColoredBox(
             color: Colors.white,
             child: Column(
@@ -122,7 +122,7 @@ class _NotificationTile extends StatelessWidget {
     child: InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 13),
+        padding: const EdgeInsets.fromLTRB(15, 16, 15, 15),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -154,7 +154,7 @@ class _NotificationTile extends StatelessWidget {
                     item.message,
                     style: PrayNoteType.body.copyWith(
                       fontWeight: item.isUnread
-                          ? FontWeight.w500
+                          ? FontWeight.w600
                           : FontWeight.w400,
                     ),
                   ),

@@ -77,7 +77,7 @@ class _MyScreenState extends ConsumerState<MyScreen> {
                   longestStreak: data.longestStreak,
                   onEdit: () => showProfileEditor(context),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 SectionHeader(
                   title: '기도 달력',
                   description: '기록한 날을 누르면 그날의 기도제목을 볼 수 있어요.',
@@ -124,7 +124,7 @@ class _MyScreenState extends ConsumerState<MyScreen> {
                       child: PrayerCard(prayer: prayer),
                     ),
                   ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 SectionHeader(
                   title: '내 기도제목',
                   description: '진행 중인 기도와 응답받은 기록을 함께 돌아보세요.',
@@ -206,7 +206,7 @@ class _ProfileRhythm extends StatelessWidget {
       orElse: () => ((currentStreak ~/ 100) + 1) * 100,
     );
     return SoftPanel(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(17),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -234,7 +234,7 @@ class _ProfileRhythm extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
           Row(
             children: [
               Container(

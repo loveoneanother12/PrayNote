@@ -56,9 +56,13 @@ class HomeScreen extends ConsumerWidget {
                   style: PrayNoteType.label.copyWith(color: brandColor),
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  '평안한 하루예요, ${data.displayName}님.',
-                  style: PrayNoteType.hero,
+                Wrap(
+                  spacing: 7,
+                  runSpacing: 0,
+                  children: [
+                    const Text('평안한 하루예요,', style: PrayNoteType.hero),
+                    Text('${data.displayName}님.', style: PrayNoteType.hero),
+                  ],
                 ),
                 const SizedBox(height: 18),
                 _TodayPrayerHero(
@@ -188,7 +192,7 @@ class _TodayPrayerHero extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
       children: [

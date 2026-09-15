@@ -36,6 +36,7 @@ class _PrayerComposerSheetState extends ConsumerState<PrayerComposerSheet> {
   late bool _personal;
   bool _showGroups = false;
   bool _saving = false;
+  int _characterCount = 0;
 
   @override
   void initState() {
@@ -150,12 +151,40 @@ class _PrayerComposerSheetState extends ConsumerState<PrayerComposerSheet> {
                       autofocus: true,
                       keyboardType: TextInputType.multiline,
                       textCapitalization: TextCapitalization.sentences,
+                      maxLength: 2000,
+                      buildCounter: (
+                        _, {
+                        required currentLength,
+                        required isFocused,
+                        maxLength,
+                      }) => null,
+                      onChanged: (value) =>
+                          setState(() => _characterCount = value.length),
                       decoration: const InputDecoration(
                         hintText: '기도하고 싶은 마음을 자유롭게 적어주세요.',
                         alignLabelWithHint: true,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _personal
+                                ? '나만 볼 수 있는 기도로 저장돼요.'
+                                : _selectedIds.isEmpty
+                                ? '공유할 그룹을 선택해주세요.'
+                                : '선택한 ${_selectedIds.length}개 그룹의 멤버에게 공유돼요.',
+                            style: PrayNoteType.caption,
+                          ),
+                        ),
+                        Text(
+                          '$_characterCount / 2,000',
+                          style: PrayNoteType.caption,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                     Text('공개 범위', style: PrayNoteType.sectionTitle),
                     const SizedBox(height: 8),
                     SegmentedButton<bool>(
@@ -258,7 +287,7 @@ class _PrayerComposerSheetState extends ConsumerState<PrayerComposerSheet> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(top: BorderSide(color: lineColor)),

@@ -16,9 +16,9 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.only(bottom: 10),
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Column(
@@ -42,10 +42,10 @@ class SoftPanel extends StatelessWidget {
   const SoftPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(18),
+    this.padding = const EdgeInsets.all(16),
     this.color = Colors.white,
     this.borderColor = lineColor,
-    this.radius = 20,
+    this.radius = 18,
   });
 
   final Widget child;
