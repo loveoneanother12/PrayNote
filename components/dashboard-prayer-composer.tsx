@@ -103,7 +103,8 @@ export function DashboardPrayerComposer({
             <span className="switch" aria-hidden="true" />
           </label>
           <label htmlFor="prayer-content">함께 기도받고 싶은 내용을 적어주세요</label>
-          <textarea id="prayer-content" name="content" autoFocus maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="솔직한 마음을 편안하게 나눠주세요." required />
+          <textarea id="prayer-content" name="content" aria-describedby="composer-guidance" autoFocus maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="솔직한 마음을 편안하게 나눠주세요." required />
+          <p className="composer-guidance" id="composer-guidance">{personalPrayer ? "나만 볼 수 있는 기도로 저장돼요." : selectedGroupIds.length > 0 ? `선택한 ${selectedGroupIds.length}개 그룹의 멤버에게 공유돼요.` : "공유할 그룹을 선택하거나 개인 기도제목을 켜주세요."}</p>
           <div className="composer-footer"><span>{draft.length} / 2,000</span><div><button type="button" className="cancel-button" onClick={onClose} disabled={pending}>취소</button><button className={`primary-button ${pending ? "button-pending" : ""}`} type="submit" disabled={pending || !draft.trim() || (!personalPrayer && selectedGroupIds.length === 0)}>{pending ? <><LoaderCircle className="button-spinner" size={15} />등록 중…</> : "기도제목 등록"}</button></div></div>
         </form>
       </div>
