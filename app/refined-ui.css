@@ -41,7 +41,9 @@ button, a, input, textarea, select { touch-action: manipulation; }
   background: linear-gradient(120deg, #fff, #f2f4fd);
   box-shadow: none;
 }
-.welcome-row h1 { font-size: clamp(26px, 3vw, 34px); line-height: 1.35; letter-spacing: -.035em; }
+.welcome-row h1 { max-width: 100%; font-size: clamp(26px, 3vw, 34px); line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
+.welcome-row h1 > span { display: inline-block; }
+.welcome-name { white-space: nowrap; }
 .eyebrow { font-size: 12px; font-weight: 500; }
 .overview-trigger { background: #fff; }
 .overview-title, .prayer-copy, .group-copy { min-width: 0; }
@@ -63,6 +65,15 @@ button, a, input, textarea, select { touch-action: manipulation; }
   box-shadow: none;
   padding: 8px 0 22px;
 }
+.groups-dashboard-hero { min-height: 0; align-items: center; gap: 20px; }
+.groups-dashboard-title { gap: 13px; }
+.groups-dashboard-icon { width: 46px; height: 46px; border-radius: 14px; box-shadow: 0 5px 14px rgba(78,99,197,.14); }
+.groups-dashboard-title p { margin-bottom: 2px; font-size: 10px; font-weight: 600; }
+.groups-dashboard-title h1 { margin-bottom: 3px; font-size: 26px; }
+.groups-dashboard-title > div > span { font-size: 12px; line-height: 1.45; }
+.groups-dashboard-actions { flex: 0 0 auto; gap: 7px; }
+.groups-dashboard-actions :is(a, button) { min-height: 40px; padding-inline: 13px; font-size: 12px; }
+.groups-dashboard-section { margin-top: 18px; }
 .groups-dashboard-title h1, .notifications-hero h1, .settings-hero h1 { letter-spacing: -.03em; }
 .groups-dashboard-card { min-height: 146px; }
 .group-hero { box-shadow: none; }
@@ -120,8 +131,17 @@ button, a, input, textarea, select { touch-action: manipulation; }
 
 @media (max-width: 760px) {
   .today-prayer-hero { margin-inline: 14px; padding: 22px 20px; gap: 16px; }
-  .welcome-row h1 { font-size: 26px; }
-  .groups-dashboard-hero, .notifications-hero, .settings-hero { padding: 8px 2px 18px; }
+  .welcome-row h1 { font-size: clamp(22px, 7vw, 26px); line-height: 1.38; }
+  .groups-dashboard-hero, .notifications-hero, .settings-hero { padding: 4px 2px 14px; }
+  .groups-dashboard-hero { gap: 12px; }
+  .groups-dashboard-title { gap: 11px; }
+  .groups-dashboard-icon { width: 42px; height: 42px; border-radius: 13px; }
+  .groups-dashboard-title h1 { margin-bottom: 1px; font-size: 23px; }
+  .groups-dashboard-title > div > span { font-size: 11px; }
+  .groups-dashboard-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .groups-dashboard-actions :is(a, button) { width: 100%; min-height: 40px; padding-inline: 8px; font-size: 11px; }
+  .groups-dashboard-section { margin-top: 14px; }
+  .groups-dashboard-content.detail-content { padding-top: 17px; }
   .overview-header .overview-trigger { padding-right: 48px; padding-bottom: 62px; }
   .dashboard-preview-filter-button { top: auto; bottom: 12px; right: 18px; transform: none; }
   .dashboard-preview-filter { right: 12px; }
@@ -146,6 +166,11 @@ button, a, input, textarea, select { touch-action: manipulation; }
   .composer-modal textarea { min-height: 150px; }
   .notification-row { padding: 16px 14px; }
   .settings-panel { padding: 20px 17px; }
+}
+
+@media (max-width: 390px) {
+  .welcome-row h1 { font-size: 22px; }
+  .groups-dashboard-title > div > span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

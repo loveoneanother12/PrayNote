@@ -183,7 +183,7 @@ export function PrayNoteApp({ displayName, profileColor, email, groups: initialG
           <section className="welcome-row today-prayer-hero">
             <div>
               <p className="eyebrow"><Sparkles size={15} />{todayLabel} · 오늘도 함께하는 기도</p>
-              <h1>{greeting}, {displayName}님.</h1>
+              <h1><span>{greeting},</span>{" "}<span className="welcome-name">{displayName}님.</span></h1>
               <p>서로의 마음을 기억하고, 작은 기도로 오늘을 이어가요.</p>
             </div>
             <button className="primary-button today-prayer-button" onClick={() => setComposerOpen(true)}><Plus size={19} />오늘 기도하기</button>

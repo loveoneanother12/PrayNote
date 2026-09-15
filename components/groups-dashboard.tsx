@@ -76,7 +76,6 @@ export function GroupsDashboard({ initialGroups, accountKey }: GroupsDashboardPr
           <div><p>함께 기도하는 공동체</p><h1>내 그룹</h1><span>가입한 그룹을 선택해 기도제목과 멤버 소식을 확인하세요.</span></div>
         </div>
         <div className="groups-dashboard-actions">
-          {groups.length > 1 && <button className="outline-button" type="button" onClick={() => setOrderModalOpen(true)}><ListOrdered size={17} />순서 바꾸기</button>}
           <Link className="outline-button" href="/join"><KeyRound size={17} />초대코드로 참여</Link>
           <button className="primary-button" type="button" onClick={() => setModalOpen(true)}><Plus size={18} />그룹 만들기</button>
         </div>
