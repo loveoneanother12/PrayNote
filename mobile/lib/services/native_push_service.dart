@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -62,11 +63,15 @@ class FirebaseNativePushService implements NativePushService {
   static const _devicePushKey = 'device_push_enabled';
   static const _installationIdKey = 'native_installation_id';
   static const _lastTokenKey = 'native_push_last_token';
+  static const _lastTokenUserKey = 'native_push_last_user';
   final SharedPreferences _preferences;
   final SupabaseClient _supabase;
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
   Future<void>? _initialization;
   StreamSubscription<String>? _tokenSubscription;
   StreamSubscription<RemoteMessage>? _openSubscription;
+  StreamSubscription<RemoteMessage>? _foregroundSubscription;
   ValueChanged<String>? _navigationHandler;
   String? _pendingRoute;
   NativePushStatus _status = NativePushStatus.disabled;
@@ -78,7 +83,11 @@ class FirebaseNativePushService implements NativePushService {
 
   Future<void> _initializeOnce() async {
     if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(options: AppConfig.firebaseOptions);
+      if (AppConfig.hasFirebaseOverrides) {
+        await Firebase.initializeApp(options: AppConfig.firebaseOptions);
+      } else {
+        await Firebase.initializeApp();
+      }
     }
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
@@ -86,11 +95,25 @@ class FirebaseNativePushService implements NativePushService {
           badge: true,
           sound: true,
         );
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await _localNotifications.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        ),
+        onDidReceiveNotificationResponse: (response) {
+          final route = response.payload;
+          if (route != null && route.isNotEmpty) _openRoute(route);
+        },
+      );
+      _foregroundSubscription ??= FirebaseMessaging.onMessage.listen(
+        (message) => unawaited(_showAndroidForegroundNotification(message)),
+      );
+    }
     _openSubscription ??= FirebaseMessaging.onMessageOpenedApp.listen(
       _openMessage,
     );
     _tokenSubscription ??= FirebaseMessaging.instance.onTokenRefresh.listen(
-      (token) => unawaited(_registerToken(token, force: true)),
+      (token) => unawaited(_registerTokenSafely(token)),
     );
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) _openMessage(initialMessage);
@@ -168,7 +191,8 @@ class FirebaseNativePushService implements NativePushService {
     final user = _supabase.auth.currentUser;
     if (user == null) return;
     final previous = _preferences.getString(_lastTokenKey);
-    if (!force && previous == token) return;
+    final previousUser = _preferences.getString(_lastTokenUserKey);
+    if (!force && previous == token && previousUser == user.id) return;
     await _supabase.rpc(
       'register_native_push_token',
       params: {
@@ -180,6 +204,15 @@ class FirebaseNativePushService implements NativePushService {
       },
     );
     await _preferences.setString(_lastTokenKey, token);
+    await _preferences.setString(_lastTokenUserKey, user.id);
+  }
+
+  Future<void> _registerTokenSafely(String token) async {
+    try {
+      await _registerToken(token, force: true);
+    } catch (_) {
+      _status = NativePushStatus.failed;
+    }
   }
 
   String _installationId() {
@@ -222,16 +255,42 @@ class FirebaseNativePushService implements NativePushService {
       }
     }
     await _preferences.remove(_lastTokenKey);
+    await _preferences.remove(_lastTokenUserKey);
   }
 
   void _openMessage(RemoteMessage message) {
-    final route = _routeFor(message.data);
+    _openRoute(_routeFor(message.data));
+  }
+
+  void _openRoute(String route) {
     final handler = _navigationHandler;
     if (handler == null) {
       _pendingRoute = route;
     } else {
       handler(route);
     }
+  }
+
+  Future<void> _showAndroidForegroundNotification(RemoteMessage message) async {
+    final notification = message.notification;
+    if (notification == null) return;
+    await _localNotifications.show(
+      id:
+          (message.messageId ?? message.hashCode.toString()).hashCode &
+          0x7fffffff,
+      title: notification.title,
+      body: notification.body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'praynote_activity',
+          '기도와 그룹 소식',
+          channelDescription: '기도제목, 그룹, 공지사항과 기도 챌린지 알림',
+          importance: Importance.max,
+          priority: Priority.high,
+        ),
+      ),
+      payload: _routeFor(message.data),
+    );
   }
 
   String _routeFor(Map<String, dynamic> data) {
@@ -247,5 +306,6 @@ class FirebaseNativePushService implements NativePushService {
   void dispose() {
     unawaited(_tokenSubscription?.cancel());
     unawaited(_openSubscription?.cancel());
+    unawaited(_foregroundSubscription?.cancel());
   }
 }

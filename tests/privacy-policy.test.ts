@@ -16,7 +16,7 @@ describe("legal documents and signup consent", () => {
   });
 
   it("publishes the revised privacy policy with sensitive-data and vendor disclosures", () => {
-    expect(privacyPage).toContain('effectiveDate="2026년 9월 14일"');
+    expect(privacyPage).toContain('effectiveDate="2026년 9월 16일"');
     expect(privacyPage).toContain("hyunjae.lee.edu@gmail.com");
     expect(privacyPage).toContain("개인정보 보호법 제23조");
     expect(privacyPage).toContain("Supabase, Inc.");

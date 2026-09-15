@@ -40,7 +40,10 @@
 - iOS Apple 로그인은 네이티브 인증과 nonce 검증을 사용하며 기본 활성화됩니다. 긴급 비활성화가 필요한 빌드에만 `ENABLE_APPLE_SIGN_IN=false`를 지정합니다.
 - 공식 서비스 URL은 `https://praynote.app`, 개인정보처리방침은 `https://praynote.app/privacy`, 고객지원은 `https://praynote.app/support`입니다.
 - 기기 토큰 테이블은 `supabase/migrations/202609130001_native_mobile_foundation.sql`에 있습니다.
-- 실제 알림 전송은 Firebase 프로젝트 생성, Android/iOS 앱 등록, APNs 키 연결 후 활성화됩니다.
+- 실제 알림 전송은 푸시 전용 `PrayNote Push` Firebase 프로젝트의 Android/iOS 앱 설정을 사용합니다. Firebase는 Cloud Messaging 전달에만 사용하며 인증·DB·파일 저장은 기존 Supabase 구성을 유지합니다.
+- Android의 `google-services.json`과 iOS의 `GoogleService-Info.plist`는 앱 식별용 공개 구성입니다. 로컬 개발에서 별도 Firebase 프로젝트를 쓸 때만 아래 `FIREBASE_*` 빌드 변수를 지정하면 해당 값이 우선됩니다.
+- 서버는 `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`를 배포 환경의 비밀값으로 받아 FCM HTTP v1 API만 호출합니다.
+- 알림 문구에는 이름·그룹명·기도제목을 넣지 않으며, 상세 내용은 앱에서 로그인과 그룹 권한을 확인한 뒤 조회합니다.
 
 ## 로컬 체험 실행
 
@@ -76,3 +79,45 @@ flutter test
 flutter build ios --simulator --debug
 flutter build apk --debug
 ```
+
+## Google Play 출시 번들
+
+Play 업로드 키와 비밀번호는 `android/upload-keystore.jks` 및
+`android/key.properties`에 로컬로만 보관되며 Git에서 제외됩니다.
+최초 1회 키를 만든 뒤 안전한 별도 저장소에 두 파일을 백업하세요.
+
+```sh
+chmod +x tool/create_android_upload_key.sh
+./tool/create_android_upload_key.sh
+flutter build appbundle --release
+```
+
+Google Play 등록용 아이콘과 대표 그래픽은 다음 명령으로 재생성합니다.
+
+```sh
+node tool/create_google_play_assets.mjs
+```
+
+## 스토어 스크린샷 자동화
+
+운영 계정 대신 `integration_test/app_store_screenshots_test.dart`의 가상
+이름과 기도제목만 사용합니다. 각 화면은 진입 후 3초 동안 안정화한 다음
+홈, 그룹 목록, 그룹 상세, 기도 작성, 마이, 설정 순서로 캡처됩니다.
+
+```sh
+# iPhone 6.7인치, iPhone 6.5인치 제출 규격, iPad 12.9인치
+./tool/capture_ios_store_screenshots.sh
+
+# Android 휴대폰, 7인치 태블릿, 10인치 태블릿
+./tool/capture_android_store_screenshots.sh
+```
+
+- 원본: `screenshots/raw` (Git 제외)
+- 제출용: `screenshots/store/ios`, `screenshots/store/android`
+- 재캡처: 명령 앞에 `FORCE_CAPTURE=1` 지정
+- 리사이즈만 다시 실행:
+  `.dart_tool/screenshots_venv/bin/python tool/prepare_store_screenshots.py`
+
+Xcode 26의 최신 iOS 런타임은 구형 iPhone XS Max 시뮬레이터를 지원하지
+않습니다. 6.5인치 제출 세트는 대형 iPhone 레이아웃을 별도로 캡처한 뒤
+Apple 호환 규격인 1242x2688로 정규화합니다.

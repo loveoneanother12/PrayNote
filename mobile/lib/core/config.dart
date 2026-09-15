@@ -25,7 +25,7 @@ class AppConfig {
   static bool get hasSupabase =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 
-  static bool get hasFirebase {
+  static bool get hasFirebaseOverrides {
     final appId = defaultTargetPlatform == TargetPlatform.iOS
         ? firebaseIosAppId
         : firebaseAndroidAppId;
@@ -34,6 +34,11 @@ class AppConfig {
         firebaseMessagingSenderId.isNotEmpty &&
         appId.isNotEmpty;
   }
+
+  static bool get hasFirebase =>
+      hasFirebaseOverrides ||
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android;
 
   static FirebaseOptions get firebaseOptions => FirebaseOptions(
     apiKey: firebaseApiKey,

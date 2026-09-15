@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { sendPushForNotification } from "@/lib/push";
+import { claimPushOutbox, completePushOutbox, failPushOutbox, sendPushForNotification } from "@/lib/push";
 
 export const runtime = "nodejs";
 
@@ -23,9 +23,16 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
 
   try {
+    const claimed = await claimPushOutbox(parsed.data.notification_id);
+    if (!claimed) return NextResponse.json({ delivered: 0, skipped: true, reason: "not_due" });
     const result = await sendPushForNotification(parsed.data.notification_id);
+    await completePushOutbox(parsed.data.notification_id);
     return NextResponse.json(result);
   } catch (error) {
+    await failPushOutbox(
+      parsed.data.notification_id,
+      error instanceof Error ? error.name : "delivery_failed",
+    );
     console.error("Push delivery failed", error instanceof Error ? error.message : "unknown_error");
     return NextResponse.json({ error: "delivery_failed" }, { status: 500 });
   }

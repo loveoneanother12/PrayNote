@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "88756541529",
+    "project_id": "praynote-push",
+    "storage_bucket": "praynote-push.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88756541529:android:a2c8aefe43c956c969b948",
+        "android_client_info": {
+          "package_name": "com.praynote.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVAt4k18RXL_opicX14yd6_v8GdqJQKhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
